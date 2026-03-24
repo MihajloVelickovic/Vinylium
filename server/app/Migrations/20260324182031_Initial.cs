@@ -31,8 +31,8 @@ namespace app.Migrations
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     Tracklist = table.Column<string>(type: "TEXT", nullable: false),
-                    Runtime = table.Column<string>(type: "TEXT", nullable: false),
-                    ReleaseDate = table.Column<string>(type: "TEXT", nullable: false),
+                    Runtime = table.Column<string>(type: "TEXT", maxLength: 11, nullable: false),
+                    ReleaseDate = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
                     InWarehouse = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -46,9 +46,10 @@ namespace app.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Username = table.Column<string>(type: "TEXT", nullable: false),
-                    Password = table.Column<string>(type: "TEXT", nullable: false)
+                    Email = table.Column<string>(type: "TEXT", maxLength: 254, nullable: false),
+                    Username = table.Column<string>(type: "TEXT", maxLength: 254, nullable: false),
+                    Password = table.Column<string>(type: "TEXT", maxLength: 254, nullable: false),
+                    Admin = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
