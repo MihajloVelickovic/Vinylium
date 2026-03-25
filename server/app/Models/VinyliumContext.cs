@@ -10,6 +10,7 @@ public class VinyliumContext: DbContext{
 	public DbSet<User> Users { get; set; } = null!;
 	public DbSet<Store> Locations { get; set; } = null!;
 	public DbSet<Product> Products { get; set; } = null!;
+	public DbSet<Token> Tokens{ get; set; } = null!;
 
 	public VinyliumContext(DbContextOptions options): base(options){}
 
@@ -46,6 +47,10 @@ public class VinyliumContext: DbContext{
 		builder.Entity<User>()
 		.HasIndex(u => new {u.Username, u.Password})
 		.IsUnique();
+
+		builder.Entity<Token>()
+		.HasOne(u => u.User)
+		.WithMany();
 
 	}
 

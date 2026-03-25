@@ -10,6 +10,8 @@ namespace app.Services;
 public interface IUserService{
 	Task<User> RegisterUserAsync(RegisterReq req);
 	Task<User> LoginUserAsync(LoginReq request);
+	Task DeleteUserAsync(string username);
+	Task<User?> FindUserByEmailOrUsernameAsync(string username);
 }
 
 public class UserService: IUserService{
@@ -36,6 +38,10 @@ public class UserService: IUserService{
 		
 	}
 
+	public async Task<User?> FindUserByEmailOrUsernameAsync(string username){
+		return await _userRepository.FindUserByEmailOrUsernameAsync(username);
+	}
+	
 	public async Task<User> LoginUserAsync(LoginReq request){
 		
 		var user = await _userRepository.FindUserByEmailOrUsernameAsync(request.EmailOrUsername) ??  
@@ -45,4 +51,9 @@ public class UserService: IUserService{
 		return !correctPassword ? throw new Exception("Incorrect password") : user;
 		
 	}
+	
+	public async Task DeleteUserAsync(string username){
+		await _userRepository.DeleteUserAsync(username);
+	}
+	
 }

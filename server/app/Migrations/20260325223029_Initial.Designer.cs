@@ -10,7 +10,7 @@ using app.Models;
 namespace app.Migrations
 {
     [DbContext(typeof(VinyliumContext))]
-    [Migration("20260324182031_Initial")]
+    [Migration("20260325223029_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -137,6 +137,21 @@ namespace app.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("app.Models.Token", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Tokens");
                 });
 
             modelBuilder.Entity("app.Models.User", b =>
@@ -276,6 +291,17 @@ namespace app.Migrations
                         .HasForeignKey("VinyliumId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("app.Models.Token", b =>
+                {
+                    b.HasOne("app.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("app.Models.Vinylium", b =>

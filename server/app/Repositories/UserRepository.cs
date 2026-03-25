@@ -8,6 +8,7 @@ public interface IUserRepository{
 	Task RegisterUserAsync(User user);
 	Task<User?> FindUserByEmailOrUsernameAsync(string emailOrUsername);
 
+	Task DeleteUserAsync(string username);
 }
 
 public class UserRepository:  IUserRepository{
@@ -46,5 +47,13 @@ public class UserRepository:  IUserRepository{
 		return await _dbContext.Users.Where(u => u.Email == emailOrUsername || u.Username == emailOrUsername)
 			                         .SingleOrDefaultAsync();
 
+	}
+	
+	public async Task DeleteUserAsync(string username){
+		var user = await FindUserByEmailOrUsernameAsync(username);
+		if(user == null)
+			throw new Exception($"User {username} not found");
+		_dbContext.Remove(user);
+		await _dbContext.SaveChangesAsync();
 	}
 }	
