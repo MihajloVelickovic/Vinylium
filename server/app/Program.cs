@@ -20,8 +20,23 @@ public class Program {
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowReact",
+                policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173") // React
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+        });
+        
         var app = builder.Build();
         
+        
+        app.UseRouting();
+        app.UseCors("AllowReact");
         app.UseAuthorization();
         app.MapControllers();
         app.Run();
