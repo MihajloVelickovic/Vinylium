@@ -173,11 +173,5 @@ public class UserController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
-
-	[HttpPost("Metadata")]
-	public async Task<ActionResult> Metadata([FromBody] MetadataReq request){
-		var product = await Discogs.CreateProduct(request.Barcode, request.Price);
-		return Ok(new{ metadata = product });
-	}
 	
 }
