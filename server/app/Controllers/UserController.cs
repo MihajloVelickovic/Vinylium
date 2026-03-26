@@ -99,7 +99,7 @@ public class UserController: ControllerBase{
 
 	[HttpPost("RefreshAccess")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> RefreshAccessToken([FromBody] RefreshTokenReq req){
 		try{
 			var username = await _jwtService.GetUsernameFromToken(req.RefreshToken, true);
@@ -173,5 +173,4 @@ public class UserController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
-	
 }

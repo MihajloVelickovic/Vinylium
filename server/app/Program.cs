@@ -31,9 +31,11 @@ public class Program {
         builder.Services.AddDbContext<VinyliumContext>(options => 
             options.UseSqlite($"Data Source={fullPath}"));
         
-        builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IProductService, ProductService>();
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
+        builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.AddScoped<IJwtRepository, JwtRepository>();
         
         

@@ -5,8 +5,11 @@ namespace app.Models;
 
 public class Product{
 	
-    public int Id { get; init; }
-
+	[Key]
+    public required string Barcode { get; init; }
+	
+    public required string CatalogNumber { get; init; }
+    
     public required string Name{ get; set; }
 
     public required string Artist{ get; set; }

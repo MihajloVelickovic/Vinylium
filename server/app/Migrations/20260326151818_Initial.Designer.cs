@@ -10,7 +10,7 @@ using app.Models;
 namespace app.Migrations
 {
     [DbContext(typeof(VinyliumContext))]
-    [Migration("20260325223029_Initial")]
+    [Migration("20260326151818_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,12 +24,12 @@ namespace app.Migrations
                     b.Property<int>("AvailableAtId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("ProductsBarcode")
+                        .HasColumnType("TEXT");
 
-                    b.HasKey("AvailableAtId", "ProductsId");
+                    b.HasKey("AvailableAtId", "ProductsBarcode");
 
-                    b.HasIndex("ProductsId");
+                    b.HasIndex("ProductsBarcode");
 
                     b.ToTable("ProductStore");
                 });
@@ -39,25 +39,25 @@ namespace app.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("WishlistId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("WishlistBarcode")
+                        .HasColumnType("TEXT");
 
-                    b.HasKey("UserId", "WishlistId");
+                    b.HasKey("UserId", "WishlistBarcode");
 
-                    b.HasIndex("WishlistId");
+                    b.HasIndex("WishlistBarcode");
 
                     b.ToTable("ProductUser");
                 });
 
             modelBuilder.Entity("ProductWarehouse", b =>
                 {
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("ProductsBarcode")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("ProductsId", "WarehouseId");
+                    b.HasKey("ProductsBarcode", "WarehouseId");
 
                     b.HasIndex("WarehouseId");
 
@@ -96,12 +96,27 @@ namespace app.Migrations
 
             modelBuilder.Entity("app.Models.Product", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Barcode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Artist")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CatalogNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("InWarehouse")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
@@ -123,7 +138,10 @@ namespace app.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Id");
+                    b.HasKey("Barcode");
+
+                    b.HasIndex("Barcode", "CatalogNumber")
+                        .IsUnique();
 
                     b.ToTable("Products");
                 });
@@ -228,7 +246,7 @@ namespace app.Migrations
 
                     b.HasOne("app.Models.Product", null)
                         .WithMany()
-                        .HasForeignKey("ProductsId")
+                        .HasForeignKey("ProductsBarcode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -243,7 +261,7 @@ namespace app.Migrations
 
                     b.HasOne("app.Models.Product", null)
                         .WithMany()
-                        .HasForeignKey("WishlistId")
+                        .HasForeignKey("WishlistBarcode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -252,7 +270,7 @@ namespace app.Migrations
                 {
                     b.HasOne("app.Models.Product", null)
                         .WithMany()
-                        .HasForeignKey("ProductsId")
+                        .HasForeignKey("ProductsBarcode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

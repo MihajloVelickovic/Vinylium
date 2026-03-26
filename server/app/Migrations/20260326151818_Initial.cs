@@ -26,8 +26,11 @@ namespace app.Migrations
                 name: "Products",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    Barcode = table.Column<string>(type: "TEXT", nullable: false),
+                    CatalogNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Artist = table.Column<string>(type: "TEXT", nullable: false),
+                    ImageUrl = table.Column<string>(type: "TEXT", nullable: false),
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     Tracklist = table.Column<string>(type: "TEXT", nullable: false),
@@ -37,7 +40,7 @@ namespace app.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_Products", x => x.Barcode);
                 });
 
             migrationBuilder.CreateTable(
@@ -61,11 +64,11 @@ namespace app.Migrations
                 columns: table => new
                 {
                     AvailableAtId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ProductsId = table.Column<int>(type: "INTEGER", nullable: false)
+                    ProductsBarcode = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductStore", x => new { x.AvailableAtId, x.ProductsId });
+                    table.PrimaryKey("PK_ProductStore", x => new { x.AvailableAtId, x.ProductsBarcode });
                     table.ForeignKey(
                         name: "FK_ProductStore_Locations_AvailableAtId",
                         column: x => x.AvailableAtId,
@@ -73,10 +76,10 @@ namespace app.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductStore_Products_ProductsId",
-                        column: x => x.ProductsId,
+                        name: "FK_ProductStore_Products_ProductsBarcode",
+                        column: x => x.ProductsBarcode,
                         principalTable: "Products",
-                        principalColumn: "Id",
+                        principalColumn: "Barcode",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -85,16 +88,16 @@ namespace app.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    WishlistId = table.Column<int>(type: "INTEGER", nullable: false)
+                    WishlistBarcode = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductUser", x => new { x.UserId, x.WishlistId });
+                    table.PrimaryKey("PK_ProductUser", x => new { x.UserId, x.WishlistBarcode });
                     table.ForeignKey(
-                        name: "FK_ProductUser_Products_WishlistId",
-                        column: x => x.WishlistId,
+                        name: "FK_ProductUser_Products_WishlistBarcode",
+                        column: x => x.WishlistBarcode,
                         principalTable: "Products",
-                        principalColumn: "Id",
+                        principalColumn: "Barcode",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProductUser_Users_UserId",
@@ -126,17 +129,17 @@ namespace app.Migrations
                 name: "ProductWarehouse",
                 columns: table => new
                 {
-                    ProductsId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ProductsBarcode = table.Column<string>(type: "TEXT", nullable: false),
                     WarehouseId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductWarehouse", x => new { x.ProductsId, x.WarehouseId });
+                    table.PrimaryKey("PK_ProductWarehouse", x => new { x.ProductsBarcode, x.WarehouseId });
                     table.ForeignKey(
-                        name: "FK_ProductWarehouse_Products_ProductsId",
-                        column: x => x.ProductsId,
+                        name: "FK_ProductWarehouse_Products_ProductsBarcode",
+                        column: x => x.ProductsBarcode,
                         principalTable: "Products",
-                        principalColumn: "Id",
+                        principalColumn: "Barcode",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -209,14 +212,20 @@ namespace app.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductStore_ProductsId",
-                table: "ProductStore",
-                column: "ProductsId");
+                name: "IX_Products_Barcode_CatalogNumber",
+                table: "Products",
+                columns: new[] { "Barcode", "CatalogNumber" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductUser_WishlistId",
+                name: "IX_ProductStore_ProductsBarcode",
+                table: "ProductStore",
+                column: "ProductsBarcode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductUser_WishlistBarcode",
                 table: "ProductUser",
-                column: "WishlistId");
+                column: "WishlistBarcode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductWarehouse_WarehouseId",

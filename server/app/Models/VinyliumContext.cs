@@ -44,14 +44,18 @@ public class VinyliumContext: DbContext{
 		.HasMany(p => p.Products)
 		.WithMany(s => s.AvailableAt);
 		
-		builder.Entity<User>()
-		.HasIndex(u => new {u.Username, u.Password})
-		.IsUnique();
-
 		builder.Entity<Token>()
 		.HasOne(u => u.User)
 		.WithMany();
-
+		
+		builder.Entity<User>()
+		.HasIndex(u => new {u.Username, u.Password})
+		.IsUnique();
+		
+		builder.Entity<Product>()
+		.HasIndex(p => new {p.Barcode, p.CatalogNumber})
+		.IsUnique();
+		
 	}
 
 }

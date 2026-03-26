@@ -24,35 +24,60 @@ public static class Discogs{
 		_secret = secret;
 	}
 
-	public static async Task<Product> CreateProduct(string code, decimal price){
+	public static async Task<List<Product>> CreateProduct(string code, bool isBarcode, decimal price){
+		
+		/* entry data will be JArray if isBarcode 
+		 * is false and JToken if it's false.
+		 * responseJson is a helper to deal 
+		 * with these different scenarios
+		 */
+		var entryData = await GetEntryData(code, isBarcode) ?? throw new Exception("Couldn't parse entry data");
+		var responseJson = entryData;
+		if(isBarcode){
+			responseJson = new JArray(entryData);
+		}
+		
+		/* list that will be returned
+		 * the logic behind this is that barcodes are unique,
+		 * while catalog numbers aren't, so if a catalog number
+		 * is inputted, we want to return every release that
+		 * number points to and let the user choose
+		 */
+		var list = new List<Product>();
 
-		JToken entryData;
-		try{
-			entryData = await GetEntryData(code, true);
+		foreach(var data in responseJson){
+			
+			var formatString = (string?)data["format"]?[0] ?? "";
+			var releaseId = (string?)data["id"];
+			var releaseData = await GetReleaseData(releaseId);
+
+			/* deals with different barcode scenarios 
+			 * that can happen when fetching data 
+			 */
+			var barcodeList = data["barcode"] ?? new JArray();
+			
+			var barcode = barcodeList.Any() ? 
+						 (string?)barcodeList[0] ?? Guid.NewGuid().ToString() : 
+						 Guid.NewGuid().ToString();
+			
+			list.Add(new Product(){
+				Barcode = isBarcode ? code : barcode,
+				CatalogNumber = !isBarcode ? code : ((string?)data["catno"]) ?? "",
+				Name = (string?)releaseData["title"] ?? "",
+				Artist = (string?)(releaseData["artists"]?[0]?["name"]) ?? "",
+				ImageUrl = (string?)(releaseData["images"]?[0]?["resource_url"]) ?? "",
+				Price = price,
+				Runtime = GetRuntime(releaseData),
+				Type = GetFormat(formatString),
+				ReleaseDate = (string?)data["year"] ?? "",
+				InWarehouse = false,
+				Tracklist = GetTracklist(releaseData),
+			});
 		}
-		catch(Exception e){
-			entryData = await GetEntryData(code, false);
-		}
-		
-		var formatString = (string)entryData["format"]![0]!;
-		var releaseId = (string)entryData["id"]!;
-		var releaseData = await GetReleaseData(releaseId);
-		
-		return new Product(){
-			Name = (string)entryData["title"]!,
-			Artist = (string)releaseData["artists"]![0]!["name"]!,
-			ImageUrl = (string)releaseData["images"]![0]!["resource_url"]!,
-			Price = price,
-			Runtime = GetRuntime(releaseData),
-			Type = GetFormat(formatString),
-			ReleaseDate = (string)entryData["year"]!,
-			InWarehouse = false,
-			Tracklist = GetTracklist(releaseData),
-		};
-		
+		return list;
 	}
 
-	private static async Task<JToken> GetEntryData(string code, bool isBarcode){
+	private static async Task<JToken?> GetEntryData(string code, bool isBarcode){
 		var prefix = SearchPrefix();
 		var suffix = AuthSuffix();
 		var searchParameter = isBarcode ? "barcode" : "catno";
@@ -64,33 +89,43 @@ public static class Discogs{
 		var responseJObject = JObject.Parse(responseString);
 		
 		/* check if anything returned */
-		var items = (int)responseJObject["pagination"]!["items"]!;
+		var items = (int?)responseJObject["pagination"]?["items"] ?? throw new Exception("Couldn't parse pagination");
 		if(items == 0)
 			throw new Exception($"No items with code {code} found");
 		
-		/* learned the hard way that some releases don't return proper
-		 * master ids.....
-		 * so we need to iterate through all releases until we find one
-		 * also checking for the format just in case...
-		 */
 		var release = "0";
-		var index = -1;
+		var year = "0";
 		var formatString = string.Empty;
-		while((string.Equals(release, "0") ||
-		       string.Equals(formatString, string.Empty)) &&
+		var index = -1;
+		while(isBarcode && (release == "0" || release == null || 
+		       formatString == string.Empty || formatString == null ||
+		       year == "0" || year == null) &&
 		      index < items - 1){
 			
 			++index;
-			var dataField = responseJObject["results"]![index]!;
-			release = (string)dataField["id"]!;
-			formatString = (string)dataField["format"]![0]!;
+			var dataField = responseJObject["results"]?[index] ?? throw new Exception("Couldn't parse data");
+			release = (string?)dataField["id"];
+			year = (string?)dataField["year"];
+			formatString = (string?)dataField["format"]![0];
 			
 		}
-		return responseJObject["results"]![index]!;
-		
+
+		/* barcode searches can also result in multiple results
+		 * but all of those are always the same album, just sometimes
+		 * have some different metadata.
+		 * If we're searching using barcodes, we want to return one
+		 * specific release (the one with the best metadata as found
+		 * above), but when searching with cat.no-s we want to return
+		 * every release
+		 */
+		return isBarcode ? responseJObject["results"]?[index]  ?? throw new Exception("Couldn't parse data") : 
+			               responseJObject["results"] ?? throw new Exception("Couldn't parse data");
+
 	}
 	
-	private static async Task<JObject> GetReleaseData(string release){
+	private static async Task<JObject> GetReleaseData(string? release){
+		if(release == null)
+			throw new Exception("Release ID is null");
 		var requestString = ReleaseString(release);
 		using var response = await Client.GetAsync(requestString);
 		if(!response.IsSuccessStatusCode)
@@ -111,30 +146,48 @@ public static class Discogs{
 	}
 	
 	private static string GetRuntime(JObject o){
-		var tracklist = o["tracklist"]!;
+		var tracklist = o["tracklist"] ?? null;
+		if (tracklist == null)
+			throw new Exception("No tracklist found");
+		
 		var runtime = TimeSpan.Zero;
 		foreach(var track in tracklist){
-			if((string)track["type_"]! == "track"){
-				var durationString = (string)track!["duration"]!;
-				var splits = durationString.Split(':');
-				if(splits[0].Length != 2)
-					splits[0] = $"0{splits[0]}";
-				durationString = string.Join(":", splits);
-				var parsed = TimeSpan.TryParseExact(durationString, @"mm\:ss", CultureInfo.InvariantCulture,
-					out var tempTime);
-				if(parsed)
-					runtime += tempTime;
+			var type = (string?)track["type_"];
+			switch(type){
+				case null:
+					throw new Exception("Track has no type_ field");
+				case "track":{
+					var durationString = (string?)track["duration"] ?? "";
+					var splits = durationString.Split(':');
+					if(splits[0].Length != 2)
+						splits[0] = $"0{splits[0]}";
+					durationString = string.Join(":", splits);
+					var parsed = TimeSpan.TryParseExact(durationString, @"mm\:ss", CultureInfo.InvariantCulture,
+						out var tempTime);
+					if(parsed)
+						runtime += tempTime;
+					break;
+				}
 			}
 		}
 		return runtime.ToString();
 	}
 	
 	private static List<string> GetTracklist(JObject o){
-		var tracklist = o["tracklist"]!;
+		var tracklist = o["tracklist"];
+		if (tracklist == null)
+			throw new Exception("No tracklist found");
+		
 		var list = new List<string>();
 		foreach(var track in tracklist){
-			if((string)track["type_"]! == "track")	
-				list.Add((string)track!["title"]!);
+			var type = (string?)track["type_"];
+			switch(type){
+				case null:
+					throw new Exception("Track has no type_ field");
+				case "track":
+					list.Add((string?)track["title"] ?? throw new Exception("Track has no title field"));
+					break;
+			}
 		}
 
 		return list;
