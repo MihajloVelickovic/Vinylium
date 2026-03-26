@@ -9,7 +9,6 @@ namespace app.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class UserController: ControllerBase{
-
 	private readonly IUserService _userService;
 	private readonly IJwtService _jwtService;
 
@@ -22,9 +21,7 @@ public class UserController: ControllerBase{
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> Register([FromBody] RegisterReq request){
-
 		try{
-
 			/* checks if the email address from the DTO
 			 * is properly formatted, doesn't check if it's
 			 * a real address
@@ -49,19 +46,16 @@ public class UserController: ControllerBase{
 
 			var registeredUser = await _userService.RegisterUserAsync(request);
 			return Ok(new{ message = "Successfully Registered" });
-
 		}
 		catch(Exception e){
 			return BadRequest(new{ message = e.Message });
 		}
-
 	}
 
 	[HttpPost("Login")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> LogIn([FromBody] LoginReq request){
-
 		try{
 			var requestIsEmail = request.EmailOrUsername.Contains('@');
 
@@ -90,7 +84,6 @@ public class UserController: ControllerBase{
 				refreshToken = refreshToken.Result,
 				user
 			});
-
 		}
 		catch(Exception e){
 			return BadRequest(e.Message);
@@ -108,10 +101,10 @@ public class UserController: ControllerBase{
 				return Unauthorized("Invalid refresh token");
 
 			var user = await _userService.FindUserByEmailOrUsernameAsync(username);
-			
+
 			if(user == null)
 				throw new Exception($"User ${username} not found");
-			
+
 			await _jwtService.DeleteRefreshToken(req.RefreshToken);
 
 			var guid = Guid.NewGuid().ToString();
@@ -128,7 +121,7 @@ public class UserController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
-	
+
 	[Authorize]
 	[HttpPost("Logout")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
@@ -141,7 +134,6 @@ public class UserController: ControllerBase{
 
 		await _jwtService.DeleteRefreshToken(req.RefreshToken);
 		return Ok(new{ message = "Deleted Refresh Token" });
-
 	}
 
 	[Authorize]
@@ -151,7 +143,6 @@ public class UserController: ControllerBase{
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<ActionResult> Delete(RefreshTokenReq req){
 		try{
-
 			var usernameRef = await _jwtService.GetUsernameFromToken(req.RefreshToken, true);
 
 			var claim = HttpContext.User.FindFirst("username");
