@@ -23,67 +23,75 @@ public static class Discogs{
 		_key = key;
 		_secret = secret;
 	}
-	
-	public static async Task<Product> CreateProduct(string barcode, decimal price){
+
+	public static async Task<Product> CreateProduct(string code, decimal price){
+
+		JToken entryData;
+		try{
+			entryData = await GetEntryData(code, true);
+		}
+		catch(Exception e){
+			entryData = await GetEntryData(code, false);
+		}
 		
-		var master = await GetMaster(barcode);
-		var response = await GetMetadata(master.Item1);
-		 
+		var formatString = (string)entryData["format"]![0]!;
+		var releaseId = (string)entryData["id"]!;
+		var releaseData = await GetReleaseData(releaseId);
+		
 		return new Product(){
-			Name = (string)response["title"]!,
-			Artist = (string)response["artists"]![0]!["name"]!,
-			ImageUrl = (string)response["images"]![0]!["resource_url"]!,
+			Name = (string)entryData["title"]!,
+			Artist = (string)releaseData["artists"]![0]!["name"]!,
+			ImageUrl = (string)releaseData["images"]![0]!["resource_url"]!,
 			Price = price,
-			Runtime = GetRuntime(response),
-			Type = GetFormat(master.Item2),
-			ReleaseDate = (string)response["year"]!,
+			Runtime = GetRuntime(releaseData),
+			Type = GetFormat(formatString),
+			ReleaseDate = (string)entryData["year"]!,
 			InWarehouse = false,
-			Tracklist = GetTracklist(response),
+			Tracklist = GetTracklist(releaseData),
 		};
 		
 	}
-	
-	private static async Task<Tuple<string,string>> GetMaster(string barcode){
-		
+
+	private static async Task<JToken> GetEntryData(string code, bool isBarcode){
 		var prefix = SearchPrefix();
 		var suffix = AuthSuffix();
-		var requestString = $"{prefix}barcode={barcode}{suffix}";
+		var searchParameter = isBarcode ? "barcode" : "catno";
+		var requestString = $"{prefix}{searchParameter}={code}{suffix}";
 
-		using var response = await Client.GetAsync(requestString);
-		if(!response.IsSuccessStatusCode)
-			throw new Exception(response.ReasonPhrase);
-
+		var response = await Client.GetAsync(requestString);
+		
 		var responseString = await response.Content.ReadAsStringAsync();
 		var responseJObject = JObject.Parse(responseString);
 		
 		/* check if anything returned */
 		var items = (int)responseJObject["pagination"]!["items"]!;
-		if (items == 0)
-			throw new Exception($"No items with barcode {barcode} found");
+		if(items == 0)
+			throw new Exception($"No items with code {code} found");
 		
 		/* learned the hard way that some releases don't return proper
 		 * master ids.....
 		 * so we need to iterate through all releases until we find one
 		 * also checking for the format just in case...
 		 */
-		var master = "0";
-		var index = 0;
-		var format = string.Empty;
-		while((string.Equals(master, "0") ||
-		       string.Equals(format, string.Empty)) &&
-		      index < items){
-			var dataField = responseJObject["results"]![index]!;
-			master = (string)dataField["master_id"]!;
-			format = (string)dataField["format"]![0]!;
+		var release = "0";
+		var index = -1;
+		var formatString = string.Empty;
+		while((string.Equals(release, "0") ||
+		       string.Equals(formatString, string.Empty)) &&
+		      index < items - 1){
+			
 			++index;
+			var dataField = responseJObject["results"]![index]!;
+			release = (string)dataField["id"]!;
+			formatString = (string)dataField["format"]![0]!;
+			
 		}
-		
-		return index <= items ? new (master, format) : throw new Exception("Couldn't find master and format");
+		return responseJObject["results"]![index]!;
 		
 	}
 	
-	private static async Task<JObject> GetMetadata(string master){
-		var requestString = MasterString(master);
+	private static async Task<JObject> GetReleaseData(string release){
+		var requestString = ReleaseString(release);
 		using var response = await Client.GetAsync(requestString);
 		if(!response.IsSuccessStatusCode)
 			throw new Exception(response.ReasonPhrase);
@@ -94,40 +102,50 @@ public static class Discogs{
 	}
 	
 	private static ProductType GetFormat(string formatString){
-		return formatString.ToUpper() switch{
-			"CD" => ProductType.Cd,
-			"VINYL" => ProductType.Vinyl,
-			"CASSETTE" => ProductType.Cassette,
-			_ => throw new Exception($"Unknown format {formatString}")
-		};
+		return formatString.ToUpper().Contains("CD") ? ProductType.Cd :
+			   formatString.ToUpper().Contains("VINYL") ||
+			   formatString.ToUpper().Contains("LP") ||
+			   formatString.ToUpper().Contains("EP") ? ProductType.Vinyl :
+			   formatString.ToUpper().Contains("CASSETTE") ? ProductType.Cassette :
+			   throw new Exception($"Product type ${formatString} not found");
 	}
 	
 	private static string GetRuntime(JObject o){
 		var tracklist = o["tracklist"]!;
 		var runtime = TimeSpan.Zero;
 		foreach(var track in tracklist){
-			var durationString = (string)track!["duration"]!;
-			var splits = durationString.Split(':');
-			if (splits[0].Length != 2)
-				splits[0] = $"0{splits[0]}";
-			durationString = string.Join(":", splits);
-			var tempTime = TimeSpan.ParseExact(durationString, @"mm\:ss", CultureInfo.InvariantCulture);
-			runtime += tempTime;
+			if((string)track["type_"]! == "track"){
+				var durationString = (string)track!["duration"]!;
+				var splits = durationString.Split(':');
+				if(splits[0].Length != 2)
+					splits[0] = $"0{splits[0]}";
+				durationString = string.Join(":", splits);
+				var parsed = TimeSpan.TryParseExact(durationString, @"mm\:ss", CultureInfo.InvariantCulture,
+					out var tempTime);
+				if(parsed)
+					runtime += tempTime;
+			}
 		}
 		return runtime.ToString();
 	}
 	
 	private static List<string> GetTracklist(JObject o){
 		var tracklist = o["tracklist"]!;
-		return tracklist.Select(track => (string)track!["title"]!).ToList();
+		var list = new List<string>();
+		foreach(var track in tracklist){
+			if((string)track["type_"]! == "track")	
+				list.Add((string)track!["title"]!);
+		}
+
+		return list;
 	}
 	
 	private static string AuthSuffix(){
 		return _key != null && _secret != null ? $"&key={_key}&secret={_secret}" : string.Empty;
 	}
 	
-	private static string MasterString(string master){
-		return $"https://api.discogs.com/masters/{master}";
+	private static string ReleaseString(string release){
+		return $"https://api.discogs.com/releases/{release}";
 	}
 	
 	private static string SearchPrefix(){

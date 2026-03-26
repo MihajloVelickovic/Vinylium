@@ -174,9 +174,9 @@ public class UserController: ControllerBase{
 		}
 	}
 
-	[HttpGet("Test")]
-	public async Task<ActionResult> Test(){
-		var product = await Discogs.CreateProduct("825646604869", 1000m);
+	[HttpPost("Metadata")]
+	public async Task<ActionResult> Metadata([FromBody] MetadataReq request){
+		var product = await Discogs.CreateProduct(request.Barcode, request.Price);
 		return Ok(new{ metadata = product });
 	}
 	
