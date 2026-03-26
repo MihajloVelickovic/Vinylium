@@ -60,7 +60,7 @@ public class UserController: ControllerBase{
 	[HttpPost("Login")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult> Login([FromBody] LoginReq request){
+	public async Task<ActionResult> LogIn([FromBody] LoginReq request){
 
 		try{
 			var requestIsEmail = request.EmailOrUsername.Contains('@');
@@ -96,7 +96,6 @@ public class UserController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
-
 
 	[HttpPost("RefreshAccess")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
@@ -174,4 +173,11 @@ public class UserController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
+
+	[HttpGet("Test")]
+	public async Task<ActionResult> Test(){
+		var testObj = await Discogs.AlbumData("AB-1006");
+		return Ok(new{ metadata = testObj });
+	}
+	
 }

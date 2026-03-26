@@ -6,11 +6,13 @@ namespace app.Models;
 public class Product{
 	
     public int Id { get; init; }
+
+    public required string Name{ get; set; }
+
+    public required string Artist{ get; set; }
     
-    public required string Name;
-    
-    public required string Artist;
-    
+    public required string ImageUrl{ get; set; }
+
     public required decimal Price { get; set; }
     
     public required ProductType Type { get; init; }
