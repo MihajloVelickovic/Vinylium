@@ -176,8 +176,8 @@ public class UserController: ControllerBase{
 
 	[HttpGet("Test")]
 	public async Task<ActionResult> Test(){
-		var testObj = await Discogs.AlbumData("AB-1006");
-		return Ok(new{ metadata = testObj });
+		var product = await Discogs.CreateProduct("825646604869", 1000m);
+		return Ok(new{ metadata = product });
 	}
 	
 }

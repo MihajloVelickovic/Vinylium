@@ -14,6 +14,10 @@ public class Program {
         var builder = WebApplication.CreateBuilder(args);
         DotEnv.LoadFromFile("../.env");
         
+        /* checks for discogs api key and secret
+         * still works if they're not set, just with a
+         * smaller rate limit
+         */
         var discogsKey = DotEnv.Get("DISCOGS_KEY");
         var discogsSecret = DotEnv.Get("DISCOGS_SECRET");
         Discogs.Authorize(discogsKey, discogsSecret);
