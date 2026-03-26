@@ -1,9 +1,12 @@
+using app.Helper;
+using app.Models;
 using app.Repositories;
+using app.Requests;
 
 namespace app.Services;
 
 public interface IProductService{
-
+	Task<List<Product>> FetchProducts(AddProductReq request);
 }
 
 public class ProductService: IProductService{
@@ -14,4 +17,11 @@ public class ProductService: IProductService{
 		_productRepository = productRepository;
 	}
 
+	public async Task<List<Product>> FetchProducts(AddProductReq request){
+		
+		var product = await Discogs.CreateProduct(request.Code, request.IsBarcode, request.Price);
+		return product;
+		
+
+	}
 }

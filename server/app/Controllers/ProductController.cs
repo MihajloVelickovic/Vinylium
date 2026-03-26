@@ -18,22 +18,21 @@ public class ProductController: ControllerBase{
 	
 	// TODO CRUD
 
-	[HttpPost("AddProduct")]
+	[HttpGet("FetchProducts")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult> AddProduct([FromBody] AddProductReq request){
+	public async Task<ActionResult> FetchProducts([FromBody] AddProductReq request){
 		try{
-			var product = await Discogs.CreateProduct(request.Code, request.IsBarcode, request.Price);
+			if(string.IsNullOrWhiteSpace(request.Code))
+				throw new ArgumentNullException(nameof(request.Code));
+
+			var product = await _productService.FetchProducts(request);
 			return Ok(new{data=product});
+			
 		}
 		catch(Exception e){
 			return BadRequest(e.Message);
 		}
 	}
-	
-	
-	//public async Task<ActionResult> GetProductById()
-	
-	
 	
 }
