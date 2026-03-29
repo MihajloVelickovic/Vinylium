@@ -14,7 +14,7 @@ public class ProductController: ControllerBase{
 		_productService = productService;
 	}
 
-	[HttpGet("FetchProducts")]
+	[HttpPost("FetchProducts")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> FetchProducts([FromBody] AddProductReq request){

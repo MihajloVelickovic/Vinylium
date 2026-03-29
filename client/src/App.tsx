@@ -1,11 +1,11 @@
-import './App.css'
+import { FetchAlbumsForm } from './components/FetchAlbumsForm';
 import RegisterForm from './components/RegisterForm';
 
 function App() {
 
     return (
         <div>
-          <RegisterForm />
+          <FetchAlbumsForm />
         </div>
     );
 }

@@ -1,0 +1,49 @@
+.albumCard{
+    border: white solid 1px;
+    border-radius: 5%;
+    font-size: 10pt;
+    width: 18%;
+    min-height: 18%;
+    max-height: fit-content;
+    margin: 10pt;
+    padding:10pt;
+    position: relative;
+}
+
+.textBord{
+    border-bottom: white 1px solid;
+}
+
+.productInput{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    width: 100%;
+    text-align: cen;
+}
+
+.background-style{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(2px) brightness(33%);
+    border-Radius: 5%;
+}
+
+.iField{
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: transparent;
+    outline: none;
+    color: #9ca3af;
+    border: none;
+    text-align: center;
+    font-family: var(--heading);
+    font-size: 10pt;
+    min-width: fit-content;
+    overflow-wrap: break-word;
+    word-break: break-all;
+}
