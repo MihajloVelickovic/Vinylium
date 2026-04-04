@@ -12,7 +12,7 @@ export const AlbumCard = ({product}) => {
             }}>
             </div>
 
-            {/* div za podatke sliku */}
+            {/* div za podatke i sliku */}
             <div style={{
                 backdropFilter: "blur(0px)"
             }}>
@@ -26,10 +26,6 @@ export const AlbumCard = ({product}) => {
                     <div contentEditable="true" className="iField">
                         <p>{product.barcode}</p>
                     </div>
-                    {/* <textarea className="iField" 
-                              rows={product.barcode.length / 15  + 1} 
-                              style={{fieldSizing:"content", resize:"none"}} 
-                              value={product.barcode}/> */}
                 </div>
 
                 <div className="productInput textBord">
@@ -52,14 +48,12 @@ export const AlbumCard = ({product}) => {
                         <p>{product.artist}</p>
                     </div>
                 </div>
-
                 <div className="productInput textBord">
                     <p>Release Date:</p>
                     <div contentEditable="true" className="iField">
                         <p>{product.releaseDate}</p>
                     </div>
                 </div>
-
                 <div className="productInput textBord">
                     <p>Type:</p>
                     <div contentEditable="true" className="iField">
