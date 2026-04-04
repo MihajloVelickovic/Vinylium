@@ -1,9 +1,26 @@
 import "../styles/AlbumCard.css"
+import axios from "axios";
 
 
 export const AlbumCard = ({product}) => {
 
-
+    const acceptProduct = async () => {
+        console.log("kliknut sam");
+        try {
+           const res = await axios.post("http://localhost:1738/api/Product/AddProduct", {
+                product
+            })
+            if (res.status===200){
+                console.log(res.data)
+            }
+        }
+        catch (e) {
+            console.log("Exception: " + e);
+            return;
+        }
+        
+    }
+    
     return (
         <div className = "albumCard">
             {/* div za pozadinsku sliku */}
@@ -59,6 +76,9 @@ export const AlbumCard = ({product}) => {
                     <div contentEditable="true" className="iField">
                         <p>{product.type}</p>
                     </div>
+                </div>
+                <div >
+                    <button className="acceptButton" onClick={acceptProduct}>Add Product</button>
                 </div>
 
             </div>

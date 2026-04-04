@@ -41,11 +41,12 @@ public class Program{
 
 		builder.Services.AddCors(options => {
 			options.AddPolicy("AllowReact",
-				policy => {
-					policy.WithOrigins("http://localhost:5173") // Front end 
+				policy =>
+				{
+					policy.WithOrigins("*") // Front end 
 						.AllowAnyHeader()
-						.AllowAnyMethod()
-						.AllowCredentials();
+						.AllowAnyMethod();
+					//.AllowCredentials();
 				});
 		});
 

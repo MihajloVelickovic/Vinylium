@@ -8,7 +8,26 @@
     margin: 10pt;
     padding:10pt;
     position: relative;
+    
+    
 }
+
+@media only screen and (max-width: 767px) {
+    .albumCard{
+        width: 100%;
+        min-width: 30%;
+    }
+}
+
+@media only screen and (max-width: 860px) {
+    .albumCard{
+        width: 41%;
+        min-width: 30%;
+        margin-right: 18px;
+    }
+}
+
+
 
 .textBord{
     border-bottom: white 1px solid;
@@ -18,7 +37,7 @@
     display: grid;
     grid-template-columns: 1fr 2fr;
     width: 100%;
-    text-align: cen;
+    text-align: center;
 }
 
 .background-style{
@@ -34,8 +53,7 @@
 }
 
 .iField{
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow: hidden;
     background-color: transparent;
     outline: none;
     color: #9ca3af;
@@ -46,4 +64,25 @@
     min-width: fit-content;
     overflow-wrap: break-word;
     word-break: break-all;
+}
+
+.acceptButton{
+    width: 100%;
+    height: 100%;
+    border-radius: 5%;
+    margin-top: 5%;
+    text-align: center;
+    background-color: transparent;
+    font-family: var(--heading);
+    font-size: 18px;
+}
+
+.acceptButton:hover{
+    background-color: forestgreen;
+    cursor: pointer;
+}
+
+.acceptButton:focus{
+    background-color: forestgreen;
+    outline: none;
 }

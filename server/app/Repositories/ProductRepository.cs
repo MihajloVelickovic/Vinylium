@@ -26,4 +26,5 @@ public class ProductRepository: IProductRepository{
 	public async Task<List<Product>> GetAllAsync(){
 		return await _dbContext.Products.ToListAsync();
 	}
+	
 }

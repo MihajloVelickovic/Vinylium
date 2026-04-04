@@ -16,8 +16,16 @@ public static class Discogs{
 		},
 	};
 
+	private static string GenerateNumericCode(int length = 13)
+	{
+		return _rng.Next().ToString($"D{length}");
+	}
+	
+	
+
 	private static string? _key = null!;
 	private static string? _secret = null!;
+	private static Random _rng = new Random();
 
 	public static void Authorize(string? key, string? secret){
 		_key = key;
@@ -55,8 +63,8 @@ public static class Discogs{
 			var barcodeList = data["barcode"] ?? new JArray();
 
 			var barcode = barcodeList.Any()
-				? (string?)barcodeList[0] ?? Guid.NewGuid().ToString()
-				: Guid.NewGuid().ToString();
+				? (string?)barcodeList[0] ?? GenerateNumericCode()
+				: GenerateNumericCode();
 
 			list.Add(new Product(){
 				Barcode = isBarcode ? code : barcode,

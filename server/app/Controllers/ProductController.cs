@@ -2,6 +2,7 @@ using app.Models;
 using app.Requests;
 using app.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace app.Controllers;
 
@@ -49,5 +50,21 @@ public class ProductController: ControllerBase{
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> GetProductsFiltered([FromBody] FilterReq req){
 		return Ok();
+	}
+
+	[HttpPost("AddProduct")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> AddProduct([FromBody] AcceptProductReq req)
+	{
+		try
+		{
+			var product = await _productService.AddProductAsync(req);
+			return Ok(new { data = product });
+		}
+		catch (Exception e)
+		{
+			return BadRequest(e.Message);
+		}
 	}
 }

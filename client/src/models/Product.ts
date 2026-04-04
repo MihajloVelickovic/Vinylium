@@ -1,4 +1,4 @@
-export default class Product{
+export default class Product {
     name: string;
     artist: string;
     imageUrl: string;
@@ -6,15 +6,24 @@ export default class Product{
     type: string;
     barcode: string;
     catalogNumber: string;
-    
-    constructor(jsonData){
+    inwarehouse: boolean;
+    runtime: string;
+    price: string;
+    tracklist: string;
+
+    constructor(jsonData) {
         ({
-          barcode: this.barcode,
-          catalogNumber: this.catalogNumber,
-          name: this.name,
-          artist: this.artist,
-          imageUrl: this.imageUrl,
-          releaseDate: this.releaseDate,
+            barcode: this.barcode,
+            catalogNumber: this.catalogNumber,
+            name: this.name,
+            artist: this.artist,
+            imageUrl: this.imageUrl,
+            price: this.price,
+            runtime: this.runtime,
+            type: this.type,
+            releaseDate: this.releaseDate,
+            inwarehouse: this.inwarehouse,
+            tracklist: this.tracklist
         } = jsonData);
 
         this.type = this.evaluateType(jsonData.type);
@@ -22,7 +31,7 @@ export default class Product{
     }
 
     private evaluateType = (type: number) => {
-        switch(type){
+        switch (type) {
             case 0:
                 return "Vinyl"
             case 1:
