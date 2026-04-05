@@ -4,3 +4,31 @@
     flex-wrap: wrap;
     justify-content: center;
 }
+
+.fetchForm{
+    box-sizing: border-box
+}
+
+
+.fetchForm input{
+    height: 2vh;
+    outline: none;
+    border-bottom: var(--text) solid 1px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: none;
+    font-size: 1.2rem;
+    margin-top: 2%;
+    margin-bottom: 1%;
+    text-align: center;
+}
+
+.fetchForm input::placeholder{
+    font-style: italic;
+}
+
+.fetchForm label{
+    font-style: italic;
+    font-size: 0.8rem;
+}
