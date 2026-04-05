@@ -57,12 +57,12 @@ export const FetchAlbumsForm = () => {
                     onChange = {(f) => setPrice(parseInt(f.target.value))} />
                 </div>
                 <div>
-                    <button type="button" onClick={() => setIsBarcode(!isBarcode)}>
+                    <button className="isBarcodeButton" type="button" onClick={() => setIsBarcode(!isBarcode)}>
                         {isBarcode ? "Barcode" : "Catalog Number"}
                     </button>
                 </div>
                 <div>
-                    <button type="submit">Fetch</button>
+                    <button className="fetchButton" type="submit">Fetch</button>
                 </div>
             </form>
 

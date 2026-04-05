@@ -32,3 +32,32 @@
     font-style: italic;
     font-size: 0.8rem;
 }
+
+.fetchButton{
+    border: none;
+    outline: white;
+    width: 15%;
+    height: 2.5vh;
+    border-radius: 10px;
+    color: white;
+}
+
+.fetchButton:hover{
+    cursor: pointer;
+    background-color: #9ca3af;
+}
+
+.isBarcodeButton{
+    border: none;
+    outline: white;
+    width: 15%;
+    height: 2.5vh;
+    border-radius: 10px;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.isBarcodeButton:hover{
+    cursor: pointer;
+    background-color: #9ca3af;
+}
