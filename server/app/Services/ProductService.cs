@@ -28,9 +28,9 @@ public class ProductService: IProductService{
 		return await _productRepository.GetAllAsync();
 	}
 
-	public async Task<Product> AddProductAsync(AcceptProductReq req)
-	{
-		var jobjectstring = req.Product.ToString() ?? throw new Exception("Failed to create product string from request data.");
+	public async Task<Product> AddProductAsync(AcceptProductReq req){
+		var jobjectstring = req.Product.ToString() ??
+		                    throw new Exception("Failed to create product string from request data.");
 		var jobject = JObject.Parse(jobjectstring);
 		var product = jobject.ToObject<Product>() ?? throw new Exception("Failed to cast json to product.");
 		await _productRepository.CreateProductAsync(product);

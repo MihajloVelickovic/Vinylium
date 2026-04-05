@@ -55,15 +55,12 @@ public class ProductController: ControllerBase{
 	[HttpPost("AddProduct")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult> AddProduct([FromBody] AcceptProductReq req)
-	{
-		try
-		{
+	public async Task<ActionResult> AddProduct([FromBody] AcceptProductReq req){
+		try{
 			var product = await _productService.AddProductAsync(req);
-			return Ok(new { data = product });
+			return Ok(new{ data = product });
 		}
-		catch (Exception e)
-		{
+		catch(Exception e){
 			return BadRequest(e.Message);
 		}
 	}

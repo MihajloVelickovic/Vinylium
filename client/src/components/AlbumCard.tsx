@@ -1,7 +1,6 @@
 import "../styles/AlbumCard.css"
 import axios from "axios";
 
-
 export const AlbumCard = ({product}) => {
 
     const acceptProduct = async () => {
@@ -18,7 +17,6 @@ export const AlbumCard = ({product}) => {
             console.log("Exception: " + e);
             return;
         }
-        
     }
     
     return (

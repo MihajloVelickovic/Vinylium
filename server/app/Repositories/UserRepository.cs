@@ -6,7 +6,6 @@ namespace app.Repositories;
 public interface IUserRepository{
 	Task RegisterUserAsync(User user);
 	Task<User?> FindUserByEmailOrUsernameAsync(string emailOrUsername);
-
 	Task DeleteUserAsync(string username);
 }
 
