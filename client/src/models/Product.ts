@@ -3,7 +3,7 @@ export default class Product {
     artist: string;
     imageUrl: string;
     releaseDate: string;
-    type: string;
+    type: number;
     barcode: string;
     catalogNumber: string;
     inwarehouse: boolean;
@@ -25,12 +25,10 @@ export default class Product {
             inwarehouse: this.inwarehouse,
             tracklist: this.tracklist
         } = jsonData);
-
-        this.type = this.evaluateType(jsonData.type);
-
+        
     }
 
-    private evaluateType = (type: number) => {
+    public evaluateType = (type: number = this.type) => {
         switch (type) {
             case 0:
                 return "Vinyl"

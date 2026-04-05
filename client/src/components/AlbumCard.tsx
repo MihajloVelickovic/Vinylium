@@ -2,15 +2,14 @@ import "../styles/AlbumCard.css"
 import axios from "axios";
 
 export const AlbumCard = ({product}) => {
-
+    
     const acceptProduct = async () => {
-        console.log("kliknut sam");
         try {
            const res = await axios.post("http://localhost:1738/api/Product/AddProduct", {
-                product
+               product
             })
             if (res.status===200){
-                console.log(res.data)
+                console.log("PRODUCT:" + res.data)
             }
         }
         catch (e) {
@@ -32,48 +31,69 @@ export const AlbumCard = ({product}) => {
                 backdropFilter: "blur(0px)"
             }}>
                 <img src={product.imageUrl} 
-                    width={100} 
-                    height={100} 
-                    style={{borderRadius: "5%"}}/>
+                     width={100} 
+                     height={100} 
+                     style={{borderRadius: "5%", pointerEvents: "none"}}/>
 
                 <div className="productInput textBord">
                     <p>Barcode:</p>
-                    <div contentEditable="true" className="iField">
+                    <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                         onInput={(b) => {
+                             product.barcode = b.currentTarget.textContent;
+                    }}>
                         <p>{product.barcode}</p>
                     </div>
                 </div>
 
                 <div className="productInput textBord">
                     <p>CatNo:</p>
-                    <div contentEditable="true" className="iField">
+                    <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                         onInput={(c) => {
+                             product.catalogNumber = c.currentTarget.textContent;
+                    }}>
                         <p>{product.catalogNumber}</p>
                     </div>
                 </div>
 
                 <div className="productInput textBord">
                     <p>Title:</p>
-                    <div contentEditable="true" className="iField">
+                    <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                         onInput={(n) => {
+                             product.name = n.currentTarget.textContent;
+                    }}>
                         <p>{product.name}</p>
                     </div>
                 </div>
 
                 <div className="productInput textBord">
                     <p>Artist:</p>
-                    <div contentEditable="true" className="iField">
+                    <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                         onInput={(a) => {
+                             product.artist = a.currentTarget.textContent;
+                    }}>
                         <p>{product.artist}</p>
                     </div>
                 </div>
                 <div className="productInput textBord">
                     <p>Release Date:</p>
-                    <div contentEditable="true" className="iField">
+                    <div contentEditable="plaintext-only" className="iField" spellCheck="false" 
+                         onInput={(r) => {
+                             product.releaseDate = r.currentTarget.textContent;
+                    }}>
                         <p>{product.releaseDate}</p>
                     </div>
                 </div>
                 <div className="productInput textBord">
                     <p>Type:</p>
-                    <div contentEditable="true" className="iField">
-                        <p>{product.type}</p>
-                    </div>
+                    <select onChange={(t) => {
+                        product.type = t.target.selectedIndex;
+                    }}>
+                        {
+                             [0, 1, 2].map((item) => {
+                                    return <option selected={item===product.type}>{product.evaluateType(item)}</option>
+                             })
+                        }
+                    </select>
                 </div>
                 <div >
                     <button className="acceptButton" onClick={acceptProduct}>Add Product</button>

@@ -29,10 +29,20 @@ public class ProductService: IProductService{
 	}
 
 	public async Task<Product> AddProductAsync(AcceptProductReq req){
+		/* the frontend sends the entire Product "object" in the request
+		 * to make the request itself easier to parse visually
+		 * because it's a weird funky object, its type is 'object',
+		 * so this checking and casting is needed to make it into
+		 * a c# Product object that can be added to the db
+		 */
 		var jobjectstring = req.Product.ToString() ??
 		                    throw new Exception("Failed to create product string from request data.");
+		
 		var jobject = JObject.Parse(jobjectstring);
-		var product = jobject.ToObject<Product>() ?? throw new Exception("Failed to cast json to product.");
+		
+		var product = jobject.ToObject<Product>() ?? 
+		              throw new Exception("Failed to cast json to product.");
+		
 		await _productRepository.CreateProductAsync(product);
 		return product;
 	}

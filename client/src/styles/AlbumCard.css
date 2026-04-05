@@ -8,26 +8,30 @@
     margin: 10pt;
     padding:10pt;
     position: relative;
-    
-    
 }
 
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 620px) {
     .albumCard{
         width: 100%;
         min-width: 30%;
     }
 }
 
-@media only screen and (max-width: 860px) {
+@media only screen and (min-width: 621px) and (max-width: 1000px) {
     .albumCard{
-        width: 41%;
+        width: 34%;
         min-width: 30%;
         margin-right: 18px;
     }
 }
 
-
+@media only screen and (min-width: 1001px) and (max-width: 1500px) {
+    .albumCard{
+        width: 20%;
+        min-width: 20%;
+        margin-right: 18px;
+    }
+}
 
 .textBord{
     border-bottom: white 1px solid;
@@ -40,6 +44,16 @@
     text-align: center;
 }
 
+.productInput select{
+    text-align-last:center;
+    background: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    appearance: none;
+}
+
 .background-style{
     position: absolute;
     width: 100%;
@@ -49,17 +63,17 @@
     background-size: cover;
     background-position: center;
     filter: blur(2px) brightness(33%);
-    border-Radius: 5%;
+    border-radius: 5%;
 }
 
 .iField{
     overflow: hidden;
     background-color: transparent;
     outline: none;
-    color: #9ca3af;
+    color: var(--text);
     border: none;
     text-align: center;
-    font-family: var(--heading);
+    font-family: var(--heading), sans-serif;
     font-size: 10pt;
     min-width: fit-content;
     overflow-wrap: break-word;
@@ -73,7 +87,7 @@
     margin-top: 5%;
     text-align: center;
     background-color: transparent;
-    font-family: var(--heading);
+    font-family: var(--heading), sans-serif;
     font-size: 18px;
 }
 

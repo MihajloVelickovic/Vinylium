@@ -1,5 +1,7 @@
 using System.Globalization;
 using System.Net.Http.Headers;
+using System.Reflection.Metadata.Ecma335;
+using System.Text.RegularExpressions;
 using app.Enums;
 using app.Models;
 using Newtonsoft.Json.Linq;
@@ -20,7 +22,9 @@ public static class Discogs{
 		return Rng.Next().ToString($"D{length}");
 	}
 
-
+	private static readonly Regex Numeric = new(@"^\d+$");
+	private static bool IsNumeric(string input) =>  Numeric.IsMatch(input);
+	
 	private static string? _key = null!;
 	private static string? _secret = null!;
 	private static readonly Random Rng = new Random();
@@ -60,10 +64,22 @@ public static class Discogs{
 			 */
 			var barcodeList = data["barcode"] ?? new JArray();
 
-			var barcode = barcodeList.Any() ? 
-						  (string?)barcodeList[0] ?? GenerateNumericCode() : 
-						  GenerateNumericCode();
-
+			string? barcode = null;
+			if(barcodeList.Any()){
+				foreach(var bc in barcodeList){
+					var tempBc = (string?)bc;
+					if(tempBc == null)
+						continue;
+					tempBc = tempBc.Replace(" ", "");
+					if(!IsNumeric(tempBc))
+						continue;
+					barcode = tempBc;
+					break;
+				}
+			}
+			
+			barcode ??= GenerateNumericCode();
+			
 			list.Add(new Product(){
 				Barcode = isBarcode ? code : barcode,
 				CatalogNumber = !isBarcode ? code : ((string?)data["catno"]) ?? "",
