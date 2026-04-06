@@ -9,7 +9,7 @@ export default class Product {
     inwarehouse: boolean;
     runtime: string;
     price: string;
-    tracklist: string;
+    tracklist: Array<string>;
 
     constructor(jsonData) {
         ({

@@ -1,5 +1,6 @@
 body{
     display: flex;
+    font-family: var(--mono), sans-serif;
 }
 
 .image{
@@ -7,11 +8,8 @@ body{
     justify-content: center;
 }
 
-
-
 .albumCard{
-    border: white solid 1px;
-    border-radius: 5%;
+    border: solid var(--vinylium-accent);
     font-size: 10pt;
     width: 18%;
     min-height: 18%;
@@ -26,7 +24,6 @@ body{
 
 .fetchButton{
     color: #08060d;
-    
 }
 
 @media only screen and (max-width: 620px) {
@@ -82,7 +79,6 @@ body{
     background-size: cover;
     background-position: center;
     filter: blur(2px) brightness(33%);
-    border-radius: 5%;
 }
 
 .iField{
@@ -92,7 +88,6 @@ body{
     color: var(--text);
     border: none;
     text-align: center;
-    font-family: var(--heading), sans-serif;
     font-size: 10pt;
     min-width: fit-content;
     overflow-wrap: break-word;
@@ -102,13 +97,15 @@ body{
 .acceptButton{
     width: 100%;
     height: 100%;
-    border-radius: 5%;
     margin-top: 5%;
     text-align: center;
     background-color: transparent;
-    font-family: var(--heading), sans-serif;
     font-size: 18px;
     color: white;
+}
+
+#details.acceptButton:hover {
+    background-color: var(--vinylium-accent);
 }
 
 .acceptButton:hover{

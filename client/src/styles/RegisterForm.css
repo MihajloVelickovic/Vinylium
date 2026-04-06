@@ -1,0 +1,47 @@
+.registrationForm {
+    
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.registrationForm input{
+    height: 3vh;
+    outline: none;
+    border-bottom: var(--text) solid 1px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: none;
+    font-size: 1.2rem;
+    margin-top: 2%;
+    margin-bottom: 1%;
+    text-align: center;
+    width: 30%;
+}
+
+.registrationForm input::placeholder{
+    font-family: var(--heading), sans-serif;
+}
+
+.loginRegButton{
+    width: 15%;
+}
+
+.submitButton{
+    width: 30%;
+}
+
+.button-main{
+    border: none;
+    outline: white;
+    height: 4vh;
+    font-family: var(--heading), sans-serif;
+    font-size: 1.2rem;
+    
+}
+

@@ -21,7 +21,10 @@ export const AlbumCard = ({product}) => {
 
     return (
         <>
-            <div className="albumCard">
+            <div className="albumCard" onKeyUp={(e) => {
+                if(e.key === 'Escape' && isOpen)
+                    setIsOpen(false)
+            }}>
                 {/* div za pozadinsku sliku */}
                 <div className="background-style" style={{
                     background: "url(" + `${product.imageUrl}` + ") center",
@@ -36,7 +39,7 @@ export const AlbumCard = ({product}) => {
                         <img src={product.imageUrl}
                              width={100}
                              height={100}
-                             style={{borderRadius: "5%", pointerEvents: "none"}}/>
+                             style={{pointerEvents: "none"}}/>
                     </div>
                     <div className="productInput textBord">
                         <p>Barcode:</p>
@@ -101,23 +104,37 @@ export const AlbumCard = ({product}) => {
                     </div>
                     <div>
                         <button className="acceptButton" onClick={acceptProduct}>Add Product</button>
-                        <button className="detailsButton" onClick={() => setIsOpen(true)}>Vidi više</button>
+                        <button className="acceptButton" id="details" onClick={() => setIsOpen(true)}>Details</button>
                     </div>
                 </div>
             </div>
-            <div className="pop-out">
+            <div className="pop-out" onKeyUp={(e) => {
+                if(e.key === 'Escape' && isOpen)
+                    setIsOpen(false);
+            }}>
                 <PopOutCard
                     isOpen={isOpen}
                     onClose={() => setIsOpen(false)}
                     title={product.name}
                     backgroundImage={product.imageUrl}
                 >
-                    <img src={product.imageUrl} style={{ width: "100%", borderRadius: "8px" }}/>
-                    <p><strong>Artist:</strong> {product.artist}</p>
-                    <p><strong>Barcode:</strong> {product.barcode}</p>
-                    <p><strong>CatNo:</strong> {product.catalogNumber}</p>
-                    <p><strong>Release Date:</strong> {product.releaseDate}</p>
-                    <p><strong>Type:</strong> {product.evaluateType(product.type)}</p>
+                    <img src={product.imageUrl} style={{ width: "100%" }}/>
+                    <p style={{textAlign: "center"}}><strong>Tracklist:</strong></p>
+                    {product.tracklist.map((_, i) => {
+                        return (
+                            <p contentEditable="plaintext-only" className="iField" spellCheck="false"
+                               onInput={(t) => {
+                                   product.tracklist[i] = t.currentTarget.textContent;
+                                   console.log(t.currentTarget.textContent);
+                               }}>{product.tracklist[i]}</p>)
+                    })}
+                    <p style={{textAlign: "center"}}><strong>Runtime:</strong></p>
+                    {
+                        <p contentEditable="plaintext-only" className="iField" spellCheck="false"
+                           onInput={(r) => {
+                               product.runtime = r.currentTarget.textContent;
+                           }}>{product.runtime}</p>
+                    }
                     
                 </PopOutCard>
             </div>

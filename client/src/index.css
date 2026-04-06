@@ -5,14 +5,15 @@
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
   --accent: #aa3bff;
+  --vinylium-accent: #60427e;
   --accent-bg: rgba(170, 59, 255, 0.1);
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: 'Pixelify Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: 'Pixelify Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 18px/145% var(--sans);
@@ -34,7 +35,7 @@
   :root {
     --text: #9ca3af;
     --text-h: #f3f4f6;
-    --bg: #16171d;
+    --bg: #181A1B;
     --border: #2e303a;
     --code-bg: #1f2028;
     --accent: #c084fc;
@@ -51,7 +52,7 @@
 }
 
 #root {
-  width: 80%;
+  width: 90%;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -97,7 +98,7 @@ p {
 
 code,
 .counter {
-  font-family: var(--mono);
+  font-family: var(--heading);
   display: inline-flex;
   border-radius: 4px;
   color: var(--text-h);
@@ -112,6 +113,8 @@ code {
 
 .logo{
   width: 125px;
+  left: 0;
+  top: 0;
   position: relative;
   display: flex;
 }
@@ -130,7 +133,7 @@ code {
   text-decoration: none; 
   display: flex;
   align-items: center;
-  font-family: var(--mono);
+  font-family: var(--heading);
   font-size: 20px;
   margin-right: 30px;
 }
@@ -138,22 +141,37 @@ code {
 .nav-link {
   position: relative;
   text-decoration: none;
-  
 }
 
 .nav-link::after {
   content: '';
   position: absolute;
-  width: 0;
+  width: 0%;
   height: 2px;
-  bottom: -5px;
+  bottom: 10px;
   left: 0;
-  background-color: #007bff;
+  background-color: var(--vinylium-accent);
   transition: width 0.3s ease;
 }
 
-.nav-link:hover::after {
+.nav-link:hover::after { 
   width: 100%;
+}
+
+#home.nav-link:hover::after {
+  content: "Home";
+}
+
+#about.nav-link:hover::after {
+  content: "About";
+}
+
+#contact.nav-link:hover::after {
+  content: "Contact";
+}
+
+#user.nav-link:hover::after {
+  content: "User";
 }
 
 .modal-overlay {
@@ -171,7 +189,7 @@ code {
 .modal-card {
   background: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  /* border-radius: 12px; */
   padding: 2rem;
   position: relative;
   width: 90vw;
@@ -182,8 +200,7 @@ code {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  font-family: var(--heading);
-  color: var(--text);
+  font-family: var(--heading), sans-serif;
 }
 
 .modal-close {
@@ -201,6 +218,7 @@ code {
   flex-direction: column;
   gap: 8px;
   z-index: 1;
+  font-family: var(--mono), sans-serif;
 }
 
 .modal-background {
@@ -211,5 +229,6 @@ code {
   left: 0;
   background-size: cover;
   background-position: center;
+  background-repeat: repeat-y;
   filter: blur(2px) brightness(33%);
 }
