@@ -10,6 +10,7 @@ public interface IProductService{
 	Task<List<Product>> FetchProducts(AddProductReq request);
 	Task<List<Product>> GetAll();
 	Task<Product> AddProductAsync(AcceptProductReq req);
+	Task<Product> GetByIdAsync(string barcode);
 }
 
 public class ProductService: IProductService{
@@ -45,5 +46,9 @@ public class ProductService: IProductService{
 		
 		await _productRepository.CreateProductAsync(product);
 		return product;
+	}
+
+	public async Task<Product> GetByIdAsync(string barcode){
+		return await _productRepository.GetByIdAsync(barcode);
 	}
 }

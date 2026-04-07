@@ -6,6 +6,7 @@ namespace app.Repositories;
 public interface IProductRepository{
 	Task CreateProductAsync(Product product);
 	Task<List<Product>> GetAllAsync();
+	Task<Product> GetByIdAsync(string barcode);
 }
 
 public class ProductRepository: IProductRepository{
@@ -25,5 +26,10 @@ public class ProductRepository: IProductRepository{
 
 	public async Task<List<Product>> GetAllAsync(){
 		return await _dbContext.Products.ToListAsync();
+	}
+
+	public async Task<Product> GetByIdAsync(string barcode){
+		return await _dbContext.Products.FirstOrDefaultAsync(p => p.Barcode == barcode) ??
+		       throw new Exception($"Failed to get product {barcode} from database");
 	}
 }

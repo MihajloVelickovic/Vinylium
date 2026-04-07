@@ -3,6 +3,7 @@ import axios from "axios";
 import PopOutCard from "./PopOutCard.tsx";
 import {useState} from "react";
 
+//@ts-ignore
 export const AlbumCard = ({product}) => {
     const [isOpen, setIsOpen] = useState(false);
     const acceptProduct = async () => {
@@ -22,7 +23,7 @@ export const AlbumCard = ({product}) => {
     return (
         <>
             <div className="albumCard" onKeyUp={(e) => {
-                if(e.key === 'Escape' && isOpen)
+                if (e.key === 'Escape' && isOpen)
                     setIsOpen(false)
             }}>
                 {/* div za pozadinsku sliku */}
@@ -109,7 +110,7 @@ export const AlbumCard = ({product}) => {
                 </div>
             </div>
             <div className="pop-out" onKeyUp={(e) => {
-                if(e.key === 'Escape' && isOpen)
+                if (e.key === 'Escape' && isOpen)
                     setIsOpen(false);
             }}>
                 <PopOutCard
@@ -118,9 +119,9 @@ export const AlbumCard = ({product}) => {
                     title={product.name}
                     backgroundImage={product.imageUrl}
                 >
-                    <img src={product.imageUrl} style={{ width: "100%" }}/>
+                    <img src={product.imageUrl} style={{width: "100%"}}/>
                     <p style={{textAlign: "center"}}><strong>Tracklist:</strong></p>
-                    {product.tracklist.map((_, i) => {
+                    {product.tracklist.map((_: any, i: number) => {
                         return (
                             <p contentEditable="plaintext-only" className="iField" spellCheck="false"
                                onInput={(t) => {
@@ -135,7 +136,7 @@ export const AlbumCard = ({product}) => {
                                product.runtime = r.currentTarget.textContent;
                            }}>{product.runtime}</p>
                     }
-                    
+
                 </PopOutCard>
             </div>
         </>

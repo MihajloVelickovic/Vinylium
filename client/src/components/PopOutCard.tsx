@@ -10,7 +10,7 @@ interface PopOutCardProps {
     children: React.ReactNode;
 }
 
-const PopOutCard: React.FC<PopOutCardProps> = ({ isOpen, onClose, title, backgroundImage, children }) => {
+const PopOutCard: React.FC<PopOutCardProps> = ({isOpen, onClose, title, backgroundImage, children}) => {
     if (!isOpen) return null; // Conditional rendering
 
     return createPortal(

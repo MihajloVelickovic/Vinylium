@@ -11,7 +11,7 @@ export default class Product {
     price: string;
     tracklist: Array<string>;
 
-    constructor(jsonData) {
+    constructor(jsonData: any) {
         ({
             barcode: this.barcode,
             catalogNumber: this.catalogNumber,
@@ -25,7 +25,7 @@ export default class Product {
             inwarehouse: this.inwarehouse,
             tracklist: this.tracklist
         } = jsonData);
-        
+
     }
 
     public evaluateType = (type: number = this.type) => {

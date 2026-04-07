@@ -64,4 +64,18 @@ public class ProductController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
+
+	[HttpGet("GetProductById/{barcode}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> GetProductById(string barcode){
+		try{
+			var product = await _productService.GetByIdAsync(barcode);
+			return Ok(new{ data = product });
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
+	}
+	
 }
