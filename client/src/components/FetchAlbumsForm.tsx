@@ -44,25 +44,24 @@ export const FetchAlbumsForm = () => {
     return (
         <div className="fetchForm">
             <form onSubmit={handleSubmit}>
-                <div>
-                    <input type="text"
-                           value={code}
-                           placeholder="Code"
-                           onChange={(f) => setCode(f.target.value)}/>
-                </div>
-                <div>
-                    <input type="text"
-                           placeholder="Price"
-                           onChange={(f) => setPrice(parseInt(f.target.value))}/>
-                </div>
-                <div>
-                    <button className="isBarcodeButton" type="button" onClick={() => setIsBarcode(!isBarcode)}>
-                        {isBarcode ? "Barcode" : "Catalog Number"}
-                    </button>
-                </div>
-                <div>
-                    <button className="fetchButton" type="submit">Fetch</button>
-                </div>
+            
+                <input type="text"
+                       value={code}
+                       placeholder="Code"
+                       onChange={(f) => setCode(f.target.value)}/>
+            
+            
+                <input type="text"
+                       placeholder="Price"
+                       onChange={(f) => setPrice(parseInt(f.target.value))}/>
+            
+            
+                <button className="isBarcodeButton" type="button" onClick={() => setIsBarcode(!isBarcode)}>
+                    {isBarcode ? "Barcode" : "Catalog Number"}
+                </button>
+            
+                <button className="fetchButton" type="submit">Fetch</button>
+                
             </form>
 
             <div className="fetchedAlbums">

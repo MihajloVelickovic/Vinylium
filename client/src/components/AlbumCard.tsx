@@ -29,6 +29,7 @@ export const AlbumCard = ({product}) => {
                 {/* div za pozadinsku sliku */}
                 <div className="background-style" style={{
                     background: "url(" + `${product.imageUrl}` + ") center",
+                    zIndex: "-1"
                 }}>
                 </div>
 

@@ -3,12 +3,14 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    width: var(--width);
+    margin: 0 auto;
 }
 
 .fetchForm{
-    box-sizing: border-box
+    box-sizing: border-box;
+    
 }
-
 
 .fetchForm input{
     height: 2vh;
@@ -19,10 +21,12 @@
     border-right: none;
     background: none;
     font-size: 1.2rem;
-    font-family: var(--mono), sans-serif;
+    font-family: var(--heading), sans-serif;
     margin-top: 2%;
     margin-bottom: 1%;
     text-align: center;
+    width: 20%;
+    margin-left: 5px;
 }
 
 .fetchForm input::placeholder{
@@ -38,9 +42,11 @@
 .fetchButton{
     border: none;
     outline: white;
-    width: 15%;
-    height: 2.5vh;
+    width: 20%;
+    height: 4vh;
     color: white;
+    margin-left: 5px;
+    font-family: var(--heading), sans-serif;
 }
 
 .fetchButton:hover{
@@ -51,10 +57,14 @@
 .isBarcodeButton{
     border: none;
     outline: white;
-    width: 15%;
-    height: 2.5vh;
+    width: 20%;
+    height: 4vh;
     margin-top: 2%;
     margin-bottom: 2%;
+    margin-left: 5px;
+    font-family: var(--heading), sans-serif;
+    
+
 }
 
 .isBarcodeButton:hover{

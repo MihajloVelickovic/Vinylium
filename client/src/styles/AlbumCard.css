@@ -1,6 +1,6 @@
 body{
     display: flex;
-    font-family: var(--mono), sans-serif;
+    font-family: var(--heading), sans-serif;
 }
 
 .image{
@@ -16,10 +16,13 @@ body{
     margin: 10pt;
     padding:10pt;
     position: relative;
+    
 }
 
 .acceptButton{
     color: #08060d;
+    font-family: var(--heading), sans-serif;
+    
 }
 
 .fetchButton{
