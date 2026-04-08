@@ -26,8 +26,15 @@ export const ProductPage = () => {
                 <div className="productCombined">
                     
                     <div className="background-style-prod-page" style={{
-                        background: "url(" + `${product.imageUrl}` + ") center"
+                        background: "url(" + `${product.imageUrl}` + ")",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
+                        position: "fixed"
                     }}>
+                        <div style={{overflowY: "scroll"}}>
+                            
+                        </div>
                     </div>
                     
                     <div className="productPageColumn left">                
@@ -66,14 +73,16 @@ export const ProductPage = () => {
                     
                     <div className="productPageColumn right">
                         <div className="title">
-                            <h1>{product.artist}</h1>
+                            <div>
+                                <h1>{product.artist}</h1>
+                                <p id="type">{product.evaluateType(product.type)}</p>
+                            </div>
                             <h1>-</h1>
-                            <h1>{product.name}</h1>
-                        </div>
-                        <div className="priceType">
-                            <p id="type">{product.evaluateType(product.type)}</p>
-                            <p></p>
-                            <p id="price">{product.price} RSD</p>
+                            <div>
+                                <h1>{product.name}</h1>
+                                <p id="price">{product.price} RSD</p>
+                                
+                            </div>
                         </div>
                         <button className="button-main">Add to cart</button>
                     </div>

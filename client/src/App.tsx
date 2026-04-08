@@ -6,6 +6,7 @@ import {Store} from "./components/Store";
 import {useEffect, useState} from "react";
 import {ProductPage} from "./components/ProductPage.tsx";
 import Cart from "./components/Cart.tsx";
+import {Filters} from "./components/Filters.tsx";
 
 function Home() {
     return <h2>Home Page</h2>;
@@ -82,7 +83,8 @@ function App() {
                     <Route path="/" element={
                         <>
                             <Home/>
-                            <Store/>
+                            <Filters />
+                            <Store />
                         </>
                     }/>
                     <Route path="/about" element={<About/>}/>
