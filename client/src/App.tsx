@@ -30,12 +30,6 @@ function App() {
     const [aboutFocus, setAboutFocus] = useState(false);
     const [contactFocus, setContactFocus] = useState(false);
     const [userFocus, setUserFocus] = useState(false);
-
-    const [loggedIn, setLoggedIn] = useState(false);
-
-    useEffect(() => {
-        localStorage.getItem("token") === null ? setLoggedIn(false) : setLoggedIn(true); 
-    }, []);
     
     return (
         <div>
@@ -83,18 +77,13 @@ function App() {
                     <Route path="/" element={
                         <>
                             <Home/>
-                            <Filters />
                             <Store />
                         </>
                     }/>
                     <Route path="/about" element={<About/>}/>
                     <Route path="/contact" element={<Contact/>}/>
                     <Route path="/products/:id" element={<ProductPage/>}/>
-                    <Route path="/login" element={
-                        <>
-                            <RegisterForm/>
-                        </>
-                    }/>
+                    <Route path="/login" element={<RegisterForm />}/>
                     <Route path="/add-album" element={
                         <>
                             <AddAlbum/>

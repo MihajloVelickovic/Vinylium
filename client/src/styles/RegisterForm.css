@@ -25,6 +25,12 @@ body{
     font-family: var(--heading) sans-serif;
 }
 
+
+.registrationForm input:focus{
+    border-bottom: 2px solid var(--vinylium-accent);
+}
+
+
 .registrationForm input::placeholder{
     font-family: var(--heading), sans-serif;
 }

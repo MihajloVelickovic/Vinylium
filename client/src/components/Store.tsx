@@ -3,11 +3,12 @@ import {useEffect, useState} from "react";
 import Product from "../models/Product.ts";
 import {ProductCard} from "./ProductCard.tsx";
 import "../styles/Store.css"
+import {Filters} from "./Filters.tsx";
 
 export const Store = () => {
 
     const [products, setProducts] = useState(new Array<Product>());
-    const [url, _] = useState("http://localhost:1738/api/Product/GetAllProducts");
+    const [url, _] = useState("http://localhost:1738/api/Product/GetRandomProducts");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,12 +26,15 @@ export const Store = () => {
     }, [url])
 
     return (
-        <div className="products">
-            {
-                products.map((product) => {
-                    return <ProductCard product={product}/>
-                })
-            }
-        </div>
+        <>
+            <Filters setProducts={setProducts} />
+            <div className="products">
+                {
+                    products.map((product) => {
+                        return <ProductCard product={product}/>
+                    })
+                }
+            </div>
+        </>
     )
 }

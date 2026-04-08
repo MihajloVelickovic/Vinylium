@@ -5,4 +5,13 @@
     flex-direction: column;
     text-align: left;
     width: 200px;
+    transition: scale 0.2s ease;
+
 }
+
+.productCard:hover {
+    scale: 1.1;
+}
+
+
+    

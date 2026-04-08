@@ -1,3 +1,5 @@
+using System.Globalization;
+using app.Enums;
 using app.Models;
 using app.Requests;
 using app.Services;
@@ -44,12 +46,46 @@ public class ProductController: ControllerBase{
 		}
 	}
 
-	//Todo filtered get
+	[HttpGet("GetRandomProducts")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> GetRandomProducts(){
+		try{
+			var random = await _productService.GetRandomProductsAsync();
+			return Ok(new{data=random});
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
+	}
+
 	[HttpGet("GetProductsFiltered")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult> GetProductsFiltered([FromBody] FilterReq req){
-		return Ok();
+	public async Task<ActionResult> GetProductsFiltered([FromQuery] string? title,  
+													    [FromQuery] string? artist,
+														[FromQuery] int? type, 
+														[FromQuery] string? priceLow, 
+														[FromQuery] string? priceHigh){
+		try{
+			
+			var pL = priceLow != null ? 
+					(decimal.TryParse(priceLow, out var temp) ? temp : (decimal?)null) ??  
+			         throw new Exception("Price Low is not a decimal value") :
+					(decimal?)null;
+			
+			var pH = priceHigh != null ? 
+					(decimal.TryParse(priceLow, out temp) ? temp : (decimal?)null) ??  
+					throw new Exception("Price High is not a decimal value") :
+					(decimal?)null;
+			
+			var filtered = await _productService.GetFilteredAsync(title, artist, type, pL, pH);
+
+			return Ok(new{data=filtered});
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
 	}
 
 	[HttpPost("AddProduct")]

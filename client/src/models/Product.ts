@@ -28,7 +28,7 @@ export default class Product {
 
     }
 
-    public evaluateType = (type: number = this.type) => {
+    public static evaluateType = (type: number) => {
         switch (type) {
             case 0:
                 return "Vinyl"

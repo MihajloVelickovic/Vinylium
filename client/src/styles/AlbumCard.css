@@ -16,7 +16,11 @@ body{
     margin: 10pt;
     padding:10pt;
     position: relative;
-    
+    transition: scale 0.3s ease;
+}
+
+.albumCard:hover{
+    scale: 1.02;
 }
 
 .acceptButton{
@@ -71,6 +75,7 @@ body{
     cursor: pointer;
     color: var(--text);
     appearance: none;
+    font-family: var(--heading), sans-serif;
 }
 
 .background-style{

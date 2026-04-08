@@ -1,3 +1,48 @@
 .filters{
     margin: 2em;
+    padding:0;
+}
+
+.filters input[type=text], input[type=number] {
+    margin: 0 2em;
+    height: 3vh;
+    border: none;
+    border-bottom: 1px solid lightgray;
+    background: none;
+    outline: none;
+    font-family: var(--heading) sans-serif;
+    width: 10%;
+    text-align: center;
+    font-size: 1.2rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+}
+
+.filters input[type=image]{
+    border: none;
+    height: 3vh;
+    transition: scale 0.3s ease;
+}
+
+.filters input[type=image]:hover{
+    scale: 1.1;
+}
+
+.filters input:focus{
+    border-bottom: 2px solid var(--vinylium-accent);
+}
+
+.filters select{
+    font-size: 1rem;
+    height: 3vh;
+    font-family: var(--heading) sans-serif;
+    margin: 0 2em;
+    text-align: center;
+    border-radius: 0;
+    border: none;
+}
+
+.filters select:hover{
+    background-color: var(--vinylium-accent);
 }

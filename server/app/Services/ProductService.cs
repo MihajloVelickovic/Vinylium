@@ -1,3 +1,4 @@
+using app.Enums;
 using app.Helper;
 using app.Models;
 using app.Repositories;
@@ -11,6 +12,8 @@ public interface IProductService{
 	Task<List<Product>> GetAll();
 	Task<Product> AddProductAsync(AcceptProductReq req);
 	Task<Product> GetByIdAsync(string barcode);
+	Task<List<Product>> GetFilteredAsync(string? title, string? artist, int? type, decimal? pL, decimal? pH);
+	Task<List<Product>> GetRandomProductsAsync();
 }
 
 public class ProductService: IProductService{
@@ -50,5 +53,26 @@ public class ProductService: IProductService{
 
 	public async Task<Product> GetByIdAsync(string barcode){
 		return await _productRepository.GetByIdAsync(barcode);
+	}
+
+	public async Task<List<Product>> GetFilteredAsync(string? title, string? artist, int? type, decimal? pL, decimal? pH){
+		
+		if(type != null && !Enum.IsDefined(typeof(ProductType), type))
+			throw new Exception("Type not valid");
+
+		var filter = new FilterReq(){
+			Title = title,
+			Artist = artist,
+			Type = (ProductType?)type,
+			PriceLow = pL,
+			PriceHigh = pH
+		};
+
+		return await _productRepository.GetFilteredAsync(filter);
+
+	}
+
+	public async Task<List<Product>> GetRandomProductsAsync(){
+		return await _productRepository.GetRandomProductsAsync();
 	}
 }

@@ -2,6 +2,7 @@ import "../styles/AlbumCard.css"
 import axios from "axios";
 import PopOutCard from "./PopOutCard.tsx";
 import {useState} from "react";
+import Product from "../models/Product.ts";
 
 //@ts-ignore
 export const AlbumCard = ({product}) => {
@@ -99,7 +100,7 @@ export const AlbumCard = ({product}) => {
                             {
                                 [0, 1, 2].map((item) => {
                                     return <option
-                                        selected={item === product.type}>{product.evaluateType(item)}</option>
+                                        selected={item === product.type}>{Product.evaluateType(item)}</option>
                                 })
                             }
                         </select>

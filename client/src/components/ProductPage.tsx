@@ -75,14 +75,20 @@ export const ProductPage = () => {
                         <div className="title">
                             <div>
                                 <h1>{product.artist}</h1>
-                                <p id="type">{product.evaluateType(product.type)}</p>
+                                <></>
                             </div>
+                            <div>
                             <h1>-</h1>
+                            <p id="type">{Product.evaluateType(product.type)}</p>
+                            </div>
                             <div>
                                 <h1>{product.name}</h1>
-                                <p id="price">{product.price} RSD</p>
-                                
+                                <></>
                             </div>
+                        </div>
+                        <div className="title">
+                        <p id="price">{product.price} RSD</p>
+                            <></>
                         </div>
                         <button className="button-main">Add to cart</button>
                     </div>

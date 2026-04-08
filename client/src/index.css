@@ -151,14 +151,12 @@ code {
 
 }
 
-
 .cart-dropdown {
   position: absolute;
   top: 100%;      /* ispod ikonice */
   right: 0;       /* poravnat sa desnom stranom */
-  background: #1a1a1a;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--accent-border);
   padding: 12px;
   min-width: 200px;
   z-index: 100;
@@ -169,11 +167,14 @@ code {
   display: flex;
   justify-content: space-between;
   height: 125px;
-  margin: 0 auto;
+  margin: 0 auto 1em auto;
   width: 50%;
   min-width: 600px;
+  background-color: var(--bg);
   z-index: 1;
   padding-bottom: 20px;
+  border: #60427e 2px solid;
+  border-top:none;
 }
 
 .navbar a{

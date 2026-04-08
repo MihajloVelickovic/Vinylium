@@ -29,6 +29,10 @@
     margin-left: 5px;
 }
 
+.fetchForm input:focus{
+    border-bottom: 2px solid var(--vinylium-accent);
+}
+
 .fetchForm input::placeholder{
     font-family: var(--heading), sans-serif;
     font-style: italic;
