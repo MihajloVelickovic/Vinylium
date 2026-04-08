@@ -5,6 +5,7 @@ import RegisterForm from "./components/RegisterForm";
 import {Store} from "./components/Store";
 import {useState} from "react";
 import {ProductPage} from "./components/ProductPage.tsx";
+import Cart from "./components/Cart.tsx";
 
 function Home() {
     return <h2>Home Page</h2>;
@@ -34,6 +35,7 @@ function App() {
             <BrowserRouter>
                 {/* Navigation */}
                 <nav className="navbar">
+                    
                     <a className="navbar-brand" href="/">
                         <img className="logo" src="../src/assets/vinylium_logo.svg" alt="logo"/>
                     </a>
@@ -63,7 +65,11 @@ function App() {
                         <img src="../src/assets/the-happy-smiler.svg" alt="Login/Register"/></Link>
 
                     <Link className="nav-link" to="/add-album">Add Album</Link>
+                    <div className="inside-cart">
+                        <Cart />
+                    </div>
                 </nav>
+                
 
                 {/* Routes */}
                 <Routes>

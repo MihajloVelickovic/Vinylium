@@ -118,14 +118,45 @@ code {
   background: var(--code-bg);
 }
 
+
 .logo{
   width: 75px;
-  left: 0;
-  top: 0;
-  position: relative;
-  display: flex;
+  left: 10px;
+  top: 25px;
+  position: fixed;
   z-index: 1;
+}
 
+.cart-wrapper {
+  margin-left: auto;
+  position: fixed;
+  right: 16px;
+  top: 20px;
+  z-index: 999;
+
+}
+
+.cart{
+  top: 0; 
+  right: 0;
+  display: flex;  
+  flex-direction: column;
+  width: 85px;
+
+}
+
+
+.cart-dropdown {
+  position: absolute;
+  top: 100%;      /* ispod ikonice */
+  right: 0;       /* poravnat sa desnom stranom */
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 200px;
+  z-index: 100;
+  color: white;
 }
 
 .navbar{
