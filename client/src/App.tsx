@@ -3,7 +3,7 @@ import {BrowserRouter, Routes, Route, Link} from 'react-router-dom';
 import "../src/index.css"
 import RegisterForm from "./components/RegisterForm";
 import {Store} from "./components/Store";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {ProductPage} from "./components/ProductPage.tsx";
 import Cart from "./components/Cart.tsx";
 
@@ -30,15 +30,21 @@ function App() {
     const [contactFocus, setContactFocus] = useState(false);
     const [userFocus, setUserFocus] = useState(false);
 
+    const [loggedIn, setLoggedIn] = useState(false);
+
+    useEffect(() => {
+        localStorage.getItem("token") === null ? setLoggedIn(false) : setLoggedIn(true); 
+    }, []);
+    
     return (
         <div>
             <BrowserRouter>
                 {/* Navigation */}
                 <nav className="navbar">
                     
-                    <a className="navbar-brand" href="/">
+                    <Link className="navbar-brand" to="/">
                         <img className="logo" src="../src/assets/vinylium_logo.svg" alt="logo"/>
-                    </a>
+                    </Link>
                     <Link className="nav-link" to="/" id="home"
                           onMouseEnter={() => setHomeFocus(true)}
                           onMouseLeave={() => setHomeFocus(false)}

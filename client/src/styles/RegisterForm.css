@@ -1,5 +1,5 @@
 .registrationForm {
-    
+    font-family: var(--heading) sans-serif;
 }
 
 body{
@@ -22,6 +22,7 @@ body{
     margin-bottom: 1%;
     text-align: center;
     width: 30%;
+    font-family: var(--heading) sans-serif;
 }
 
 .registrationForm input::placeholder{
@@ -42,6 +43,9 @@ body{
     height: 4vh;
     font-family: var(--heading), sans-serif;
     font-size: 1.2rem;
-    
+}
+
+.button-main:hover{
+    cursor: pointer;
 }
 
