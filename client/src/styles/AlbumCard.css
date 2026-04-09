@@ -12,10 +12,17 @@ body{
     border: solid var(--vinylium-accent);
     font-size: 10pt;
     width: 18%;
-    min-height: 18%;
     margin: 10pt;
     padding:10pt;
     position: relative;
+    transition: scale 0.3s ease;
+    box-shadow: var(--vinylium-accent) 0 0 10px;
+}
+
+.bestCard{
+    border: solid goldenrod;
+    box-shadow: goldenrod 0 0 10px;
+    width: 14vw;
     transition: scale 0.3s ease;
 }
 

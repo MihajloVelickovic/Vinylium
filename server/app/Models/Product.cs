@@ -14,10 +14,10 @@ public class Product{
 
 	public required string ImageUrl{ get; set; }
 
-	public required decimal Price{ get; set; }
+	public required decimal? Price{ get; set; }
 
 	public required ProductType Type{ get; init; }
-
+	
 	public ICollection<string> Tracklist{ get; init; } = [];
 
 	[StringLength(11)] public required string Runtime{ get; init; }

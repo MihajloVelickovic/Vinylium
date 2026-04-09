@@ -6,8 +6,7 @@ import axios from "axios";
 
 export const Filters = ({setProducts}) => {
 
-    const [title, setTitle] = useState("");
-    const [artist, setArtist] = useState("");
+    const [search, setSearch] = useState("");
     const [type, setType] = useState(0);
     const [priceLow, setPriceLow] = useState("");
     const [priceHigh, setPriceHigh] = useState("");
@@ -17,8 +16,7 @@ export const Filters = ({setProducts}) => {
         try{
             const res = await axios.get("http://localhost:1738/api/Product/GetProductsFiltered", {
                 params: {
-                    title: title,
-                    artist: artist,
+                    title: search,
                     type: type != 0 ? type : null,
                     priceLow: priceLow ? priceLow : null,
                     priceHigh: priceHigh ? priceHigh : null,
@@ -38,10 +36,18 @@ export const Filters = ({setProducts}) => {
     
     return (
         <form className="filters" onSubmit={handleSubmit}>
+            <label>Per Page</label>
+            <select onChange={(t) => {
+                setType(t.target.selectedIndex)
+            }}>
+                {
+                    [20, 30, 40].map((item) => {
+                        return <option>{item}</option>
+                    })
+                }
+            </select>
             <input type="text" placeholder="Title" 
-            onInput={(e) => setTitle(e.currentTarget.value)}></input>
-            <input type="text" placeholder="Artist"
-            onInput={(e) => setArtist(e.currentTarget.value)}></input>
+            onInput={(e) => setSearch(e.currentTarget.value)}></input>
             <select onChange={(t) => {
                 setType(t.target.selectedIndex)
             }}>

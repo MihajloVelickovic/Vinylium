@@ -20,6 +20,7 @@
     border: 2px solid var(--vinylium-accent);
     padding: 20px;
     height: fit-content;
+    box-shadow: var(--vinylium-accent) 0 0 10px;
 }
 
 .mainInfo{

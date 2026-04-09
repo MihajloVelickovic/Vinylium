@@ -16,10 +16,30 @@
     overflow: hidden;
 }
 
+
+.best{
+    width: 100%;
+}
+
 .fetchForm{
     box-sizing: border-box;
     overflow-y:hidden;
-    
+}
+
+.formAndBest{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    width: 75%;
+    margin: 0 auto 4em auto;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 26em;
 }
 
 .fetchForm input{
@@ -33,10 +53,10 @@
     font-size: 1.2rem;
     font-family: var(--heading), sans-serif;
     margin-top: 2%;
-    margin-bottom: 1%;
+    margin-bottom: 3%;
     text-align: center;
-    width: 20%;
     margin-left: 5px;
+    width: 60%;
 }
 
 .fetchForm input:focus{

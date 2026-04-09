@@ -32,7 +32,7 @@ public static class Discogs{
 		_secret = secret;
 	}
 
-	public static async Task<List<Product>> CreateProduct(string code, decimal price){
+	public static async Task<List<Product>> CreateProduct(string code){
 		
 		
 		var productsBarcode = await GetEntryData(code, barcodeSearch: true) as JArray ?? [];
@@ -112,7 +112,7 @@ public static class Discogs{
 				Name = (string?)releaseData["title"] ?? "",
 				Artist = (string?)(releaseData["artists"]?[0]?["name"]) ?? "",
 				ImageUrl = (string?)(releaseData["images"]?[0]?["resource_url"]) ?? "",
-				Price = price,
+				Price = null,
 				Runtime = GetRuntime(releaseData),
 				Type = GetFormat(formatString),
 				ReleaseDate = (string?)product["year"] ?? "",

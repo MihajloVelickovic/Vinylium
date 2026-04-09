@@ -43,6 +43,7 @@ function App() {
                             <Store />
                         </>
                     }/>
+                    <Route path="/user/:username" element={<></>}/>
                     <Route path="/about" element={<About/>}/>
                     <Route path="/contact" element={<Contact/>}/>
                     <Route path="/products/:id" element={<ProductPage/>}/>
