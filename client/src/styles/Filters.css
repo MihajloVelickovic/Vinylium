@@ -22,11 +22,12 @@
 .filters input[type=image]{
     border: none;
     height: 3vh;
-    transition: scale 0.3s ease;
+    transition: scale 0.3s ease, filter 0.3s ease;
 }
 
 .filters input[type=image]:hover{
     scale: 1.1;
+    filter: contrast(50%);
 }
 
 .filters input:focus{

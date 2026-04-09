@@ -8,6 +8,7 @@ function Cart() {
                 className="cart-img"
                 src="../src/assets/cart.svg"
             />
+            <span>Cart</span>
         </Link>
     );
 }

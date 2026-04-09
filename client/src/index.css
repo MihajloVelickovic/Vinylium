@@ -125,14 +125,19 @@ code {
   background: var(--code-bg);
 }
 
-
 .logo{
-  width: clamp(75px, 5vw, 75px);
+  width: clamp(64px, 5vw,64px);
+  transition: filter 0.2s ease;
+}
+
+.logo:hover{
+  filter: contrast(50%);
+  cursor: pointer;
 }
 
 
 .cart-img{
-  width: 85px;
+  width: clamp(64px, 5vw, 75px);
   transition: filter 0.2s ease;
 }
 
@@ -144,69 +149,49 @@ code {
 .navbar{
   display: flex;
   justify-content: space-evenly;
-  margin: 0 auto 1em auto;
+  padding: 1em 0 0 0;
+  margin-bottom: 1em;
+  padding-bottom: 0.4em;
   width: 100%;
   min-width: 600px;
   background-color: var(--bg);
   position: sticky;
   z-index: 1000;
-  margin-bottom: 5%;
   top: 0;
-  margin-top: 1%
+  border-bottom: 1px solid var(--border);
 }
 
 .navbar.navbar-transparent{
-  background-color: transparent;
-}
 
+}
 
 .nav-link {
   position: relative;
   text-decoration: none;
   z-index: 1;
+  transition: filter 0.2s ease;
 }
 
-.nav-link::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: 10px;
-  left: 0;
-  background-color: var(--vinylium-accent);
-  transition: width 0.3s ease;
-  
+.nav-link:hover {
+  filter: contrast(50%);
 }
 
-.nav-link:hover::after { 
-  width: 100%;
+.navbar span{
+  opacity: 0;
+  position: relative;
+  top:-30%;
+  left:5%;
+  background: transparent;
+  color: var(--vinylium-accent);
+  transition: none;
+}
+.nav-link:hover span{
+  opacity: 1;
+  transition: opacity 0.5s linear(0, 0 0% 70%,1);
 }
 
-#home.nav-link:hover::after {
-  content: "Home";
-}
+.na
 
-#about.nav-link:hover::after {
-  content: "About";
-}
-
-#contact.nav-link:hover::after {
-  content: "Contact";
-}
-
-#user.nav-link:hover::after {
-  content: "User";
-  
-}
-
-#admin.nav-link:hover::after {
-  content: "Dashboard";
-
-}
-
-#cart.nav-link:hover::after {
-  content: "View cart";
-}
 
 /*.nav-link img {*/
 /*  transition: filter 0.2s ease;*/
