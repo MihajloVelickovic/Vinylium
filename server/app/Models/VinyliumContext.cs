@@ -34,7 +34,7 @@ public class VinyliumContext: DbContext{
 			.WithMany();
 
 		builder.Entity<User>()
-			.HasMany(p => p.Wishlist)
+			.HasMany(p => p.Cart)
 			.WithMany();
 
 		builder.Entity<Store>()

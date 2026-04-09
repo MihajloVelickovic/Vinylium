@@ -52,6 +52,7 @@ export default function RegisterForm() {
             console.log("Login successful: ");
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("refreshToken", response.data.refreshToken);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
             navigate("/")
             
         } catch (error:any) {

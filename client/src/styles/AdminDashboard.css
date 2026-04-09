@@ -1,0 +1,32 @@
+body{
+    display: flex;
+    font-family: var(--heading), sans-serif;
+}
+
+.admin-sidebar{
+    position: relative;
+    padding-top: 2%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding-bottom: 5%;
+}
+
+.admin-sidebar .admin-sidebar-content{
+    display: flex;
+}
+
+.admin-link{
+    border: none;
+    outline: white;
+    height: 3vh;
+    font-family: var(--heading), sans-serif;
+    font-size: 1.2rem;
+    text-decoration: none;
+    text-align: center;
+}
+
+.admin-link:hover{
+   cursor: pointer;background-color: var(--vinylium-accent)
+}

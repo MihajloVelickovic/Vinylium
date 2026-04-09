@@ -13,5 +13,5 @@ public class User{
 
 	public required bool Admin{ get; set; }
 
-	public ICollection<Product> Wishlist{ get; } = [];
+	public ICollection<Product> Cart{ get; } = [];
 }

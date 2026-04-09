@@ -3,6 +3,6 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    overflow-y: scroll;
     max-height: 100vh;
+    overflow: hidden;
 }

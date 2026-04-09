@@ -1,5 +1,6 @@
 .productPage{
     font-family: var(--heading), sans-serif;
+ 
 }
 
 .productCombined{
@@ -69,3 +70,4 @@
 #price.priceType{
     text-align: right;
 }
+

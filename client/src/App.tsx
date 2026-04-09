@@ -5,8 +5,8 @@ import RegisterForm from "./components/RegisterForm";
 import {Store} from "./components/Store";
 import {useEffect, useState} from "react";
 import {ProductPage} from "./components/ProductPage.tsx";
-import Cart from "./components/Cart.tsx";
-import {Filters} from "./components/Filters.tsx";
+import {AdminDashboard} from "./components/AdminDashboard";
+import { Navbar } from "./components/Navbar";
 
 function Home() {
     return <h2>Home Page</h2>;
@@ -20,58 +20,21 @@ function Contact() {
     return <h2>Contact Page</h2>;
 }
 
-function AddAlbum() {
-    return <h2>Search for an album</h2>
-}
+
 
 function App() {
+    
+    const [loggedIn, setLoggedIn] = useState(false);
 
-    const [homeFocus, setHomeFocus] = useState(false);
-    const [aboutFocus, setAboutFocus] = useState(false);
-    const [contactFocus, setContactFocus] = useState(false);
-    const [userFocus, setUserFocus] = useState(false);
+    useEffect(() => {
+        localStorage.getItem("token") === null ? setLoggedIn(false) : setLoggedIn(true); 
+    }, []);
     
     return (
         <div>
             <BrowserRouter>
                 {/* Navigation */}
-                <nav className="navbar">
-                    
-                    <Link className="navbar-brand" to="/">
-                        <img className="logo" src="../src/assets/vinylium_logo.svg" alt="logo"/>
-                    </Link>
-                    <Link className="nav-link" to="/" id="home"
-                          onMouseEnter={() => setHomeFocus(true)}
-                          onMouseLeave={() => setHomeFocus(false)}
-                          style={{filter: homeFocus ? "contrast(50%)" : ""}}
-                    >
-                        <img src="../src/assets/home.svg" alt="Home"/></Link>
-
-                    <Link className="nav-link" to="/about" id="about"
-                          onMouseEnter={() => setAboutFocus(true)}
-                          onMouseLeave={() => setAboutFocus(false)}
-                          style={{filter: aboutFocus ? "contrast(50%)" : ""}}>
-                        <img src="../src/assets/about.svg" alt="About"/></Link>
-
-                    <Link className="nav-link" to="/contact" id="contact"
-                          onMouseEnter={() => setContactFocus(true)}
-                          onMouseLeave={() => setContactFocus(false)}
-                          style={{filter: contactFocus ? "contrast(50%)" : ""}}>
-                        <img src="../src/assets/contact.svg" alt="Contact"/></Link>
-
-                    <Link className="nav-link" to="/login" id="user"
-                          onMouseEnter={() => setUserFocus(true)}
-                          onMouseLeave={() => setUserFocus(false)}
-                          style={{filter: userFocus ? "contrast(50%)" : ""}}>
-                        <img src="../src/assets/the-happy-smiler.svg" alt="Login/Register"/></Link>
-
-                    <Link className="nav-link" to="/add-album">Add Album</Link>
-                    <div className="inside-cart">
-                        <Cart />
-                    </div>
-                </nav>
-                
-
+                <Navbar />
                 {/* Routes */}
                 <Routes>
                     <Route path="/" element={
@@ -83,14 +46,16 @@ function App() {
                     <Route path="/about" element={<About/>}/>
                     <Route path="/contact" element={<Contact/>}/>
                     <Route path="/products/:id" element={<ProductPage/>}/>
-                    <Route path="/login" element={<RegisterForm />}/>
-                    <Route path="/add-album" element={
+                    <Route path="/login" element={
                         <>
-                            <AddAlbum/>
-                            <FetchAlbumsForm/>
+                            <RegisterForm/>
                         </>
-                    }
-                    />
+                    }/>
+                    <Route path="/admin" element={<AdminDashboard />}>
+                        
+                        <Route path="add-album" element={<FetchAlbumsForm />} />
+                    </Route>
+                    <Route path="/cart"></Route>
 
                 </Routes>
             </BrowserRouter>
