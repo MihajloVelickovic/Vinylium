@@ -7,7 +7,6 @@ import "../styles/FetchAlbumsForm.css"
 export const FetchAlbumsForm = () => {
 
     const [code, setCode] = useState("");
-    const [isBarcode, setIsBarcode] = useState(true);
     const [price, setPrice] = useState(0);
     const [results, setResults] = useState(new Array<Product>());
 
@@ -19,7 +18,6 @@ export const FetchAlbumsForm = () => {
         try {
             result = await axios.post("http://localhost:1738/api/Product/FetchProducts", {
                     code,
-                    isBarcode,
                     price
                 }
             );
@@ -36,11 +34,7 @@ export const FetchAlbumsForm = () => {
         setResults(resultProducts);
 
     }
-
-    const printRes = (result: Product) => {
-        return <AlbumCard product={result}/>
-    }
-
+    
     return (
         <div className="fetchForm">
             <form onSubmit={handleSubmit}>
@@ -50,26 +44,31 @@ export const FetchAlbumsForm = () => {
                        placeholder="Code"
                        onChange={(f) => setCode(f.target.value)}/>
             
-            
                 <input type="text"
                        placeholder="Price"
                        onChange={(f) => setPrice(parseInt(f.target.value))}/>
-            
-            
-                <button className="isBarcodeButton" type="button" onClick={() => setIsBarcode(!isBarcode)}>
-                    {isBarcode ? "Barcode" : "Catalog Number"}
-                </button>
-            
+                
                 <button className="fetchButton" type="submit">Fetch</button>
                 
             </form>
-
-            <div className="fetchedAlbums">
-                {
-                    results.map(result => printRes(result))
-                }
-            </div>
-
+            {results.length > 0 &&
+                <div>
+                    <div className="fetchedAlbums">
+                        <h2>Potential best match</h2>
+                        <div className="albums">
+                            <AlbumCard product={results.at(0)}/>
+                        </div>
+                    </div>
+                    { results.length > 1 &&
+                        <div className="fetchedAlbums">
+                            <h2>Other matches</h2>
+                            <div className="albums">
+                                {results.slice(1).map((p: Product) => <AlbumCard product={p}/>)}
+                            </div>   
+                        </div>
+                    }
+                </div>
+            }
         </div>
     );
 

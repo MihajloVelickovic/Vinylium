@@ -1,5 +1,12 @@
 .fetchedAlbums{
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto 20px auto;
+}
+
+.albums{
+    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;

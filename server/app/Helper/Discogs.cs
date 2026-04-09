@@ -21,44 +21,40 @@ public static class Discogs{
 	private static string GenerateNumericCode(int length = 13){
 		return Rng.Next().ToString($"D{length}");
 	}
-
-	private static readonly Regex Numeric = new(@"^\d+$");
-	private static bool IsNumeric(string input) =>  Numeric.IsMatch(input);
 	
-	private static string? _key = null!;
-	private static string? _secret = null!;
-	private static readonly Random Rng = new Random();
+	private static string? _key;
+	private static string? _secret;
+	private static readonly Random Rng = new();
 
 	public static void Authorize(string? key, string? secret){
 		_key = key;
 		_secret = secret;
 	}
 
-	public static async Task<List<Product>> CreateProduct(string code, bool isBarcode, decimal price){
-		/* entry data will be JArray if isBarcode
-		 * is false and JToken if it's false.
-		 * responseJson is a helper to deal
-		 * with these different scenarios
-		 */
-		var entryData = await GetEntryData(code, isBarcode) ?? throw new Exception("Couldn't parse entry data");
-		var responseJson = entryData;
-		if(isBarcode){
-			responseJson = new JArray(entryData);
-		}
+	public static async Task<List<Product>> CreateProduct(string code, decimal price){
 
-		/* list that will be returned
-		 * the logic behind this is that barcodes are unique,
-		 * while catalog numbers aren't, so if a catalog number
-		 * is inputted, we want to return every release that
-		 * number points to and let the user choose
-		 */
+		var entryData = await GetEntryData(code, true);
+		var entryDataCatalog = await GetEntryData(code, false) as JArray ?? [];
+		if(entryData == null && entryDataCatalog == null)
+			throw new Exception($"No results found for {code}");
+
+		if(entryData != null)
+			entryDataCatalog.AddFirst(entryData);
+		
 		var list = new List<Product>();
-
-		foreach(var data in responseJson){
+		
+		foreach(var data in entryDataCatalog){
 			var formatString = (string?)data["format"]?[0] ?? "";
 			var releaseId = (string?)data["id"];
-			var releaseData = await GetReleaseData(releaseId);
+			var releaseData = await GetReleaseMasterData(releaseId, true);
 
+			if((string?)releaseData["title"] != ((string?)data["title"])?.Split('-')[1].Trim()){
+				var masterId = (string?)data["master_id"];
+				if(masterId == null || masterId == "0")
+					continue;
+				releaseData = await GetReleaseMasterData(masterId, false);
+			}
+			
 			/* deals with different barcode scenarios
 			 * that can happen when fetching data
 			 */
@@ -71,8 +67,6 @@ public static class Discogs{
 					if(tempBc == null)
 						continue;
 					tempBc = tempBc.Replace(" ", "");
-					if(!IsNumeric(tempBc))
-						continue;
 					barcode = tempBc;
 					break;
 				}
@@ -81,8 +75,8 @@ public static class Discogs{
 			barcode ??= GenerateNumericCode();
 			
 			list.Add(new Product(){
-				Barcode = isBarcode ? code : barcode,
-				CatalogNumber = !isBarcode ? code : ((string?)data["catno"]) ?? "",
+				Barcode = barcode,
+				CatalogNumber = ((string?)data["catno"]) ?? "",
 				Name = (string?)releaseData["title"] ?? "",
 				Artist = (string?)(releaseData["artists"]?[0]?["name"]) ?? "",
 				ImageUrl = (string?)(releaseData["images"]?[0]?["resource_url"]) ?? "",
@@ -97,12 +91,12 @@ public static class Discogs{
 		return list;
 	}
 
-	private static async Task<JToken?> GetEntryData(string code, bool isBarcode){
+	private static async Task<JToken?> GetEntryData(string code, bool barcodeSearch){
 		var prefix = SearchPrefix();
 		var suffix = AuthSuffix();
-		var searchParameter = isBarcode ? "barcode" : "catno";
+		var searchParameter = barcodeSearch ? "barcode" : "catno";
 		var requestString = $"{prefix}{searchParameter}={code}{suffix}";
-
+		
 		var response = await Client.GetAsync(requestString);
 
 		var responseString = await response.Content.ReadAsStringAsync();
@@ -111,40 +105,48 @@ public static class Discogs{
 		/* check if anything returned */
 		var items = (int?)responseJObject["pagination"]?["items"] ?? throw new Exception("Couldn't parse pagination");
 		if(items == 0)
-			throw new Exception($"No items with code {code} found");
+			return null;
 
+		string? masterUrl = null;
 		var release = "0";
 		var year = "0";
 		var formatString = string.Empty;
 		var index = -1;
-		while(isBarcode && (release == "0" || release == null ||
-		                    formatString == string.Empty || formatString == null ||
-		                    year == "0" || year == null) &&
-		      index < items - 1){
+		while(barcodeSearch && (release == "0" || formatString == string.Empty || 
+		                    formatString == string.Empty ||  year == "0" ||
+		                    masterUrl == null) && index < items - 1){
 			++index;
 			var dataField = responseJObject["results"]?[index] ?? throw new Exception("Couldn't parse data");
 			release = (string?)dataField["id"];
 			year = (string?)dataField["year"];
+			masterUrl = (string?)dataField["master_url"];
 			formatString = (string?)dataField["format"]![0];
 		}
 
+		if(barcodeSearch && index > items - 1)
+			throw new Exception("Couldn't find appropriate release");
+
+		if(barcodeSearch && masterUrl == null)
+			throw new Exception("Couldn't find master release");
+		
+		
 		/* barcode searches can also result in multiple results
 		 * but all of those are always the same album, just sometimes
 		 * have some different metadata.
 		 * If we're searching using barcodes, we want to return one
 		 * specific release (the one with the best metadata as found
 		 * above), but when searching with cat.no-s we want to return
-		 * every release
+		 * every releaserelease
 		 */
-		return isBarcode
+		return barcodeSearch
 			? responseJObject["results"]?[index] ?? throw new Exception("Couldn't parse data")
 			: responseJObject["results"] ?? throw new Exception("Couldn't parse data");
 	}
 
-	private static async Task<JObject> GetReleaseData(string? release){
-		if(release == null)
-			throw new Exception("Release ID is null");
-		var requestString = ReleaseString(release);
+	private static async Task<JObject> GetReleaseMasterData(string? id, bool release){
+		if(id == null)
+			throw new Exception("ID is null");
+		var requestString = release ? ReleaseString(id) : MasterString(id);
 		using var response = await Client.GetAsync(requestString);
 		if(!response.IsSuccessStatusCode)
 			throw new Exception(response.ReasonPhrase);
@@ -160,7 +162,7 @@ public static class Discogs{
 			formatString.ToUpper().Contains("LP") ||
 			formatString.ToUpper().Contains("EP") ? ProductType.Vinyl :
 			formatString.ToUpper().Contains("CASSETTE") ? ProductType.Cassette :
-			throw new Exception($"Product type ${formatString} not found");
+			ProductType.Unknown;
 	}
 
 	private static string GetRuntime(JObject o){
@@ -219,8 +221,12 @@ public static class Discogs{
 	private static string ReleaseString(string release){
 		return $"https://api.discogs.com/releases/{release}";
 	}
-
+	private static string MasterString(string master){
+		return $"https://api.discogs.com/masters/{master}";
+	}
+	
 	private static string SearchPrefix(){
 		return "https://api.discogs.com/database/search?";
 	}
+	
 }

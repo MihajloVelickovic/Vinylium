@@ -24,7 +24,7 @@ public class ProductService: IProductService{
 	}
 
 	public async Task<List<Product>> FetchProducts(AddProductReq request){
-		var product = await Discogs.CreateProduct(request.Code, request.IsBarcode, request.Price);
+		var product = await Discogs.CreateProduct(request.Code, request.Price);
 		return product;
 	}
 

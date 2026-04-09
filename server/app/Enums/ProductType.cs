@@ -1,6 +1,7 @@
 namespace app.Enums;
 public enum ProductType{
-    Vinyl = 0,
+    Unknown = -1,
+    Vinyl,
     Cassette,
-    Cd
+    Cd,
 }
