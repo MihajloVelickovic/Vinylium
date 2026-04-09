@@ -38,6 +38,7 @@ public class ProductController: ControllerBase{
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> GetAllProducts(){
 		try{
+			var totalCount = await _productService.GetCount();
 			var list = await _productService.GetAll();
 			return Ok(new{ data = list });
 		}
@@ -79,9 +80,9 @@ public class ProductController: ControllerBase{
 					throw new Exception("Price High is not a decimal value") :
 					(decimal?)null;
 			
-			var filtered = await _productService.GetFilteredAsync(title, artist, type, pL, pH);
+			var filtered = await _productService.GetFilteredAsync(title, type, pL, pH);
 
-			return Ok(new{data=filtered});
+			return Ok(new{count=filtered.Count, data=filtered});
 		}
 		catch(Exception e){
 			return BadRequest(e.Message);

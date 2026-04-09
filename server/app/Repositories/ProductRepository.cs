@@ -10,6 +10,7 @@ public interface IProductRepository{
 	Task<Product> GetByIdAsync(string barcode);
 	Task<List<Product>> GetFilteredAsync(FilterReq req);
 	Task<List<Product>> GetRandomProductsAsync();
+	Task<int> GetCount();
 }
 
 public class ProductRepository: IProductRepository{
@@ -41,12 +42,9 @@ public class ProductRepository: IProductRepository{
 
 		var query = _dbContext.Products.AsQueryable();
 		
-		if(!string.IsNullOrWhiteSpace(req.Title))
-			query = query.Where(p => p.Name ==  req.Title);
+		if(!string.IsNullOrWhiteSpace(req.Search))
+			query = query.Where(p => p.Name.Contains(req.Search) || p.Artist.Contains(req.Search));
 		
-		if(!string.IsNullOrWhiteSpace(req.Artist))
-			query = query.Where(p => p.Artist ==  req.Artist);
-
 		if(req.Type != null)
 			query = query.Where(p => p.Type ==  req.Type);
 		
@@ -64,5 +62,9 @@ public class ProductRepository: IProductRepository{
 		return await _dbContext.Products.OrderBy(p => EF.Functions.Random())
 										.Take(50)
 										.ToListAsync();
+	}
+
+	public async Task<int> GetCount(){
+		return await _dbContext.Products.CountAsync();
 	}
 }

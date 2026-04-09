@@ -5,7 +5,7 @@ import {useState} from "react";
 import Product from "../models/Product.ts";
 
 //@ts-ignore
-export const AlbumCard = ({product}) => {
+export const AlbumCard = ({product, best}) => {
     const [isOpen, setIsOpen] = useState(false);
     const acceptProduct = async () => {
         try {
@@ -23,7 +23,7 @@ export const AlbumCard = ({product}) => {
 
     return (
         <>
-            <div className="albumCard" onKeyUp={(e) => {
+            <div className={"albumCard " + (best && "bestCard")} onKeyUp={(e) => {
                 if (e.key === 'Escape' && isOpen)
                     setIsOpen(false)
             }}>
@@ -104,6 +104,15 @@ export const AlbumCard = ({product}) => {
                                 })
                             }
                         </select>
+                    </div>
+                    <div className="productInput textBord">
+                        <p>Price:</p>
+                        <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                             onInput={(r) => {
+                                 product.price = r.currentTarget.textContent;
+                             }}>
+                            <p>{product.price}</p>
+                        </div>
                     </div>
                     <div>
                         <button className="acceptButton" onClick={acceptProduct}>Add Product</button>

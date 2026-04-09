@@ -8,7 +8,7 @@ export default class Product {
     catalogNumber: string;
     inwarehouse: boolean;
     runtime: string;
-    price: string;
+    price: string | null;
     tracklist: Array<string>;
 
     constructor(jsonData: any) {
