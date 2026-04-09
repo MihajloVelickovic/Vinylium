@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using app.Enums;
 using app.Models;
@@ -32,34 +33,65 @@ public static class Discogs{
 	}
 
 	public static async Task<List<Product>> CreateProduct(string code, decimal price){
-
-		var entryData = await GetEntryData(code, true);
-		var entryDataCatalog = await GetEntryData(code, false) as JArray ?? [];
-		if(entryData == null && entryDataCatalog == null)
+		
+		
+		var productsBarcode = await GetEntryData(code, barcodeSearch: true) as JArray ?? [];
+		var productsCatalogNumber = await GetEntryData(code, barcodeSearch: false) as JArray ?? [];
+		
+		if(!productsBarcode.Any() && !productsCatalogNumber.Any())
 			throw new Exception($"No results found for {code}");
 
-		if(entryData != null)
-			entryDataCatalog.AddFirst(entryData);
+		/* will result in productsBarcode holding all available data no matter if any of the two arrays is empty */
+		productsBarcode.Merge(productsCatalogNumber);
 		
 		var list = new List<Product>();
+		var visited = new List<string>();
 		
-		foreach(var data in entryDataCatalog){
-			var formatString = (string?)data["format"]?[0] ?? "";
-			var releaseId = (string?)data["id"];
+		foreach(var product in productsBarcode){
+			
+			/* for cases when the title itself contains a hyphen,
+			 * joining is needed to keep it whole
+			 */
+			var titleSeparated = string.Join('-', ((string?)product["title"])?.Split('-').Skip(1) ?? []).Trim();
+			
+			/* avoiding rate limits and slow responses by only allowing one product with the same name
+			 * to be added to the final list, useful for cases when the same barcode or catalog number 
+			 * returns many same products with minimal differences (country, or some other minor detail)
+			 * discogs api has a rate limit of 60 calls per minute for auth-ed users and 20 for
+			 * non auth-ed so this is potentially a big improvement if it doesn't lead to faulty searches
+			 */
+			if(visited.Contains(titleSeparated, StringComparer.InvariantCultureIgnoreCase))
+				continue;
+			
+			var formatString = (string?)product["format"]?[0] ?? "";
+			
+			/* release or master_release have better metadata than specific product queries
+			 * such as: better images, they contain the tracklist, better formatting
+			 */
+			var releaseId = (string?)product["id"];
 			var releaseData = await GetReleaseMasterData(releaseId, true);
-
-			if((string?)releaseData["title"] != ((string?)data["title"])?.Split('-')[1].Trim()){
-				var masterId = (string?)data["master_id"];
+			
+			/* if the title from the request itself doesn't match the
+			 * release title, try to do the same with the master release
+			 */
+			if(string.Compare((string?)releaseData["title"], titleSeparated, StringComparison.InvariantCultureIgnoreCase) != 0){
+				var masterId = (string?)product["master_id"];
 				if(masterId == null || masterId == "0")
 					continue;
 				releaseData = await GetReleaseMasterData(masterId, false);
+				if((string?)releaseData["title"] != titleSeparated)
+					continue;
 			}
+			
+			/* If both release and master titles don't match the queried title, we cant consider
+			 * it visited, so we only now add it to the list
+			*/
+			visited.Add(titleSeparated);
 			
 			/* deals with different barcode scenarios
 			 * that can happen when fetching data
 			 */
-			var barcodeList = data["barcode"] ?? new JArray();
-
+			var barcodeList = product["barcode"] ?? new JArray();
 			string? barcode = null;
 			if(barcodeList.Any()){
 				foreach(var bc in barcodeList){
@@ -76,29 +108,29 @@ public static class Discogs{
 			
 			list.Add(new Product(){
 				Barcode = barcode,
-				CatalogNumber = ((string?)data["catno"]) ?? "",
+				CatalogNumber = ((string?)product["catno"]) ?? "",
 				Name = (string?)releaseData["title"] ?? "",
 				Artist = (string?)(releaseData["artists"]?[0]?["name"]) ?? "",
 				ImageUrl = (string?)(releaseData["images"]?[0]?["resource_url"]) ?? "",
 				Price = price,
 				Runtime = GetRuntime(releaseData),
 				Type = GetFormat(formatString),
-				ReleaseDate = (string?)data["year"] ?? "",
+				ReleaseDate = (string?)product["year"] ?? "",
 				InWarehouse = false,
 				Tracklist = GetTracklist(releaseData),
 			});
 		}
-		return list;
+		return list.Count > 0 ? list : throw new Exception("No valid items found");
 	}
 
 	private static async Task<JToken?> GetEntryData(string code, bool barcodeSearch){
+		
 		var prefix = SearchPrefix();
 		var suffix = AuthSuffix();
 		var searchParameter = barcodeSearch ? "barcode" : "catno";
 		var requestString = $"{prefix}{searchParameter}={code}{suffix}";
-		
-		var response = await Client.GetAsync(requestString);
 
+		var response = await Client.GetAsync(requestString);
 		var responseString = await response.Content.ReadAsStringAsync();
 		var responseJObject = JObject.Parse(responseString);
 
@@ -106,41 +138,8 @@ public static class Discogs{
 		var items = (int?)responseJObject["pagination"]?["items"] ?? throw new Exception("Couldn't parse pagination");
 		if(items == 0)
 			return null;
-
-		string? masterUrl = null;
-		var release = "0";
-		var year = "0";
-		var formatString = string.Empty;
-		var index = -1;
-		while(barcodeSearch && (release == "0" || formatString == string.Empty || 
-		                    formatString == string.Empty ||  year == "0" ||
-		                    masterUrl == null) && index < items - 1){
-			++index;
-			var dataField = responseJObject["results"]?[index] ?? throw new Exception("Couldn't parse data");
-			release = (string?)dataField["id"];
-			year = (string?)dataField["year"];
-			masterUrl = (string?)dataField["master_url"];
-			formatString = (string?)dataField["format"]![0];
-		}
-
-		if(barcodeSearch && index > items - 1)
-			throw new Exception("Couldn't find appropriate release");
-
-		if(barcodeSearch && masterUrl == null)
-			throw new Exception("Couldn't find master release");
 		
-		
-		/* barcode searches can also result in multiple results
-		 * but all of those are always the same album, just sometimes
-		 * have some different metadata.
-		 * If we're searching using barcodes, we want to return one
-		 * specific release (the one with the best metadata as found
-		 * above), but when searching with cat.no-s we want to return
-		 * every releaserelease
-		 */
-		return barcodeSearch
-			? responseJObject["results"]?[index] ?? throw new Exception("Couldn't parse data")
-			: responseJObject["results"] ?? throw new Exception("Couldn't parse data");
+		return responseJObject["results"] ?? throw new Exception("Couldn't parse data");
 	}
 
 	private static async Task<JObject> GetReleaseMasterData(string? id, bool release){
