@@ -15,6 +15,7 @@ public interface IProductService{
 	Task<List<Product>> GetFilteredAsync(string? search, int? type, decimal? pL, decimal? pH);
 	Task<List<Product>> GetRandomProductsAsync();
 	Task<int> GetCount();
+	Task<List<Product>> GetPage(int? page, int? items);
 }
 
 public class ProductService: IProductService{
@@ -77,5 +78,13 @@ public class ProductService: IProductService{
 
 	public async Task<int> GetCount(){
 		return await _productRepository.GetCount();
+	}
+
+	public async Task<List<Product>> GetPage(int? page, int? items){
+		var p = page ?? 1;
+
+		var i = items ?? throw new Exception("Need to return some items");
+		
+		return await _productRepository.GetPage(p, i);
 	}
 }

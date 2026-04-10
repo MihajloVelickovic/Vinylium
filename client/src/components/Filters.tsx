@@ -46,7 +46,7 @@ export const Filters = ({setProducts}) => {
                     })
                 }
             </select>
-            <input type="text" placeholder="Title" 
+            <input type="text" placeholder="Search" 
             onInput={(e) => setSearch(e.currentTarget.value)}></input>
             <select onChange={(t) => {
                 setType(t.target.selectedIndex)

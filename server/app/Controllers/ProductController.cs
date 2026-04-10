@@ -31,11 +31,10 @@ public class ProductController: ControllerBase{
 			return Ok(new{ data = product });
 		}
 		catch(BadHttpRequestException r){
-			if(r.StatusCode == 429){
+			if(r.StatusCode == 429)
 				return BadRequest($"Too Many Requests to Discogs API. Either the code {request.Code} " +
 				                  $"is not unique enough, or too many requests have been made in a short + " +
 				                  $"amount of time, in which case you should wait a bit before fetching again!");
-			}
 			throw;
 		}
 		catch(Exception e){
@@ -43,14 +42,16 @@ public class ProductController: ControllerBase{
 		}
 	}
 
-	[HttpGet("GetAllProducts")]
+	[HttpGet("GetPage")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult> GetAllProducts(){
+	public async Task<ActionResult> GetPage([FromQuery] int? page, [FromQuery] int? items){
 		try{
 			var totalCount = await _productService.GetCount();
-			var list = await _productService.GetAll();
-			return Ok(new{ data = list });
+			var pages = totalCount/(items+1) + 1;		
+			var list = await _productService.GetPage(page, items);
+			//var list = await _productService.GetAll(page, items);
+			return Ok(new{pages, data = list });
 		}
 		catch(Exception e){
 			return BadRequest(e.Message);

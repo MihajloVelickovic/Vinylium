@@ -11,6 +11,7 @@ public interface IProductRepository{
 	Task<List<Product>> GetFilteredAsync(FilterReq req);
 	Task<List<Product>> GetRandomProductsAsync();
 	Task<int> GetCount();
+	Task<List<Product>> GetPage(int page, int items);
 }
 
 public class ProductRepository: IProductRepository{
@@ -66,5 +67,12 @@ public class ProductRepository: IProductRepository{
 
 	public async Task<int> GetCount(){
 		return await _dbContext.Products.CountAsync();
+	}
+
+	public async Task<List<Product>> GetPage(int page, int items){
+		
+		var skip = (page - 1) * items;
+		return await _dbContext.Products.Select(p => p).Skip(skip).Take(items).ToListAsync();
+
 	}
 }
