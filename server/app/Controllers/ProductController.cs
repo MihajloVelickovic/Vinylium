@@ -74,8 +74,9 @@ public class ProductController: ControllerBase{
 	[HttpGet("GetProductsFiltered")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult> GetProductsFiltered([FromQuery] string? title,  
-													    [FromQuery] string? artist,
+	public async Task<ActionResult> GetProductsFiltered([FromQuery] int? page, 
+														[FromQuery] int? items,
+														[FromQuery] string? search,  
 														[FromQuery] int? type, 
 														[FromQuery] string? priceLow, 
 														[FromQuery] string? priceHigh){
@@ -87,13 +88,13 @@ public class ProductController: ControllerBase{
 					(decimal?)null;
 			
 			var pH = priceHigh != null ? 
-					(decimal.TryParse(priceLow, out temp) ? temp : (decimal?)null) ??  
+					(decimal.TryParse(priceHigh, out temp) ? temp : (decimal?)null) ??  
 					throw new Exception("Price High is not a decimal value") :
 					(decimal?)null;
-			
-			var filtered = await _productService.GetFilteredAsync(title, type, pL, pH);
 
-			return Ok(new{count=filtered.Count, data=filtered});
+			var filtered = await _productService.GetFilteredAsync(page, items, search, type, pL, pH);
+			
+			return Ok(new{pages=filtered.pages, data=filtered.result});
 		}
 		catch(Exception e){
 			return BadRequest(e.Message);

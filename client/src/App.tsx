@@ -2,15 +2,13 @@ import {FetchAlbumsForm} from './components/FetchAlbumsForm';
 import {BrowserRouter, Routes, Route, Link} from 'react-router-dom';
 import "../src/index.css"
 import RegisterForm from "./components/RegisterForm";
-import {Store} from "./components/Store";
-import {useEffect, useState} from "react";
+import Store from "./components/Store";
+import {createContext, useEffect, useState} from "react";
 import {ProductPage} from "./components/ProductPage.tsx";
 import {AdminDashboard} from "./components/AdminDashboard";
 import { Navbar } from "./components/Navbar";
+import type Product from "./models/Product.ts";
 
-function Home() {
-    return <h2>Home Page</h2>;
-}
 
 function About() {
     return <h2>About Page</h2>;
@@ -20,12 +18,10 @@ function Contact() {
     return <h2>Contact Page</h2>;
 }
 
-
-
 function App() {
     
     const [loggedIn, setLoggedIn] = useState(false);
-
+    
     useEffect(() => {
         localStorage.getItem("token") === null ? setLoggedIn(false) : setLoggedIn(true); 
     }, []);
@@ -38,10 +34,7 @@ function App() {
                 {/* Routes */}
                 <Routes>
                     <Route path="/" element={
-                        <>
-                            <Home/>
-                            <Store />
-                        </>
+                        <Store />
                     }/>
                     <Route path="/user/:username" element={<></>}/>
                     <Route path="/about" element={<About/>}/>
@@ -51,9 +44,8 @@ function App() {
                         <>
                             <RegisterForm/>
                         </>
-                    }/>
+                    }/>s
                     <Route path="/admin" element={<AdminDashboard />}>
-                        
                         <Route path="add-album" element={<FetchAlbumsForm />} />
                     </Route>
                     <Route path="/cart"></Route>
