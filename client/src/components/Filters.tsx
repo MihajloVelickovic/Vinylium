@@ -62,10 +62,10 @@ export const Filters = ({params}) => {
             <div className="pages">
                 {
                     Array.from(Array(params.filters.pages).keys()).map((_, i) => (i+1)).map((n => {
-                    return <button className="button-main" onClick={() => {
+                    return <button onClick={() => {
                         params.setFilters({...params.filters, currentPage: n})
                         params.setChange(!params.change)
-                    }}>{n}</button>
+                    }} className={(params.filters.currentPage == n ? "clicked" : "")+" button-main"}>{n}</button>
                 }))
                 }
             </div>

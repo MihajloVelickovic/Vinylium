@@ -1,15 +1,32 @@
 .filtersFull{
     animation-name: scaleAnim;
     animation-duration: 0.2s;
+    border-bottom: var(--border) 1px solid;
+    box-shadow: var(--border) 0 10px 10px -10px;
+    margin-bottom: 2em;
 }
 
 .filters{
-    margin: 2em;
+    margin: 2em 2em 1em 2em;
     padding:0;
 }
 
+.pages {
+    display: flex;
+    grid-template-columns:1fr 1fr;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1em;
+}
 .pages button{
-    
+    font-size: 0.8rem;
+    width: 2em;
+    height: 2em;
+}
+
+.clicked{
+    background-color: var(--vinylium-accent);
 }
 
 .filters input[type=text], input[type=number] {
