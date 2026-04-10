@@ -5,13 +5,15 @@
     flex-direction: column;
     text-align: left;
     width: 200px;
-    transition: scale 0.2s ease;
-
+    transition: scale 0.2s ease, box-shadow 10s ease;
 }
 
 .productCard:hover {
     scale: 1.1;
 }
 
-
-    
+.productCard:hover img{
+    box-shadow: var(--vinylium-accent) 0 0 10px;
+    border: var(--vinylium-accent) outset 2px;
+    transition: box-shadow 0.2s ease;
+}

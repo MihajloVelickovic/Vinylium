@@ -25,8 +25,7 @@ public class ProductService: IProductService{
 	}
 
 	public async Task<List<Product>> FetchProducts(AddProductReq request){
-		var product = await Discogs.CreateProduct(request.Code);
-		return product;
+		return await Discogs.CreateProduct(request.Code);
 	}
 
 	public async Task<List<Product>> GetAll(){

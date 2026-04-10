@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using app.Enums;
 using app.Models;
 using app.Requests;
@@ -20,6 +21,7 @@ public class ProductController: ControllerBase{
 	[HttpPost("FetchProducts")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	[ProducesResponseType(StatusCodes.Status429TooManyRequests)]
 	public async Task<ActionResult> FetchProducts([FromBody] AddProductReq request){
 		try{
 			if(string.IsNullOrWhiteSpace(request.Code))
@@ -27,6 +29,14 @@ public class ProductController: ControllerBase{
 
 			var product = await _productService.FetchProducts(request);
 			return Ok(new{ data = product });
+		}
+		catch(BadHttpRequestException r){
+			if(r.StatusCode == 429){
+				return BadRequest($"Too Many Requests to Discogs API. Either the code {request.Code} " +
+				                  $"is not unique enough, or too many requests have been made in a short + " +
+				                  $"amount of time, in which case you should wait a bit before fetching again!");
+			}
+			throw;
 		}
 		catch(Exception e){
 			return BadRequest(e.Message);

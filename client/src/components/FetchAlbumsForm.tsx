@@ -8,7 +8,7 @@ export const FetchAlbumsForm = () => {
 
     const [code, setCode] = useState("");
     const [results, setResults] = useState(new Array<Product>());
-    
+    const [error, setError] = useState("");
     // flips value on every successful fetch 
     // is then passed to AlbumCard components
     // useEffect in there tracks the renderer variable
@@ -18,14 +18,18 @@ export const FetchAlbumsForm = () => {
     
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError("");
         let result;
         try {
             result = await axios.post("http://localhost:1738/api/Product/FetchProducts", {
                     code
                 }
             );
-        } catch (e) {
+        } catch (e:any) {
+            if(e.response && e.response.data)
+                setError(e.response.data);
             console.log("Exception: " + e);
+            setResults([])
             return;
         }
 
@@ -48,15 +52,14 @@ export const FetchAlbumsForm = () => {
                         <button className="fetchButton" type="submit">Fetch</button>
                 </form>
                 {results.length > 0 ?
-                    <div style={{padding:"0",border:"none",margin:"0"}}>
+                    <div>
                         <h2>Potential Best Match</h2>
                         <div className="albums best">
                             <AlbumCard product={results.at(0)} best={true} rerender={rerender}/>
                         </div>
                     </div>
                     :
-                    <></>
-                    
+                    <h2 className="fetchError">{error}</h2>
                 }
             </div>
             {results.length > 1 &&

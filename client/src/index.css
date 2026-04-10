@@ -168,11 +168,12 @@ code {
   position: relative;
   text-decoration: none;
   z-index: 1;
-  transition: filter 0.2s ease;
+  transition: filter 0.2s ease, scale 0.2s ease;
 }
 
 .nav-link:hover {
-  filter: contrast(50%);
+  filter: contrast(70%);
+  scale: 1.01;
 }
 
 .navbar span{
@@ -188,9 +189,6 @@ code {
   opacity: 1;
   transition: opacity 0.5s linear(0, 0 0% 70%,1);
 }
-
-.na
-
 
 /*.nav-link img {*/
 /*  transition: filter 0.2s ease;*/
