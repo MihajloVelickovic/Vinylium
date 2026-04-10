@@ -1,6 +1,15 @@
+.filtersFull{
+    animation-name: scaleAnim;
+    animation-duration: 0.2s;
+}
+
 .filters{
     margin: 2em;
     padding:0;
+}
+
+.pages button{
+    
 }
 
 .filters input[type=text], input[type=number] {
@@ -27,7 +36,7 @@
 
 .filters input[type=image]:hover{
     scale: 1.1;
-    filter: contrast(50%);
+    filter: contrast(70%);
 }
 
 .filters input:focus{

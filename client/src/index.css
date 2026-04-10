@@ -260,3 +260,8 @@ code {
 .admin-dash-img{
   width: 90px;
 }
+
+@keyframes scaleAnim {
+  from { filter: blur(10px); }
+  to { filter: blur(0); }
+}
