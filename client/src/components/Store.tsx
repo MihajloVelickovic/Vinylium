@@ -4,7 +4,6 @@ import Product from "../models/Product.ts";
 import {ProductCard} from "./ProductCard.tsx";
 import "../styles/Store.css"
 import {Filters} from "./Filters.tsx";
-import User from "../models/User.ts";
 
 interface IFilter{
     pages:number;
@@ -41,14 +40,16 @@ const Store = () => {
         }
         
         else{
-            // debouncing
-            // sets a timer to execute the query, but resets it if its 
-            // called again before the timer runs out, and discards the
-            // call that was supposed to happen, and instead starts a new timer
+            /* debouncing
+             * sets a timer to execute the query, but resets it if its 
+             * called again before the timer runs out, and discards the
+             * call that was supposed to happen, and instead starts a new timer 
+             */
             const timer = setTimeout(() =>
                     getProducts().then(res => {
                         finalizeData(res);
-                        localStorage.setItem(res.request.responseURL, JSON.stringify({data: res.data, time: Date.now()}));
+                        const cacheKey = '?'+ res.request.responseURL.split('?').at(-1)
+                        localStorage.setItem(cacheKey, JSON.stringify({data: res.data, time: Date.now()}));
                     })
                         .catch(err => console.log(err))
                 , 500)
@@ -59,7 +60,6 @@ const Store = () => {
 
     /* currently uses local storage, could change to redis as to not overload local storage */
     const checkCache = () => {
-        const urlBase = "http://localhost:1738/api/Product/GetProductsFiltered";
         const params = {
             page: filters.currentPage,
             items: filters.items,
@@ -68,8 +68,8 @@ const Store = () => {
             priceLow: filters.priceLow,
             priceHigh: filters.priceHigh
         }
-        const url = axios.getUri({url: urlBase, params});
-
+        const url = axios.getUri({url:"", params});
+        
         return localStorage.getItem(url);
         
     }
@@ -89,7 +89,7 @@ const Store = () => {
     
     const finalizeData = (result:any) =>{
         let temp = new Array<Product>();
-        setFilters({...filters, pages: result.data.pages});
+        setFilters({...filters, pages: result.data.pages, currentPage:1});
         result.data.data.forEach((item: any) => {
             temp.push(new Product(item));
         })

@@ -4,21 +4,23 @@ import {Link} from "react-router-dom";
 
 //@ts-ignore
 export const ProductCard = ({product}) => {
-    
+
     return (
-        <Link to={`/products/${product.barcode}`} style={{textDecoration: "none", color: "var(--text)"}}>
-            <div className="productCard">
+        <div className="productCard">
+            <Link to={`/products/${product.barcode}`} style={{textDecoration: "none", color: "var(--text)"}}>
                 <div>
-                <img src={product.imageUrl}
-                     width={200}
-                     height={200}
-                     alt="Epic album cover"/>
+                    <img src={product.imageUrl}
+                         width={200}
+                         height={200}
+                         alt={product.artist+ ' - ' + product.name}/>
                 </div>
                 <div>
                     <p>{product.artist} - {product.name} ({Product.evaluateType(product.type)})</p>
                     <p>{product.price} RSD</p>
                 </div>
-            </div>
-        </Link>
+            </Link>
+            
+        </div>
+
     )
 }

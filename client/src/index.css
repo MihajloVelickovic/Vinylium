@@ -172,8 +172,14 @@ code {
 }
 
 .nav-link:hover {
-  filter: contrast(70%);
+  filter: contrast(50%);
   scale: 1.01;
+}
+
+.nav-link:focus {
+  filter: contrast(50%);
+  scale: 1.01;
+  outline: none;
 }
 
 .navbar span{
@@ -186,6 +192,11 @@ code {
   transition: none;
 }
 .nav-link:hover span{
+  opacity: 1;
+  transition: opacity 0.5s linear(0, 0 0% 70%,1);
+}
+
+.nav-link:focus span{
   opacity: 1;
   transition: opacity 0.5s linear(0, 0 0% 70%,1);
 }

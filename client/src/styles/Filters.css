@@ -1,4 +1,7 @@
 .filtersFull{
+    margin-top:1em;
+    padding-top:0.2em;
+    background-color: var(--bg);
     animation-name: scaleAnim;
     animation-duration: 0.2s;
     border-bottom: var(--border) 1px solid;
@@ -23,13 +26,20 @@
     font-size: 0.8rem;
     width: 2em;
     height: 2em;
+    transition: font-size 0.1s ease;
+}
+
+.pages button:focus{
+    font-size: 1rem;
+    width: 2em;
+    height: 2em;
 }
 
 .clicked{
     background-color: var(--vinylium-accent);
 }
 
-.filters input[type=text], input[type=number] {
+.filters input{
     margin: 0 2em;
     height: 3vh;
     border: none;
@@ -37,13 +47,33 @@
     background: none;
     outline: none;
     font-family: var(--heading) sans-serif;
-    width: 10%;
     text-align: center;
     font-size: 1.2rem;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: textfield;
+    transition: width 0.5s ease;
 }
+
+.filters input[type=text] {
+    width: 15%;
+}
+
+
+.filters input[type=text]:focus {
+    width: 20%;
+    transition: width 0.5s ease;
+}
+
+.filters input[type=number]{
+    width: 10%;
+}
+
+.filters input[type=number]:focus{
+    width: 15%;
+    transition: width 0.5s ease;
+}
+
 
 .filters input[type=image]{
     border: none;
@@ -67,8 +97,14 @@
     margin: 0 2em;
     text-align: center;
     border-radius: 0;
-    border: none;
     background: none;
+    border: none;
+    transition: background-color 0.1s ease;
+}
+
+.filters select:focus{
+    background-color: var(--vinylium-accent);
+    outline: none;
 }
 
 .filters select:hover{

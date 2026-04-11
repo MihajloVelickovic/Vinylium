@@ -12,6 +12,24 @@
     scale: 1.05;
 }
 
+
+.productCard a {
+    transition: scale 0.2s ease, box-shadow 10s ease;
+}
+
+.productCard a:focus {
+    transition: box-shadow 0.2s ease;
+    scale: 1.05;
+    outline: none;
+}
+
+.productCard a:focus img{
+    box-shadow: var(--vinylium-accent) 0 0 10px;
+    border: var(--vinylium-accent) outset 2px;
+    transition: box-shadow 0.2s ease;
+    
+}
+
 .productCard:hover img{
     box-shadow: var(--vinylium-accent) 0 0 10px;
     border: var(--vinylium-accent) outset 2px;

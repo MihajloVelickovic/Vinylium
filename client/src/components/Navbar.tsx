@@ -1,15 +1,9 @@
-import {Link, useLocation} from "react-router-dom";
-import {useState} from "react";
+import {Link} from "react-router-dom";
 import Cart from "./Cart";
 
-
-
 export const Navbar = () => {
-    const location = useLocation();
-    const isTransparent = location.pathname.startsWith("/products/");
-    
     return(
-        <nav className={`navbar ${isTransparent ? "navbar-transparent" : ""}`}>
+        <nav className="navbar">
             <Link className="nav-link" to="/">
                 <img className="logo navbar-icon" src="../src/assets/vinylium_logo.svg" alt="logo"/>
                 <span>Home</span>
@@ -29,9 +23,7 @@ export const Navbar = () => {
                 <img className="navbar-icon" src="../src/assets/contact.svg" alt="Contact"/>
                 <span>Contact</span>
             </Link>
-    
             
-    
             <Link className="nav-link" to="/admin" id="admin">
                 <img className="admin-dash-img" src="../src/assets/admin_dash.svg" alt="Admin Dashboard"/>
                 <span>Dashboard</span>

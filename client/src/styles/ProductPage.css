@@ -60,12 +60,12 @@
     z-index: -2;
     scale: var(--scale);
     filter: blur(10px) brightness(var(--brightness));
-    animation: bgBlur 1s ease;
+    animation: bgBlur 0.5s ease;
 }
 
 @keyframes bgBlur {
     from{
-        filter: blur(20px) brightness(var(--brightness));
+        filter: blur(50px) brightness(var(--brightness));
     }
     to{
         filter: blur(10px) brightness(var(--brightness));

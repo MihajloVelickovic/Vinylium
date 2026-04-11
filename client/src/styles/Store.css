@@ -3,7 +3,6 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    max-height: 100vh;
     overflow: hidden;
     animation-name: scaleAnim;
     animation-duration: 0.2s;
