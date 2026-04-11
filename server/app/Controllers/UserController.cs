@@ -44,8 +44,15 @@ public class UserController: ControllerBase{
 			if(!RegExp.Check(@"^[ -~]{8,}$", request.Password))
 				throw new Exception("Password format not valid");
 
-			var registeredUser = await _userService.RegisterUserAsync(request);
-			return Ok(new{ message = "Successfully Registered" });
+			var user = await _userService.RegisterUserAsync(request);
+			
+			var guid = Guid.NewGuid().ToString();
+
+			var token = _jwtService.GenerateAccessToken(user.Username, user.Email, user.Admin);
+			var refreshToken = _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
+			
+			
+			return Ok(new{ message = "Successfully Registered", user, token, refreshToken});
 		}
 		catch(Exception e){
 			return BadRequest(new{ message = e.Message });

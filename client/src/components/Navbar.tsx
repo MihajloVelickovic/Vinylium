@@ -1,7 +1,11 @@
 import {Link} from "react-router-dom";
 import Cart from "./Cart";
+import {useAuth} from "./AuthContext.tsx";
 
 export const Navbar = () => {
+    
+    const {isLoggedIn, logout, refreshToken, token} = useAuth();
+    
     return(
         <nav className="navbar">
             <Link className="nav-link" to="/">
@@ -23,11 +27,17 @@ export const Navbar = () => {
                 <img className="navbar-icon" src="../src/assets/contact.svg" alt="Contact"/>
                 <span>Contact</span>
             </Link>
-            
-            <Link className="nav-link" to="/admin" id="admin">
-                <img className="admin-dash-img" src="../src/assets/admin_dash.svg" alt="Admin Dashboard"/>
-                <span>Dashboard</span>
-            </Link>
+            {isLoggedIn() ?
+                <>
+                <Link className="nav-link" to="/admin" id="admin">
+                    <img className="admin-dash-img" src="../src/assets/admin_dash.svg" alt="Admin Dashboard"/>
+                    <span>Dashboard</span>
+                </Link>
+                    <button onClick={async () => {
+                        logout(refreshToken)
+                    }}>Logout</button>
+                </>
+                : <></>}
             <Cart/>
         </nav>
     )

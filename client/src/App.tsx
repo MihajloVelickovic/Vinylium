@@ -1,13 +1,12 @@
 import {FetchAlbumsForm} from './components/FetchAlbumsForm';
-import {BrowserRouter, Routes, Route, Link} from 'react-router-dom';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import "../src/index.css"
 import RegisterForm from "./components/RegisterForm";
 import Store from "./components/Store";
-import {createContext, useEffect, useState} from "react";
 import {ProductPage} from "./components/ProductPage.tsx";
 import {AdminDashboard} from "./components/AdminDashboard";
-import { Navbar } from "./components/Navbar";
-import type Product from "./models/Product.ts";
+import {Navbar} from "./components/Navbar";
+import {AuthProvider} from "./components/AuthContext.tsx";
 
 
 function About() {
@@ -20,39 +19,36 @@ function Contact() {
 
 function App() {
     
-    const [loggedIn, setLoggedIn] = useState(false);
-    
-    useEffect(() => {
-        localStorage.getItem("token") === null ? setLoggedIn(false) : setLoggedIn(true); 
-    }, []);
-    
     return (
-        <div>
+            
             <BrowserRouter>
-                {/* Navigation */}
-                <Navbar />
-                {/* Routes */}
-                <Routes>
-                    <Route path="/" element={
-                        <Store />
-                    }/>
-                    <Route path="/user/:username" element={<></>}/>
-                    <Route path="/about" element={<About/>}/>
-                    <Route path="/contact" element={<Contact/>}/>
-                    <Route path="/products/:id" element={<ProductPage/>}/>
-                    <Route path="/login" element={
-                        <>
-                            <RegisterForm/>
-                        </>
-                    }/>s
-                    <Route path="/admin" element={<AdminDashboard />}>
-                        <Route path="add-album" element={<FetchAlbumsForm />} />
-                    </Route>
-                    <Route path="/cart"></Route>
+                <AuthProvider>
+                    {/* Navigation */}
+                    <Navbar/>
+                    {/* Routes */}
+                    <Routes>
+                        <Route path="/" element={
+                            <Store/>
+                        }/>
+                        <Route path="/user/:username" element={<></>}/>
+                        <Route path="/about" element={<About/>}/>
+                        <Route path="/contact" element={<Contact/>}/>
+                        <Route path="/products/:id" element={<ProductPage/>}/>
+                        <Route path="/login" element={
+                            <>
+                                <RegisterForm/>
+                            </>
+                        }/>s
+                        <Route path="/admin" element={<AdminDashboard/>}>
+                            <Route path="add-album" element={<FetchAlbumsForm/>}/>
+                        </Route>
+                        <Route path="/cart"></Route>
 
-                </Routes>
+                    </Routes>
+                </AuthProvider>
             </BrowserRouter>
-        </div>
+                
+            
     );
 }
 
