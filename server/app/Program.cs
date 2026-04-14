@@ -74,8 +74,8 @@ public class Program{
 
 		app.UseRouting();
 		app.UseCors("AllowReact");
-		app.UseAuthorization();
 		app.UseAuthentication();
+		app.UseAuthorization();
 		app.MapControllers();
 		app.Run();
 	}

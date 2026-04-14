@@ -12,6 +12,7 @@ public interface IJwtService{
 	Task<string> GenerateRefreshToken(string username, int userId, string id);
 	Task<ClaimsPrincipal?> ValidateToken(string token, bool refresh = false);
 	Task<string?> GetUsernameFromToken(string token, bool refresh = false);
+	Task<bool> GetAdminStatus(string token);
 	public Task DeleteRefreshToken(string token);
 }
 
@@ -109,6 +110,11 @@ public class JwtService: IJwtService{
 		var principal = await ValidateToken(token, refresh);
 		return principal?.FindFirst("username")?.Value ??
 		       principal?.FindFirst(ClaimTypes.Name)?.Value;
+	}
+
+	public async Task<bool> GetAdminStatus(string token){
+		var principal = await ValidateToken(token);
+		return principal?.FindFirst(ClaimTypes.Role) != null;
 	}
 
 	public async Task DeleteRefreshToken(string token){

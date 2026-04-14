@@ -4,6 +4,7 @@ using app.Enums;
 using app.Models;
 using app.Requests;
 using app.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -18,6 +19,7 @@ public class ProductController: ControllerBase{
 		_productService = productService;
 	}
 
+	[Authorize]
 	[HttpPost("FetchProducts")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -100,7 +102,8 @@ public class ProductController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
-
+	
+	[Authorize]
 	[HttpPost("AddProduct")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]

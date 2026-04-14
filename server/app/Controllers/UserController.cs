@@ -83,12 +83,12 @@ public class UserController: ControllerBase{
 			var guid = Guid.NewGuid().ToString();
 
 			var token = _jwtService.GenerateAccessToken(user.Username, user.Email, user.Admin);
-			var refreshToken = _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
-
+			var refreshToken = await _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
+			
 			return Ok(new{
 				message = "Successfully Logged In",
 				token,
-				refreshToken = refreshToken.Result,
+				refreshToken,
 				user
 			});
 		}
@@ -96,7 +96,8 @@ public class UserController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
-
+	
+	//TODO encapsulate stuff to user service
 	[HttpPost("RefreshAccess")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -117,11 +118,11 @@ public class UserController: ControllerBase{
 			var guid = Guid.NewGuid().ToString();
 
 			var newToken = _jwtService.GenerateAccessToken(user.Username, user.Email, user.Admin);
-			var newRefreshToken = _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
+			var newRefreshToken = await _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
 
 			return Ok(new{
 				token = newToken,
-				refreshToken = newRefreshToken.Result
+				refreshToken = newRefreshToken
 			});
 		}
 		catch(Exception e){
@@ -134,15 +135,30 @@ public class UserController: ControllerBase{
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public async Task<ActionResult> LogOut(RefreshTokenReq req){
-		var validated = await _jwtService.ValidateToken(req.RefreshToken, true);
+		try{
+			var validated = await _jwtService.ValidateToken(req.RefreshToken, true);
+			if(validated == null)
+				return Unauthorized("Invalid refresh token");
 
-		if(validated == null)
-			return Unauthorized("Invalid refresh token");
-
-		await _jwtService.DeleteRefreshToken(req.RefreshToken);
-		return Ok(new{ message = "Deleted Refresh Token" });
+			await _jwtService.DeleteRefreshToken(req.RefreshToken);
+			return Ok(new{ message = "Deleted Refresh Token" });
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
 	}
 
+	[HttpGet("IsAdmin")]
+	public async Task<ActionResult> IsAdmin([FromQuery]string token){
+		try{
+			var res = await _jwtService.GetAdminStatus(token);
+			return Ok(new{isAdmin=res});
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
+	}
+	
 	[Authorize]
 	[HttpDelete("Delete")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
@@ -171,4 +187,23 @@ public class UserController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
+
+	[Authorize]
+	[HttpGet("GetUsername")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> GetUsername(){
+		try{
+			HttpContext.Request.Headers.TryGetValue("Authorization", out var token); 
+			var noBearer = token.Single()!.Split(' ')[1];
+			var username = await _jwtService.GetUsernameFromToken(noBearer);
+			return Ok(new{username});
+		}
+		catch(Exception e){
+			return BadRequest(e);
+		}
+	} 
+	
+	
 }
