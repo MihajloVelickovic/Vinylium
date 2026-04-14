@@ -104,7 +104,8 @@ public class UserController: ControllerBase{
 	public async Task<ActionResult> RefreshAccessToken([FromBody] RefreshTokenReq req){
 		try{
 			var username = await _jwtService.GetUsernameFromToken(req.RefreshToken, true);
-
+			await _jwtService.DeleteRefreshToken(req.RefreshToken);
+			
 			if(string.IsNullOrEmpty(username))
 				return Unauthorized("Invalid refresh token");
 
@@ -112,9 +113,7 @@ public class UserController: ControllerBase{
 
 			if(user == null)
 				throw new Exception($"User ${username} not found");
-
-			await _jwtService.DeleteRefreshToken(req.RefreshToken);
-
+			
 			var guid = Guid.NewGuid().ToString();
 
 			var newToken = _jwtService.GenerateAccessToken(user.Username, user.Email, user.Admin);

@@ -2,8 +2,7 @@ import {useState} from "react";
 import Product from "../models/Product";
 import {AlbumCard} from "./AlbumCard";
 import "../styles/FetchAlbumsForm.css"
-import adminClient from "../api/AdminClient.ts";
-import authClient from "../api/AdminClient.ts";
+import authClient from "../api/AuthClient";
 
 export const FetchAlbumsForm = () => {
 

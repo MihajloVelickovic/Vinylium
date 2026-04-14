@@ -82,7 +82,6 @@ public class JwtService: IJwtService{
 
 	public async Task<ClaimsPrincipal?> ValidateToken(string token, bool refresh = false){
 		var tokenHandler = new JwtSecurityTokenHandler();
-
 		try{
 			if(refresh){
 				var read = tokenHandler.ReadJwtToken(token);

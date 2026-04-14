@@ -1,9 +1,7 @@
 import {createContext, type Dispatch, type SetStateAction, useContext, useEffect, useState} from "react";
-import User from "../models/User.ts";
 import {useNavigate} from "react-router-dom";
-import authClient from "../api/AdminClient.ts";
+import authClient from "../api/AuthClient";
 import client from "../api/Client.ts";
-import adminClient from "../api/AdminClient.ts";
 
 type AuthContextData = {
     username: string | null;
@@ -64,7 +62,7 @@ export const AuthProvider = ({children}) => {
     }
     
     const getUsername = async () => {
-        return await adminClient.get("/User/GetUsername")
+        return await authClient.get("/User/GetUsername")
     }
     
     const register = async (email: string, username: string, password: string) => {

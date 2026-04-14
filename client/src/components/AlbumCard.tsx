@@ -2,7 +2,7 @@ import "../styles/AlbumCard.css"
 import PopOutCard from "./PopOutCard.tsx";
 import {useEffect, useRef, useState} from "react";
 import Product from "../models/Product.ts";
-import authClient from "../api/AdminClient.ts";
+import authClient from "../api/AuthClient";
 
 //@ts-ignore
 export const AlbumCard = ({product, best, rerender}) => {
