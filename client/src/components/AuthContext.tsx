@@ -1,16 +1,19 @@
 import {createContext, type Dispatch, type SetStateAction, useContext, useEffect, useState} from "react";
 import User from "../models/User.ts";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
+import authClient from "../api/AdminClient.ts";
+import client from "../api/Client.ts";
+import adminClient from "../api/AdminClient.ts";
 
 type AuthContextData = {
-    user: User | null;
+    username: string | null;
     token: string | null;
     refreshToken: string | null;
     register: (email: string, username: string, password: string) => void;
     login: (emailOrUsername: string, password: string) => void;
-    logout: (refTok: string | null) => void;
+    logout: () => void;
     isLoggedIn: () => boolean;
+    admin: boolean | null;
     message: string | null;
     setMessage: Dispatch<SetStateAction<string|null>>;
     error: string | null;
@@ -23,46 +26,75 @@ export const AuthProvider = ({children}) => {
     const navigate = useNavigate();
     const [token, setToken] = useState<string | null>(null);
     const [refreshToken, setRefreshToken] = useState<string|null>(null);
-    const [user, setUser] = useState<User | null>(null);
+    const [username, setUsername] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [admin, setAdmin] = useState<boolean | null>(false);
     
     useEffect(() => {
+        //const username = localStorage.getItem("username");
         const token = localStorage.getItem("token");
         const refreshToken = localStorage.getItem("refreshToken");
         if (token && refreshToken) {
+            //setUsername(username);
             setToken(token);
             setRefreshToken(refreshToken);
+            isAdmin(token).then(res => setAdmin(res));
+            getUsername().then(res => {
+                setUsername(res.data.username)}
+            )
         }
         setLoading(false);
-    }, [token])
+    }, [token, refreshToken]);
 
+    const isAdmin = async (token: string) =>{
+        try {
+            const res = await client.get("/User/IsAdmin", {
+                params: {
+                    token
+                }
+            });
+            return res.data.isAdmin;
+        }
+        catch(e){
+            console.error(e);
+        }
+        return false;
+    }
+    
+    const getUsername = async () => {
+        return await adminClient.get("/User/GetUsername")
+    }
+    
     const register = async (email: string, username: string, password: string) => {
-        await axios.post("http://localhost:1738/api/User/Register", {
+        await client.post("/User/Register", {
             email: email,
             username: username,
             password: password
-        }).then(result => {
-            
-            localStorage.setItem("token", JSON.stringify(result.data.token));
-            localStorage.setItem("refreshToken", JSON.stringify(result.data.refreshToken));
+        }).
+        then(result => {
+            localStorage.setItem("token", result.data.token);
+            localStorage.setItem("refreshToken", result.data.refreshToken);
             setToken(result.data.token);
             setRefreshToken(result.data.refreshToken);
             setMessage("Successful registration"); //TODO Write server side messages
-            setTimeout(() => {setMessage(null); navigate("/")}, 1000);
-        }).catch(e => setError(e.response?.data ?? e.message));
-        
+            setTimeout(() => {
+                setMessage(null); 
+                navigate("/")
+            }, 1000);
+        })
+        .catch(e => setError(e.response?.data ?? e.message));
     }
     
     const login = async (emailOrUsername: string, password: string) => {
-   
-        await axios.post("http://localhost:1738/api/User/Login", {
+        
+        await client.post("/User/Login", {
             emailOrUsername: emailOrUsername,
             password: password
         }).then(result => {
-            localStorage.setItem("token", JSON.stringify(result.data.token));
-            localStorage.setItem("refreshToken", JSON.stringify(result.data.refreshToken));
+            localStorage.setItem("token", result.data.token);
+            localStorage.setItem("refreshToken", result.data.refreshToken);
             setToken(result.data.token);
             setRefreshToken(result.data.refreshToken);
             setMessage("Successful login");
@@ -73,20 +105,29 @@ export const AuthProvider = ({children}) => {
 
     }
     
-    const logout = async (refTok) => {
-        
-        await axios.post("http://localhost:1738/api/User/Logout", {
-            refTok
-        }).then(_ => {})
-            .catch(e => setError(e.response?.data ?? e.message));
+    const logout = async () => {
+        await authClient.post("/User/Logout", {
+            refreshToken
+        }).then(_ => {
+            setToken(null);
+            setRefreshToken(null);
+            setAdmin(false);
+            localStorage.removeItem("token");
+            localStorage.removeItem("refreshToken");
+            setMessage("Logged Out");
+            navigate("/")
+        })
+          .catch(e => setError(e.response?.data ?? e.message));
     }
     
     const isLoggedIn = () => {
-        return token != null;
+        return token !== null;
     }
     
     return (
-        <AuthContext value={{user, token, refreshToken, register, login, logout, isLoggedIn, message, setMessage, error, setError}}>
+        <AuthContext value={{username, token, refreshToken, register, 
+                            login, logout, isLoggedIn, message, 
+                            setMessage, error, setError, admin}}>
             {loading ? null : children}
         </AuthContext>
     )

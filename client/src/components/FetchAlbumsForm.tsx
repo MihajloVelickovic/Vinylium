@@ -1,8 +1,9 @@
-import axios from "axios";
 import {useState} from "react";
 import Product from "../models/Product";
 import {AlbumCard} from "./AlbumCard";
 import "../styles/FetchAlbumsForm.css"
+import adminClient from "../api/AdminClient.ts";
+import authClient from "../api/AdminClient.ts";
 
 export const FetchAlbumsForm = () => {
 
@@ -21,7 +22,7 @@ export const FetchAlbumsForm = () => {
         setError("");
         let result;
         try {
-            result = await axios.post("http://localhost:1738/api/Product/FetchProducts", {
+            result = await authClient.post("/Product/FetchProducts", {
                     code
                 }
             );

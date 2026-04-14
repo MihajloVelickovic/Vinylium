@@ -4,6 +4,7 @@ import Product from "../models/Product.ts";
 import {ProductCard} from "./ProductCard.tsx";
 import "../styles/Store.css"
 import {Filters} from "./Filters.tsx";
+import client from "../api/Client.ts";
 
 interface IFilter{
     pages:number;
@@ -75,7 +76,7 @@ const Store = () => {
     }
     
     const getProducts = async () => {
-        return await axios.get("http://localhost:1738/api/Product/GetProductsFiltered", {
+        return await client.get("/Product/GetProductsFiltered", {
             params: {
                 page: filters.currentPage,
                 items: filters.items,
