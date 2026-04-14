@@ -1,18 +1,18 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import Product from "../models/Product.ts";
 import "../styles/ProductPage.css"
+import client from "../api/Client.ts";
 
 export const ProductPage = () => {
 
     const params = useParams();
-    const [url, _] = useState(`http://localhost:1738/api/Product/GetProductById/${params.id}`);
+    const [url, _] = useState(`/Product/GetProductById/${params.id}`);
     const [product, setProduct] = useState<Product>();
 
     useEffect(() => {
         const fetchData = async () => {
-            return await axios.get(url);
+            return await client.get(url);
         }
 
         fetchData().then(res => {

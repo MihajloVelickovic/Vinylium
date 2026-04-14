@@ -16,6 +16,12 @@
     overflow: hidden;
 }
 
+.fetchError{
+    color: indianred;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .best{
     width: 100%;
@@ -68,11 +74,6 @@
     font-style: italic;
 }
 
-.fetchForm label{
-    font-style: italic;
-    font-size: 0.8rem;
-}
-
 .fetchButton{
     border: none;
     outline: white;
@@ -88,20 +89,3 @@
     background-color: #9ca3af;
 }
 
-.isBarcodeButton{
-    border: none;
-    outline: white;
-    width: 20%;
-    height: 4vh;
-    margin-top: 2%;
-    margin-bottom: 2%;
-    margin-left: 5px;
-    font-family: var(--heading), sans-serif;
-    
-
-}
-
-.isBarcodeButton:hover{
-    cursor: pointer;
-    background-color: #9ca3af;
-}

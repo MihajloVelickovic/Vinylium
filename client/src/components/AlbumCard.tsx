@@ -1,26 +1,35 @@
 import "../styles/AlbumCard.css"
-import axios from "axios";
 import PopOutCard from "./PopOutCard.tsx";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import Product from "../models/Product.ts";
+import authClient from "../api/AuthClient";
 
 //@ts-ignore
-export const AlbumCard = ({product, best}) => {
+export const AlbumCard = ({product, best, rerender}) => {
     const [isOpen, setIsOpen] = useState(false);
+    const inputRef = useRef<HTMLParagraphElement>(null);
+    
+    // Needs to be at the first level of the component
+    // rerender is flipping every time
+    // so useEffect is called on every fetch
+    // used to put focus on the price input field on the best match
+    useEffect(() => {
+        if(best) {
+            console.log(best);
+            inputRef.current?.focus();
+        }
+    }, [inputRef, best, rerender]);
+    
     const acceptProduct = async () => {
         try {
-            const res = await axios.post("http://localhost:1738/api/Product/AddProduct", {
+            const res = await authClient.post("/Product/AddProduct", {
                 product
             })
-            if (res.status === 200) {
-                console.log("PRODUCT:" + res.data)
-            }
         } catch (e) {
-            console.log("Exception: " + e);
             return;
         }
     }
-
+    
     return (
         <>
             <div className={"albumCard " + (best && "bestCard")} onKeyUp={(e) => {
@@ -110,7 +119,7 @@ export const AlbumCard = ({product, best}) => {
                         <div contentEditable="plaintext-only" className="iField" spellCheck="false"
                              onInput={(r) => {
                                  product.price = r.currentTarget.textContent;
-                             }}>
+                             }} ref={inputRef}>
                             <p>{product.price}</p>
                         </div>
                     </div>

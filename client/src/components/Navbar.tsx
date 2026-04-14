@@ -1,25 +1,23 @@
-import {Link, useLocation} from "react-router-dom";
-import {useState} from "react";
+import {Link} from "react-router-dom";
 import Cart from "./Cart";
-
-
+import {useAuth} from "./AuthContext.tsx";
 
 export const Navbar = () => {
-    const location = useLocation();
-    const isTransparent = location.pathname.startsWith("/products/");
+    
+    const {isLoggedIn, admin, username} = useAuth();
     
     return(
-        <nav className={`navbar ${isTransparent ? "navbar-transparent" : ""}`}>
+        <nav className="navbar">
             <Link className="nav-link" to="/">
                 <img className="logo navbar-icon" src="../src/assets/vinylium_logo.svg" alt="logo"/>
                 <span>Home</span>
             </Link>
             
-            <Link className="nav-link" to="/login" id="user">
+            <Link className="nav-link" to={isLoggedIn() ? `/user/${username}` : "/login" } id="user">
                 <img className="navbar-icon" src="../src/assets/the-happy-smiler.svg" alt="Login/Register"/>
                 <span>User</span>
             </Link>
-    
+            
             <Link className="nav-link" to="/about" id="about">
                 <img className="navbar-icon" src="../src/assets/about.svg" alt="About"/>
                 <span>About</span>
@@ -29,13 +27,12 @@ export const Navbar = () => {
                 <img className="navbar-icon" src="../src/assets/contact.svg" alt="Contact"/>
                 <span>Contact</span>
             </Link>
-    
-            
-    
-            <Link className="nav-link" to="/admin" id="admin">
-                <img className="admin-dash-img" src="../src/assets/admin_dash.svg" alt="Admin Dashboard"/>
-                <span>Dashboard</span>
-            </Link>
+            {admin ?
+                <Link className="nav-link" to="/admin" id="admin">
+                    <img className="admin-dash-img" src="../src/assets/admin_dash.svg" alt="Admin Dashboard"/>
+                    <span>Dashboard</span>
+                </Link>
+                : <></>}
             <Cart/>
         </nav>
     )

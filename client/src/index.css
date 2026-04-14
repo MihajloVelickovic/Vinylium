@@ -168,11 +168,18 @@ code {
   position: relative;
   text-decoration: none;
   z-index: 1;
-  transition: filter 0.2s ease;
+  transition: filter 0.2s ease, scale 0.2s ease;
 }
 
 .nav-link:hover {
   filter: contrast(50%);
+  scale: 1.01;
+}
+
+.nav-link:focus {
+  filter: contrast(50%);
+  scale: 1.01;
+  outline: none;
 }
 
 .navbar span{
@@ -189,8 +196,10 @@ code {
   transition: opacity 0.5s linear(0, 0 0% 70%,1);
 }
 
-.na
-
+.nav-link:focus span{
+  opacity: 1;
+  transition: opacity 0.5s linear(0, 0 0% 70%,1);
+}
 
 /*.nav-link img {*/
 /*  transition: filter 0.2s ease;*/
@@ -261,4 +270,9 @@ code {
 
 .admin-dash-img{
   width: 90px;
+}
+
+@keyframes scaleAnim {
+  from { filter: blur(10px); }
+  to { filter: blur(0); }
 }

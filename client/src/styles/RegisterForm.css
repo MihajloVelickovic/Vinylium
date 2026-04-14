@@ -1,5 +1,6 @@
 .registrationForm {
     font-family: var(--heading) sans-serif;
+    animation: scaleAnim 0.2s ease;
 }
 
 body{

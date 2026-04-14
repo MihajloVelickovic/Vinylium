@@ -7,7 +7,7 @@ public class Product{
 	[Key] public required string Barcode{ get; init; }
 
 	public required string CatalogNumber{ get; init; }
-
+	
 	public required string Name{ get; set; }
 
 	public required string Artist{ get; set; }

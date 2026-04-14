@@ -1,5 +1,6 @@
 .productPage{
     font-family: var(--heading), sans-serif;
+    
 }
 
 .productCombined{
@@ -9,6 +10,7 @@
     align-items: center;
     width: var(--width);
     margin: 0 auto;
+   
 }
 
 .productPageColumn{
@@ -21,6 +23,8 @@
     padding: 20px;
     height: fit-content;
     box-shadow: var(--vinylium-accent) 0 0 10px;
+    animation-name: scaleAnim;
+    animation-duration: 0.2s;
 }
 
 .mainInfo{
@@ -53,9 +57,19 @@
     left: 0;
     min-height: 100vh;
     width: 100vw;
-    filter: blur(10px) brightness(var(--brightness));
     z-index: -2;
-    scale: var(--scale)
+    scale: var(--scale);
+    filter: blur(10px) brightness(var(--brightness));
+    animation: bgBlur 0.5s ease;
+}
+
+@keyframes bgBlur {
+    from{
+        filter: blur(50px) brightness(var(--brightness));
+    }
+    to{
+        filter: blur(10px) brightness(var(--brightness));
+    }
 }
 
 .title{

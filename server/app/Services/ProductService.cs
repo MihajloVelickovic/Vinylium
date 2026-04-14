@@ -12,9 +12,11 @@ public interface IProductService{
 	Task<List<Product>> GetAll();
 	Task<Product> AddProductAsync(AcceptProductReq req);
 	Task<Product> GetByIdAsync(string barcode);
-	Task<List<Product>> GetFilteredAsync(string? search, int? type, decimal? pL, decimal? pH);
+	Task<(List<Product> result, int pages)> GetFilteredAsync(int? page, int? items, string? search, int? type,
+		decimal? pL, decimal? pH);
 	Task<List<Product>> GetRandomProductsAsync();
 	Task<int> GetCount();
+	Task<List<Product>> GetPage(int? page, int? items);
 }
 
 public class ProductService: IProductService{
@@ -25,8 +27,7 @@ public class ProductService: IProductService{
 	}
 
 	public async Task<List<Product>> FetchProducts(AddProductReq request){
-		var product = await Discogs.CreateProduct(request.Code);
-		return product;
+		return await Discogs.CreateProduct(request.Code);
 	}
 
 	public async Task<List<Product>> GetAll(){
@@ -56,12 +57,16 @@ public class ProductService: IProductService{
 		return await _productRepository.GetByIdAsync(barcode);
 	}
 
-	public async Task<List<Product>> GetFilteredAsync(string? search, int? type, decimal? pL, decimal? pH){
+	public async Task<(List<Product> result, int pages)> GetFilteredAsync(int? page, int? items, string? search,
+		int? type, decimal? pL,
+		decimal? pH){
 		
 		if(type != null && !Enum.IsDefined(typeof(ProductType), type))
 			throw new Exception("Type not valid");
 
 		var filter = new FilterReq(){
+			Page = page,
+			PerPage = items,
 			Search = search,
 			Type = (ProductType?)type,
 			PriceLow = pL,
@@ -78,5 +83,13 @@ public class ProductService: IProductService{
 
 	public async Task<int> GetCount(){
 		return await _productRepository.GetCount();
+	}
+	
+	public async Task<List<Product>> GetPage(int? page, int? items){
+		var p = page ?? 1;
+
+		var i = items ?? throw new Exception("Need to return some items");
+		
+		return await _productRepository.GetPage(p, i);
 	}
 }

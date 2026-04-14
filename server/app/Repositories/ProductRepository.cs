@@ -8,9 +8,10 @@ public interface IProductRepository{
 	Task CreateProductAsync(Product product);
 	Task<List<Product>> GetAllAsync();
 	Task<Product> GetByIdAsync(string barcode);
-	Task<List<Product>> GetFilteredAsync(FilterReq req);
+	Task<(List<Product> result, int pages)> GetFilteredAsync(FilterReq req);
 	Task<List<Product>> GetRandomProductsAsync();
 	Task<int> GetCount();
+	Task<List<Product>> GetPage(int page, int items);
 }
 
 public class ProductRepository: IProductRepository{
@@ -38,12 +39,17 @@ public class ProductRepository: IProductRepository{
 		       throw new Exception($"Failed to get product {barcode} from database");
 	}
 
-	public async Task<List<Product>> GetFilteredAsync(FilterReq req){
+	public async Task<(List<Product> result, int pages)> GetFilteredAsync(FilterReq req){
 
 		var query = _dbContext.Products.AsQueryable();
 		
+		var page = req.Page ?? 1;
+		var perPage = req.PerPage ?? 20;
+		var skip = (page - 1) * perPage;
+		
 		if(!string.IsNullOrWhiteSpace(req.Search))
-			query = query.Where(p => p.Name.Contains(req.Search) || p.Artist.Contains(req.Search));
+			query = query.Where(p => EF.Functions.Like(p.Artist, $"%{req.Search}%")  || 
+			                         EF.Functions.Like(p.Name, $"%{req.Search}%"));
 		
 		if(req.Type != null)
 			query = query.Where(p => p.Type ==  req.Type);
@@ -53,8 +59,11 @@ public class ProductRepository: IProductRepository{
 
 		if(req.PriceHigh != null)
 			query = query.Where(p => p.Price <=  req.PriceHigh);
-		
-		return await query.ToListAsync();
+
+		var totalCount = await query.CountAsync();
+		var pages = totalCount / perPage + 1;
+		var result = await query.Skip(skip).Take(perPage).ToListAsync();
+		return (result, pages);
 
 	}
 
@@ -66,5 +75,12 @@ public class ProductRepository: IProductRepository{
 
 	public async Task<int> GetCount(){
 		return await _dbContext.Products.CountAsync();
+	}
+
+	public async Task<List<Product>> GetPage(int page, int items){
+		
+		var skip = (page - 1) * items;
+		return await _dbContext.Products.Select(p => p).Skip(skip).Take(items).ToListAsync();
+
 	}
 }

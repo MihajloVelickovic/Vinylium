@@ -1,8 +1,4 @@
 using System.Globalization;
-using System.Net.Http.Headers;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using app.Enums;
 using app.Models;
 using Newtonsoft.Json.Linq;
@@ -46,6 +42,7 @@ public static class Discogs{
 		
 		var list = new List<Product>();
 		var visited = new List<string>();
+		const StringComparison sc = StringComparison.InvariantCultureIgnoreCase;
 		
 		foreach(var product in productsBarcode){
 			
@@ -74,7 +71,7 @@ public static class Discogs{
 			/* if the title from the request itself doesn't match the
 			 * release title, try to do the same with the master release
 			 */
-			if(string.Compare((string?)releaseData["title"], titleSeparated, StringComparison.InvariantCultureIgnoreCase) != 0){
+			if(string.Compare((string?)releaseData["title"], titleSeparated, sc) != 0){
 				var masterId = (string?)product["master_id"];
 				if(masterId == null || masterId == "0")
 					continue;
@@ -120,7 +117,17 @@ public static class Discogs{
 				Tracklist = GetTracklist(releaseData),
 			});
 		}
-		return list.Count > 0 ? list : throw new Exception("No valid items found");
+		
+		/* If there are elements in the list, returns that list, but sorted so that the first element
+		 * is the one whose barcode or catalog number best matches the one used in the query
+		 */
+		return list.Count > 0 ? 
+			   list.OrderBy(s => 
+				   Math.Min(Math.Abs(string.Compare(s.CatalogNumber, code, sc)), 
+							Math.Abs(string.Compare(s.Barcode, code, sc))
+					   )
+				   ).ToList() : 
+			   throw new Exception("No valid items found");
 	}
 
 	private static async Task<JToken?> GetEntryData(string code, bool barcodeSearch){
@@ -148,7 +155,7 @@ public static class Discogs{
 		var requestString = release ? ReleaseString(id) : MasterString(id);
 		using var response = await Client.GetAsync(requestString);
 		if(!response.IsSuccessStatusCode)
-			throw new Exception(response.ReasonPhrase);
+			throw new BadHttpRequestException(response.ReasonPhrase ?? "HttpRequestError", (int)response.StatusCode);
 
 		var responseString = await response.Content.ReadAsStringAsync();
 		var responseJObject = JObject.Parse(responseString);
