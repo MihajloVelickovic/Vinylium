@@ -1,0 +1,24 @@
+services:
+  vinylium.server:
+    container_name: "vinylium-api"
+    environment:
+      - ASPNETCORE_HTTP_PORTS=1738
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+    env_file: server/.env
+    image: vinylium-server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "1738:1738"
+  vinylium.client:
+    container_name: "vinylium-client"
+    image: vinylium-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - vinylium.server
+      
