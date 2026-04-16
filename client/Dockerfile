@@ -6,7 +6,7 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY --chown=app:app . .
+COPY --chown=node:node . .
 
 EXPOSE 5173
 

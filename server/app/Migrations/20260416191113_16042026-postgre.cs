@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace app.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class _16042026postgre : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,8 +15,8 @@ namespace app.Migrations
                 name: "Locations",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 },
                 constraints: table =>
                 {
@@ -26,17 +27,17 @@ namespace app.Migrations
                 name: "Products",
                 columns: table => new
                 {
-                    Barcode = table.Column<string>(type: "TEXT", nullable: false),
-                    CatalogNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Artist = table.Column<string>(type: "TEXT", nullable: false),
-                    ImageUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    Tracklist = table.Column<string>(type: "TEXT", nullable: false),
-                    Runtime = table.Column<string>(type: "TEXT", maxLength: 11, nullable: false),
-                    ReleaseDate = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
-                    InWarehouse = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Barcode = table.Column<string>(type: "text", nullable: false),
+                    CatalogNumber = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Artist = table.Column<string>(type: "text", nullable: false),
+                    ImageUrl = table.Column<string>(type: "text", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: true),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Tracklist = table.Column<string[]>(type: "text[]", nullable: false),
+                    Runtime = table.Column<string>(type: "character varying(11)", maxLength: 11, nullable: false),
+                    ReleaseDate = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    InWarehouse = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,12 +48,12 @@ namespace app.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 254, nullable: false),
-                    Username = table.Column<string>(type: "TEXT", maxLength: 254, nullable: false),
-                    Password = table.Column<string>(type: "TEXT", maxLength: 254, nullable: false),
-                    Admin = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
+                    Username = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
+                    Password = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
+                    Admin = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -63,8 +64,8 @@ namespace app.Migrations
                 name: "ProductStore",
                 columns: table => new
                 {
-                    AvailableAtId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ProductsBarcode = table.Column<string>(type: "TEXT", nullable: false)
+                    AvailableAtId = table.Column<int>(type: "integer", nullable: false),
+                    ProductsBarcode = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,15 +88,15 @@ namespace app.Migrations
                 name: "ProductUser",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    WishlistBarcode = table.Column<string>(type: "TEXT", nullable: false)
+                    CartBarcode = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductUser", x => new { x.UserId, x.WishlistBarcode });
+                    table.PrimaryKey("PK_ProductUser", x => new { x.CartBarcode, x.UserId });
                     table.ForeignKey(
-                        name: "FK_ProductUser_Products_WishlistBarcode",
-                        column: x => x.WishlistBarcode,
+                        name: "FK_ProductUser_Products_CartBarcode",
+                        column: x => x.CartBarcode,
                         principalTable: "Products",
                         principalColumn: "Barcode",
                         onDelete: ReferentialAction.Cascade);
@@ -111,8 +112,8 @@ namespace app.Migrations
                 name: "Tokens",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -129,8 +130,8 @@ namespace app.Migrations
                 name: "ProductWarehouse",
                 columns: table => new
                 {
-                    ProductsBarcode = table.Column<string>(type: "TEXT", nullable: false),
-                    WarehouseId = table.Column<int>(type: "INTEGER", nullable: false)
+                    ProductsBarcode = table.Column<string>(type: "text", nullable: false),
+                    WarehouseId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -147,8 +148,8 @@ namespace app.Migrations
                 name: "StoreVinylium",
                 columns: table => new
                 {
-                    StoresId = table.Column<int>(type: "INTEGER", nullable: false),
-                    VinyliumId = table.Column<int>(type: "INTEGER", nullable: false)
+                    StoresId = table.Column<int>(type: "integer", nullable: false),
+                    VinyliumId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -165,8 +166,8 @@ namespace app.Migrations
                 name: "UserVinylium",
                 columns: table => new
                 {
-                    UsersId = table.Column<int>(type: "INTEGER", nullable: false),
-                    VinyliumId = table.Column<int>(type: "INTEGER", nullable: false)
+                    UsersId = table.Column<int>(type: "integer", nullable: false),
+                    VinyliumId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -183,9 +184,9 @@ namespace app.Migrations
                 name: "Vinylium",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    WarehouseId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    WarehouseId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -196,9 +197,9 @@ namespace app.Migrations
                 name: "Warehouses",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    VinyliumId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    VinyliumId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -223,9 +224,9 @@ namespace app.Migrations
                 column: "ProductsBarcode");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductUser_WishlistBarcode",
+                name: "IX_ProductUser_UserId",
                 table: "ProductUser",
-                column: "WishlistBarcode");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductWarehouse_WarehouseId",

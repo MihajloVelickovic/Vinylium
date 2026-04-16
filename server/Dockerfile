@@ -5,19 +5,20 @@ WORKDIR /server/app
 
 # copies the csproj to /server/Vinylium on the container and restores
 # the project
-COPY ["app/Vinylium.csproj" , "."]
-RUN dotnet restore "Vinylium.csproj"
+COPY ["app/app.csproj" , "."]
+RUN dotnet restore "app.csproj"
 
 # copies the rest of the files
 COPY ["app", "."]
-RUN dotnet build "Vinylium.csproj" -c Release -o /app/build
+RUN dotnet build "app.csproj" -c Release -o /app/build
 
+# https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
 FROM build AS publish
-RUN dotnet publish "Vinylium.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "app.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 EXPOSE 1738
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Vinylium.dll"]
+ENTRYPOINT ["dotnet", "app.dll"]
 

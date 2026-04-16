@@ -13,7 +13,7 @@ public class Program{
 	public static void Main(string[] args){
 		var builder = WebApplication.CreateBuilder(args);
 		DotEnv.LoadFromFile("../.env");
-
+		DotEnv.LoadFromFile("../db.env");
 		/* checks for discogs api key and secret
 		 * still works if they're not set, just with a
 		 * smaller rate limit
@@ -24,12 +24,12 @@ public class Program{
 
 		builder.Services.AddControllers();
 
-		var currentDir = Directory.GetCurrentDirectory();
-		var dbPath = builder.Configuration["DbPath"]!;
-		var fullPath = Path.Combine(currentDir, dbPath);
+		var connectionString = $"Host={DotEnv.Get("POSTGRES_HOST")};Database={DotEnv.Get("POSTGRES_DB")};" +
+		                       $"User Id={DotEnv.Get("POSTGRES_USER")};Password={DotEnv.Get("POSTGRES_PASSWORD")};";
 
 		builder.Services.AddDbContext<VinyliumContext>(options =>
-			options.UseSqlite($"Data Source={fullPath}"));
+			options.UseNpgsql(connectionString, o => o.EnableRetryOnFailure())
+		);
 
 		builder.Services.AddScoped<IUserService, UserService>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();

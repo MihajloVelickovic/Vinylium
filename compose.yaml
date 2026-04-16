@@ -1,16 +1,27 @@
 services:
+  vinylium.database:
+    image: "postgres"
+    container_name: "vinylium-database"
+    ports:
+      - "5432:5432"
+    restart: always
+    shm_size: 128mb
+    env_file: ./server/db.env
+    volumes:
+      - pgdata:/var/lib/postgresql/
+  
   vinylium.server:
-    container_name: "vinylium-api"
     environment:
       - ASPNETCORE_HTTP_PORTS=1738
       - DOTNET_USE_POLLING_FILE_WATCHER=1
-    env_file: server/.env
+    env_file: ./server/.env
     image: vinylium-server
     build:
       context: ./server
       dockerfile: Dockerfile
     ports:
       - "1738:1738"
+  
   vinylium.client:
     container_name: "vinylium-client"
     image: vinylium-client
@@ -21,4 +32,6 @@ services:
       - "5173:5173"
     depends_on:
       - vinylium.server
-      
+  
+volumes:
+    pgdata:
