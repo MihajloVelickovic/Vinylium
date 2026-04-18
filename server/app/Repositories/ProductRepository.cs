@@ -48,8 +48,8 @@ public class ProductRepository: IProductRepository{
 		var skip = (page - 1) * perPage;
 		
 		if(!string.IsNullOrWhiteSpace(req.Search))
-			query = query.Where(p => EF.Functions.Like(p.Artist, $"%{req.Search}%")  || 
-			                         EF.Functions.Like(p.Name, $"%{req.Search}%"));
+			query = query.Where(p => EF.Functions.ILike(p.Artist, $"%{req.Search}%")  || 
+			                         EF.Functions.ILike(p.Name, $"%{req.Search}%"));
 		
 		if(req.Type != null)
 			query = query.Where(p => p.Type ==  req.Type);

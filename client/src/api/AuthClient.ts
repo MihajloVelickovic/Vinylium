@@ -55,8 +55,6 @@ authClient.interceptors.response.use(
         
         if (error.response?.status === 401) {
             if (refreshing) {
-                console.log("drugi if")
-
                 return new Promise((resolve, reject) => {
                     failedRequests.push({resolve, reject})
                 }).then(token => {
@@ -83,6 +81,8 @@ authClient.interceptors.response.use(
                     localStorage.setItem("refreshToken", newRef);
 
                     req.headers.Authorization = `Bearer ${newTok}`;
+                    if (req.data?.includes("refreshToken"))
+                        req.data = JSON.stringify({refreshToken: newRef});
                     
                     processRequests(null, newTok);
                     

@@ -2,6 +2,7 @@ import {createContext, type Dispatch, type SetStateAction, useContext, useEffect
 import {useNavigate} from "react-router-dom";
 import authClient from "../api/AuthClient";
 import client from "../api/Client.ts";
+import User from "../models/User.ts";
 
 type AuthContextData = {
     username: string | null;
@@ -28,31 +29,36 @@ export const AuthProvider = ({children}) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [admin, setAdmin] = useState<boolean | null>(false);
+    const [admin, setAdmin] = useState<boolean | null>(null);
     
     useEffect(() => {
-        //const username = localStorage.getItem("username");
         const token = localStorage.getItem("token");
         const refreshToken = localStorage.getItem("refreshToken");
         if (token && refreshToken) {
-            //setUsername(username);
             setToken(token);
             setRefreshToken(refreshToken);
-            isAdmin(token).then(res => setAdmin(res));
-            getUsername().then(res => {
-                setUsername(res.data.username)}
+            
+            isAdmin().then(res => {
+                setAdmin(res)
+                return getUsername()
+            })
+            .then(res =>
+                setUsername(res.data.username)
             )
-        }
-        setLoading(false);
+            .finally(() => 
+                setLoading(false)
+            )
+            
+        }         
+        else
+            setLoading(false);
+        console.log(loading)
+        
     }, [token, refreshToken]);
 
-    const isAdmin = async (token: string) =>{
+    const isAdmin = async () =>{
         try {
-            const res = await client.get("/User/IsAdmin", {
-                params: {
-                    token
-                }
-            });
+            const res = await authClient.get("/User/IsAdmin");
             return res.data.isAdmin;
         }
         catch(e){

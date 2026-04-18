@@ -48,5 +48,6 @@ public class JwtRepository: IJwtRepository{
 		             throw new Exception("Temp exception");
 
 		_dbContext.Remove(exists);
+		await _dbContext.SaveChangesAsync();
 	}
 }

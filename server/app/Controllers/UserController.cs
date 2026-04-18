@@ -49,8 +49,7 @@ public class UserController: ControllerBase{
 			var guid = Guid.NewGuid().ToString();
 
 			var token = _jwtService.GenerateAccessToken(user.Username, user.Email, user.Admin);
-			var refreshToken = _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
-			
+			var refreshToken = await _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
 			
 			return Ok(new{ message = "Successfully Registered", user, token, refreshToken});
 		}
@@ -147,10 +146,13 @@ public class UserController: ControllerBase{
 		}
 	}
 
+	[Authorize]
 	[HttpGet("IsAdmin")]
-	public async Task<ActionResult> IsAdmin([FromQuery]string token){
+	public async Task<ActionResult> IsAdmin(){
 		try{
-			var res = await _jwtService.GetAdminStatus(token);
+			HttpContext.Request.Headers.TryGetValue("Authorization", out var token); 
+			var noBearer = token.Single()!.Split(' ')[1];
+			var res = await _jwtService.GetAdminStatus(noBearer);
 			return Ok(new{isAdmin=res});
 		}
 		catch(Exception e){

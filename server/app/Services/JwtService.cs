@@ -29,8 +29,8 @@ public class JwtService: IJwtService{
 		             throw new InvalidOperationException("JWT_SECRET not found in environment");
 		_refreshSecret = DotEnv.Get("JWT_REFRESH_SECRET") ??
 		                 throw new InvalidOperationException("JWT_REFRESH_SECRET not found in environment");
-		_jwtExpMinutes = double.Parse(DotEnv.Get("JWT_EXP") ?? "10");
-		_refreshExpMinutes = double.Parse(DotEnv.Get("JWT_REFRESH_EXP") ?? "25200");
+		_jwtExpMinutes = double.Parse(DotEnv.Get("JWT_EXP") ?? "30");
+		_refreshExpMinutes = double.Parse(DotEnv.Get("JWT_REFRESH_EXP") ?? "20160");
 		_jwtRepository = jwtRepo;
 	}
 
