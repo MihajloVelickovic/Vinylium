@@ -3,7 +3,7 @@ import "../styles/Filters.css"
 import Product from "../models/Product";
 // import Search from "../assets/search.svg"
 
-export const Filters = ({params}) => {
+export const Filters = ({searchRef, params}) => {
     
     return (
         <div className="filtersFull">
@@ -26,7 +26,7 @@ export const Filters = ({params}) => {
                             })
                         }
                     </select>
-                    <input type="text" placeholder="Search" 
+                    <input ref={searchRef} type="text" placeholder="Search" 
                     onInput={(e) => {
                         params.setFilters({...params.filters, search: e.currentTarget.value})
                         params.setChange(!params.change)

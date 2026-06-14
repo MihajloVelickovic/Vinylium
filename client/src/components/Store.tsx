@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useEffect, useState} from "react";
+import {type InputEventHandler, useCallback, useEffect, useRef, useState} from "react";
 import Product from "../models/Product.ts";
 import {ProductCard} from "./ProductCard.tsx";
 import "../styles/Store.css"
@@ -20,6 +20,7 @@ const Store = () => {
     
     const [products, setProducts] = useState<Product[]>([]);
     const [change, setChange] = useState(false);
+    const searchRef = useRef<HTMLInputElement>(null);
     
     const [filters, setFilters] = useState<IFilter>({
         pages: 0, 
@@ -59,6 +60,30 @@ const Store = () => {
         
     }, [change]);
 
+    useEffect(() => {
+        window.addEventListener("keydown", handleKeyPress);
+        return() => {
+            window.removeEventListener("keydown", handleKeyPress);
+        }
+    }, []);
+
+    const handleKeyPress = useCallback((e) => {
+
+        const currentElement = document.activeElement;
+        /* forward slash and division */
+        if ((e.which === 111 || e.which == 191) && document.activeElement !== searchRef.current 
+                                                && !(currentElement instanceof HTMLInputElement)) {
+            e.preventDefault();
+            searchRef.current!.focus();
+        }
+        
+        /* escape */
+        if(e.which === 27 && currentElement instanceof HTMLInputElement){
+            e.preventDefault();
+            currentElement.blur();
+        }
+    },[])
+    
     /* currently uses local storage, could change to redis as to not overload local storage */
     const checkCache = () => {
         const params = {
@@ -99,7 +124,7 @@ const Store = () => {
     
     return (
         <>
-            <Filters params={{filters, setFilters, change, setChange}}/>
+            <Filters searchRef={searchRef} params={{filters, setFilters, change, setChange}}/>
             <div className="products">
                 {
                     products.map((product) => {
