@@ -33,31 +33,18 @@ const Store = () => {
     });
 
     useEffect(() => {
-        
-        const cached = checkCache();
-        
-        if (cached) {
-            const result = JSON.parse(cached);
-            finalizeData(result);
-        }
-        
-        else{
-            /* debouncing
-             * sets a timer to execute the query, but resets it if its 
-             * called again before the timer runs out, and discards the
-             * call that was supposed to happen, and instead starts a new timer 
-             */
-            const timer = setTimeout(() =>
-                    getProducts().then(res => {
-                        finalizeData(res);
-                        const cacheKey = '?'+ res.request.responseURL.split('?').at(-1)
-                        localStorage.setItem(cacheKey, JSON.stringify({data: res.data, time: Date.now()}));
-                    })
-                        .catch(err => console.log(err))
-                , 500)
-            return () => clearTimeout(timer);
-        }
-        
+        /* debouncing
+         * sets a timer to execute the query, but resets it if its 
+         * called again before the timer runs out, and discards the
+         * call that was supposed to happen, and instead starts a new timer 
+         */
+        const timer = setTimeout(() =>
+                getProducts().then(res => {
+                    finalizeData(res);
+                })
+                    .catch(err => console.log(err))
+            , 100)
+        return () => clearTimeout(timer);
     }, [change]);
 
     useEffect(() => {
@@ -83,22 +70,6 @@ const Store = () => {
             currentElement.blur();
         }
     },[])
-    
-    /* currently uses local storage, could change to redis as to not overload local storage */
-    const checkCache = () => {
-        const params = {
-            page: filters.currentPage,
-            items: filters.items,
-            search: filters.search,
-            type: filters.type,
-            priceLow: filters.priceLow,
-            priceHigh: filters.priceHigh
-        }
-        const url = axios.getUri({url:"", params});
-        
-        return localStorage.getItem(url);
-        
-    }
     
     const getProducts = async () => {
         return await client.get("/Product/GetProductsFiltered", {
