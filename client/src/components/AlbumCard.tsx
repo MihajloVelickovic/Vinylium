@@ -4,25 +4,35 @@ import {useEffect, useRef, useState} from "react";
 import Product from "../models/Product.ts";
 import authClient from "../api/AuthClient";
 
+// .focus() on a contentEditable does not move the caret, so it can land in
+// front of an existing value and the next keystroke ends up in the wrong place
+const focusEnd = (el: HTMLElement) => {
+    el.focus();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+}
 //@ts-ignore
-export const AlbumCard = ({product, best, rerender}) => {
+export const AlbumCard = ({product, best}) => {
     const [isOpen, setIsOpen] = useState(false);
-    const inputRef = useRef<HTMLParagraphElement>(null);
-    
-    // Needs to be at the first level of the component
-    // rerender is flipping every time
-    // so useEffect is called on every fetch
-    // used to put focus on the price input field on the best match
+    const priceRef = useRef<HTMLDivElement>(null);
+    // the price is the one field Discogs cannot fill in, so it gets called out
+    // until something is typed into it
+    const [showPriceHint, setShowPriceHint] = useState(true);
+
+    // runs once per mount, and FetchAlbumsForm remounts this card on every
+    // fetch and every newly picked match by changing its key
     useEffect(() => {
-        if(best) {
-            console.log(best);
-            inputRef.current?.focus();
-        }
-    }, [inputRef, best, rerender]);
+        if(priceRef.current)
+            focusEnd(priceRef.current);
+    }, []);
     
     const acceptProduct = async () => {
         try {
-            const res = await authClient.post("/Product/AddProduct", {
+            await authClient.post("/Product/AddProduct", {
                 product
             })
         } catch (e) {
@@ -32,7 +42,7 @@ export const AlbumCard = ({product, best, rerender}) => {
     
     return (
         <>
-            <div className={"albumCard " + (best && "bestCard")} onKeyUp={(e) => {
+            <div className={"albumCard" + (best ? " bestCard" : "")} onKeyUp={(e) => {
                 if (e.key === 'Escape' && isOpen)
                     setIsOpen(false)
             }}>
@@ -44,89 +54,98 @@ export const AlbumCard = ({product, best, rerender}) => {
                 </div>
 
                 {/* div za podatke i sliku */}
-                <div style={{
-                    backdropFilter: "blur(0px)"
-                }}>
+                <div className="cardBody">
                     <div className="image">
                         <img src={product.imageUrl}
-                             width={100}
-                             height={100}
+                             width={220}
+                             height={220}
                              style={{pointerEvents: "none"}}/>
                     </div>
-                    <div className="productInput textBord">
-                        <p>Barcode:</p>
-                        <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                             onInput={(b) => {
-                                 product.barcode = b.currentTarget.textContent;
-                             }}>
-                            <p>{product.barcode}</p>
-                        </div>
-                    </div>
 
-                    <div className="productInput textBord">
-                        <p>CatNo:</p>
-                        <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                             onInput={(c) => {
-                                 product.catalogNumber = c.currentTarget.textContent;
-                             }}>
-                            <p>{product.catalogNumber}</p>
+                    <div className="cardFields">
+                        <div className="productInput textBord">
+                            <p>Barcode:</p>
+                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                                 onInput={(b) => {
+                                     product.barcode = b.currentTarget.textContent;
+                                 }}>
+                                <p>{product.barcode}</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="productInput textBord">
-                        <p>Title:</p>
-                        <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                             onInput={(n) => {
-                                 product.name = n.currentTarget.textContent;
-                             }}>
-                            <p>{product.name}</p>
+                        <div className="productInput textBord">
+                            <p>CatNo:</p>
+                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                                 onInput={(c) => {
+                                     product.catalogNumber = c.currentTarget.textContent;
+                                 }}>
+                                <p>{product.catalogNumber}</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="productInput textBord">
-                        <p>Artist:</p>
-                        <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                             onInput={(a) => {
-                                 product.artist = a.currentTarget.textContent;
-                             }}>
-                            <p>{product.artist}</p>
+                        <div className="productInput textBord">
+                            <p>Title:</p>
+                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                                 onInput={(n) => {
+                                     product.name = n.currentTarget.textContent;
+                                 }}>
+                                <p>{product.name}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div className="productInput textBord">
-                        <p>Release Date:</p>
-                        <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                             onInput={(r) => {
-                                 product.releaseDate = r.currentTarget.textContent;
-                             }}>
-                            <p>{product.releaseDate}</p>
+
+                        <div className="productInput textBord">
+                            <p>Artist:</p>
+                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                                 onInput={(a) => {
+                                     product.artist = a.currentTarget.textContent;
+                                 }}>
+                                <p>{product.artist}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div className="productInput textBord">
-                        <p>Type:</p>
-                        <select onChange={(t) => {
-                            product.type = t.target.selectedIndex;
-                        }}>
-                            {
-                                [0, 1, 2].map((item) => {
-                                    return <option
-                                        selected={item === product.type}>{Product.evaluateType(item)}</option>
-                                })
+                        <div className="productInput textBord">
+                            <p>Release Date:</p>
+                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                                 onInput={(r) => {
+                                     product.releaseDate = r.currentTarget.textContent;
+                                 }}>
+                                <p>{product.releaseDate}</p>
+                            </div>
+                        </div>
+                        <div className="productInput textBord">
+                            <p>Type:</p>
+                            <select onChange={(t) => {
+                                product.type = t.target.selectedIndex;
+                            }}>
+                                {
+                                    [0, 1, 2].map((item) => {
+                                        return <option
+                                            selected={item === product.type}>{Product.evaluateType(item)}</option>
+                                    })
+                                }
+                            </select>
+                        </div>
+                        <div className="productInput textBord priceRow">
+                            <p>Price:</p>
+                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                                 onInput={(r) => {
+                                     product.price = r.currentTarget.textContent;
+                                     setShowPriceHint(false);
+                                 }} ref={priceRef}>
+                                <p>{product.price}</p>
+                            </div>
+                            {showPriceHint &&
+                                <div className="priceHint" role="tooltip"
+                                     onClick={() => setShowPriceHint(false)}>
+                                    Set a price before adding
+                                </div>
                             }
-                        </select>
-                    </div>
-                    <div className="productInput textBord">
-                        <p>Price:</p>
-                        <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                             onInput={(r) => {
-                                 product.price = r.currentTarget.textContent;
-                             }} ref={inputRef}>
-                            <p>{product.price}</p>
                         </div>
                     </div>
-                    <div>
-                        <button className="acceptButton" onClick={acceptProduct}>Add Product</button>
-                        <button className="acceptButton" id="details" onClick={() => setIsOpen(true)}>Details</button>
-                    </div>
+                </div>
+
+                <div className="cardActions">
+                    <button className="acceptButton" onClick={acceptProduct}>Add Product</button>
+                    <button className="acceptButton detailsButton" onClick={() => setIsOpen(true)}>Details</button>
                 </div>
             </div>
             <div className="pop-out" onKeyUp={(e) => {

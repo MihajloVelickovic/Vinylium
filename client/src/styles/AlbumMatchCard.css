@@ -1,0 +1,67 @@
+/* one candidate release in the crate: look at it, pick it, done.
+ * every tile is the same size no matter how long the title is: the grid
+ * fixes the width, the square art and the clamped text lines fix the height */
+.matchCard{
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    padding: 10pt;
+    background-color: #08060d;
+    border: 1px solid var(--border);
+    text-align: left;
+    font-family: var(--heading), sans-serif;
+    font-size: 10pt;
+    color: #f3f4f6;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, scale 0.15s ease;
+}
+
+.matchCard:hover,
+.matchCard:focus-visible{
+    scale: 1.02;
+    border-color: var(--vinylium-accent);
+    box-shadow: var(--accent) 0 0 10px;
+    outline: none;
+}
+
+.matchArt{
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    margin-bottom: 6pt;
+    box-shadow: rgba(0, 0, 0, 0.5) 0 4px 12px;
+}
+
+/* exactly two lines tall whether the title needs one line or five, so a long
+ * title cannot make its tile taller than its neighbours */
+.matchTitle{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    height: 2.4em;
+    line-height: 1.2;
+    color: #f3f4f6;
+    overflow-wrap: anywhere;
+}
+
+/* one line, cut with an ellipsis rather than wrapping */
+.matchArtist{
+    height: 1.2em;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--vinylium-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .matchCard:hover,
+    .matchCard:focus-visible{
+        scale: 1;
+    }
+}

@@ -1,21 +1,4 @@
 
-.fetchedAlbums{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 0 auto 20px auto;
-}
-
-.albums{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: var(--width);
-    margin: 0 auto;
-    overflow: hidden;
-}
-
 .fetchError{
     color: indianred;
     display: flex;
@@ -23,20 +6,23 @@
     align-items: center;
 }
 
-.best{
-    width: 100%;
-}
-
 .fetchForm{
     box-sizing: border-box;
-    overflow-y:hidden;
 }
 
 .formAndBest{
     display:grid;
     grid-template-columns:1fr 1fr;
+    gap: 2em;
+    align-items: center;
     width: 75%;
-    margin: 0 auto 4em auto;
+    margin: 0 auto 3em auto;
+}
+
+/* the crate needs the whole width, so the form drops to a single bar on top */
+.formAndBest.browsing{
+    grid-template-columns: 1fr;
+    margin-bottom: 1.5em;
 }
 
 .form{
@@ -46,6 +32,22 @@
     align-items: center;
     width: 100%;
     height: 26em;
+}
+
+.formAndBest.browsing .form{
+    flex-direction: row;
+    justify-content: center;
+    gap: 1em;
+    height: auto;
+}
+
+.formAndBest.browsing .form input{
+    width: 40%;
+    margin: 0;
+}
+
+.formAndBest.browsing .fetchButton{
+    margin: 0;
 }
 
 .fetchForm input{
@@ -87,5 +89,72 @@
 .fetchButton:hover{
     cursor: pointer;
     background-color: #9ca3af;
+}
+
+.mainMatch{
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
+}
+
+/* stays mounted while the crate is open so typed-in edits survive the detour */
+.mainMatch.hidden{
+    display: none;
+}
+
+.mainMatch h2{
+    text-align: left;
+    margin: 0;
+}
+
+.altButton,
+.backButton{
+    padding: 0.6em 1em;
+    font-family: var(--heading), sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.altButton:hover,
+.altButton:focus-visible,
+.backButton:hover,
+.backButton:focus-visible{
+    color: var(--text-h);
+    background-color: var(--accent-bg);
+    border-color: var(--vinylium-accent);
+    outline: none;
+}
+
+.crate{
+    width: var(--width);
+    margin: 0 auto 3em auto;
+    text-align: left;
+}
+
+.crate h2{
+    margin: 0.6em 0 1em 0;
+}
+
+/* auto-fill + minmax is what keeps every tile the same width: the columns are
+ * sized by the grid, not by whatever text happens to be inside them */
+.crateGrid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 1.2em;
+}
+
+@media only screen and (max-width: 1000px) {
+    .formAndBest{
+        grid-template-columns: 1fr;
+    }
+
+    .form{
+        height: auto;
+        margin-bottom: 2em;
+    }
 }
 

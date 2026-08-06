@@ -3,86 +3,50 @@ body{
     font-family: var(--heading), sans-serif;
 }
 
+/* the one match being edited, blown up to fill its column */
+.albumCard{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 14pt;
+    position: relative;
+    border: solid var(--vinylium-accent);
+    box-shadow: var(--vinylium-accent) 0 0 10px;
+    background-color: #08060d;
+    font-size: 10pt;
+    text-align: left;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* gold means this is the release Discogs ranked first */
+.bestCard{
+    border: solid var(--accent);
+    box-shadow: var(--accent) 0 0 10px;
+}
+
+.cardBody{
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(110px, 38%) 1fr;
+    gap: 14pt;
+    align-items: start;
+}
+
 .image{
     display: flex;
     justify-content: center;
 }
 
-.albumCard{
-    border: solid var(--vinylium-accent);
-    font-size: 10pt;
-    width: 18%;
-    margin: 10pt;
-    padding:10pt;
-    position: relative;
-    transition: scale 0.3s ease;
-    box-shadow: var(--vinylium-accent) 0 0 10px;
-}
-
-.bestCard{
-    border: solid goldenrod;
-    box-shadow: goldenrod 0 0 10px;
-    width: 14vw;
-    transition: scale 0.3s ease;
-}
-
-.albumCard:hover{
-    scale: 1.02;
-}
-
-.acceptButton{
-    color: #08060d;
-    font-family: var(--heading), sans-serif;
-    
-}
-
-.fetchButton{
-    color: #08060d;
-}
-
-@media only screen and (max-width: 620px) {
-    .albumCard{
-        width: 100%;
-        min-width: 30%;
-    }
-}
-
-@media only screen and (min-width: 621px) and (max-width: 1000px) {
-    .albumCard{
-        width: 34%;
-        min-width: 30%;
-        margin-right: 18px;
-    }
-}
-
-@media only screen and (min-width: 1001px) and (max-width: 1500px) {
-    .albumCard{
-        width: 20%;
-        min-width: 20%;
-        margin-right: 18px;
-    }
-}
-
-.textBord{
-    border-bottom: white 1px solid;
-}
-
-.productInput{
-    display: grid;
-    grid-template-columns: 1fr 2fr;
+.image img{
     width: 100%;
-    text-align: center;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    box-shadow: rgba(0, 0, 0, 0.5) 0 4px 12px;
 }
 
-.productInput select{
-    text-align-last:center;
-    background: transparent;
-    outline: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text);
-    appearance: none;
-    font-family: var(--heading), sans-serif;
+.cardFields{
+    display: flex;
+    flex-direction: column;
 }
 
 .background-style{
@@ -96,40 +60,168 @@ body{
     filter: blur(2px) brightness(33%);
 }
 
+/* the card sits on cover art at 33% brightness, so it is always a dark
+ * surface and its text stays light in both themes */
+.textBord{
+    border-bottom: rgba(243, 244, 246, 0.35) 1px solid;
+}
+
+.productInput{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-items: center;
+    gap: 6pt;
+    width: 100%;
+    padding: 3pt 0;
+    color: #f3f4f6;
+}
+
+.productInput > p{
+    text-align: left;
+    color: rgba(243, 244, 246, 0.6);
+}
+
+.productInput select{
+    text-align-last: left;
+    background: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    color: #f3f4f6;
+    appearance: none;
+    font-family: var(--heading), sans-serif;
+    transition: background-color 0.15s ease;
+}
+
+.productInput select:hover,
+.productInput select:focus{
+    background-color: var(--vinylium-accent);
+}
+
 .iField{
     overflow: hidden;
+    padding: 2px 4px;
     background-color: transparent;
     outline: none;
-    color: var(--text);
     border: none;
-    text-align: center;
+    color: #f3f4f6;
+    text-align: left;
     font-size: 10pt;
     min-width: fit-content;
     overflow-wrap: break-word;
     word-break: break-all;
+    transition: background-color 0.15s ease;
+}
+
+/* contentEditable divs look like plain text, so say that they are typeable */
+.iField:hover{
+    background-color: rgba(243, 244, 246, 0.08);
+    cursor: text;
+}
+
+.iField:focus{
+    background-color: rgba(243, 244, 246, 0.08);
+    box-shadow: inset 0 -2px 0 var(--vinylium-accent);
+}
+
+/* anchors the price tooltip to this row instead of to the whole card */
+.priceRow{
+    position: relative;
+}
+
+.priceHint{
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    width: max-content;
+    max-width: 100%;
+    padding: 4px 8px;
+    font-family: var(--heading), sans-serif;
+    font-size: 9pt;
+    color: #08060d;
+    background: var(--accent);
+    box-shadow: var(--vinylium-accent) 0 0 10px;
+    cursor: pointer;
+    animation: hintIn 0.18s ease;
+}
+
+/* the little arrow: an empty box whose only visible border side mitres
+ * into a triangle */
+.priceHint::before{
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: var(--accent);
+}
+
+/* an animation replaces the element's transform while it runs, so the
+ * centring translateX has to be carried through every keyframe */
+@keyframes hintIn {
+    from { opacity: 0; transform: translate(-50%, -4px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .priceHint{
+        animation: none;
+    }
+}
+
+.cardActions{
+    position: relative;
+    display: flex;
+    gap: 8pt;
+    margin-top: 14pt;
 }
 
 .acceptButton{
-    width: 100%;
-    height: 100%;
-    margin-top: 5%;
+    flex: 1;
+    padding: 0.5em;
     text-align: center;
     background-color: transparent;
-    font-size: 18px;
+    border: 1px solid rgba(243, 244, 246, 0.35);
+    font-family: var(--heading), sans-serif;
+    font-size: 16px;
     color: white;
-}
-
-#details.acceptButton:hover {
-    background-color: var(--vinylium-accent);
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .acceptButton:hover{
     background-color: forestgreen;
+    border-color: forestgreen;
     cursor: pointer;
 }
 
-.acceptButton:focus{
+.acceptButton:focus-visible{
     background-color: forestgreen;
+    border-color: forestgreen;
     outline: none;
 }
 
+/* must stay after the .acceptButton rules above: same specificity,
+ * so source order is what makes these win */
+.detailsButton{
+    flex: 0 0 30%;
+}
+
+.detailsButton:hover,
+.detailsButton:focus-visible{
+    background-color: var(--vinylium-accent);
+    border-color: var(--vinylium-accent);
+}
+
+@media only screen and (max-width: 900px) {
+    .cardBody{
+        grid-template-columns: 1fr;
+    }
+
+    .image img{
+        max-width: 220px;
+        margin: 0 auto;
+    }
+}
