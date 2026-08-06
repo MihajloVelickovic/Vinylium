@@ -24,7 +24,7 @@ public class Product{
 
 	[StringLength(10)] public required string ReleaseDate{ get; init; }
 
-	public ICollection<Store> AvailableAt{ get; } = [];
-
+	public ICollection<Tuple<Store, int>> AvailableAt{ get; } = [];
+	
 	public required bool InWarehouse{ get; set; }
 }

@@ -6,7 +6,7 @@ public class VinyliumContext: DbContext{
 	public DbSet<Warehouse> Warehouses{ get; set; } = null!;
 	public DbSet<Vinylium> Vinylium{ get; set; } = null!;
 	public DbSet<User> Users{ get; set; } = null!;
-	public DbSet<Store> Locations{ get; set; } = null!;
+	public DbSet<Store> Stores{ get; set; } = null!;
 	public DbSet<Product> Products{ get; set; } = null!;
 	public DbSet<Token> Tokens{ get; set; } = null!;
 
@@ -39,7 +39,7 @@ public class VinyliumContext: DbContext{
 
 		builder.Entity<Store>()
 			.HasMany(p => p.Products)
-			.WithMany(s => s.AvailableAt);
+			.WithMany();
 
 		builder.Entity<Token>()
 			.HasOne(u => u.User)
