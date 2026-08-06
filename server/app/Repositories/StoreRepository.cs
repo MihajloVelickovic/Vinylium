@@ -27,12 +27,6 @@ public class StoreRepository: IStoreRepository{
 	public async Task DeleteStoreAsync(int id){
 		var store =  await _dbContext.Stores.Include(s => s.Products).FirstOrDefaultAsync(s => s.Id == id) ??
 		             throw new Exception("Failed to get store from database");
-
-		foreach(var product in store.Products){
-			product.AvailableAt.Remove(product.AvailableAt.FirstOrDefault(s => s.Item1.Id == id) ?? 
-			                           throw new Exception("Failed to remove product from database"));
-			_dbContext.Products.Update(product);
-		}
 		
 		_dbContext.Stores.Remove(store);
 		await _dbContext.SaveChangesAsync();

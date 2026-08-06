@@ -36,21 +36,21 @@ public class VinyliumContext: DbContext{
 		builder.Entity<User>()
 			.HasMany(p => p.Cart)
 			.WithMany();
-
-		builder.Entity<Store>()
-			.HasMany(p => p.Products)
-			.WithMany();
-
+		
 		builder.Entity<Token>()
 			.HasOne(u => u.User)
 			.WithMany();
 
+		builder.Entity<StoreStock>()
+			.HasOne(s => s.Store)
+			.WithMany();
+		
+		builder.Entity<StoreStock>()
+			.HasOne(p => p.Product)
+			.WithMany();
+		
 		builder.Entity<User>()
 			.HasIndex(u => new{ u.Username, u.Password })
-			.IsUnique();
-
-		builder.Entity<Product>()
-			.HasIndex(p => new{ p.Barcode, p.CatalogNumber })
 			.IsUnique();
 	}
 }

@@ -8,5 +8,4 @@ public class Store{
 	[StringLength(50)] public required string Address{ get; set; }
 	//^(\+381|0)[1-9]\d{7,8}$
 	[StringLength(12)] public required string ContactNumber{ get; set; }
-	public ICollection<Product> Products{ get; init; } = [];
 }
