@@ -25,9 +25,13 @@ public class StoreRepository: IStoreRepository{
 	}
 
 	public async Task DeleteStoreAsync(int id){
-		var store =  await _dbContext.Stores.Include(s => s.Products).FirstOrDefaultAsync(s => s.Id == id) ??
-		             throw new Exception("Failed to get store from database");
+		var store =  await _dbContext.Stores.FindAsync(id) ?? 
+		             throw new Exception($"Store with id {id} doesnt exist");
+
+		var storeStock = await _dbContext.StoreStocks.FirstOrDefaultAsync(s => s.StoreId == id) ??
+		                 throw new Exception($"StoreStock object with store id {id} doesnt exist");
 		
+		_dbContext.StoreStocks.Remove(storeStock);
 		_dbContext.Stores.Remove(store);
 		await _dbContext.SaveChangesAsync();
 	}

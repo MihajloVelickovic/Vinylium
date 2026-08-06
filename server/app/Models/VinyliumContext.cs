@@ -9,6 +9,7 @@ public class VinyliumContext: DbContext{
 	public DbSet<Store> Stores{ get; set; } = null!;
 	public DbSet<Product> Products{ get; set; } = null!;
 	public DbSet<Token> Tokens{ get; set; } = null!;
+	public DbSet<StoreStock> StoreStocks{ get; set; } = null!;
 
 	public VinyliumContext(DbContextOptions options): base(options){}
 
