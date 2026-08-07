@@ -1,9 +1,12 @@
 using System.Globalization;
 using app.Helper;
+using app.Models;
 using app.Requests;
 using app.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 
 namespace app.Controllers;
 
@@ -12,9 +15,10 @@ namespace app.Controllers;
 public class StoreController: ControllerBase{
 	
 	private readonly IStoreService _storeService;
-
-	public StoreController(IStoreService storeService){
+	private readonly IDistributedCache _cache;
+	public StoreController(IStoreService storeService,  IDistributedCache cache){
 		_storeService = storeService;
+		_cache =  cache;
 	}
 
 	[Authorize]

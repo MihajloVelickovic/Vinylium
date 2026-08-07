@@ -5,6 +5,7 @@ using app.Repositories;
 using app.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 
 namespace app;
@@ -31,6 +32,10 @@ public class Program{
 			options.UseNpgsql(connectionString, o => o.EnableRetryOnFailure())
 		);
 
+		builder.Services.AddStackExchangeRedisCache(options => {
+			options.Configuration = DotEnv.Get("REDIS_CS");
+		});
+		
 		builder.Services.AddScoped<IUserService, UserService>();
 		builder.Services.AddScoped<IUserRepository, UserRepository>();
 		builder.Services.AddScoped<IProductService, ProductService>();
