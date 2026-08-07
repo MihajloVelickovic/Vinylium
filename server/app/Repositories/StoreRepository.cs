@@ -18,7 +18,7 @@ public class StoreRepository: IStoreRepository{
 
 	public async Task CreateStoreAsync(Store store){
 		var dbStore = await _dbContext.Stores.AddAsync(store) ??
-		                throw new Exception("Failed to add store to database");
+		              throw new Exception("Failed to add store to database");
 		var changes = await _dbContext.SaveChangesAsync();
 		if(changes == 0)
 			throw new Exception("Failed to write store to database");

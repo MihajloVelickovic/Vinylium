@@ -10,6 +10,7 @@ import {AuthProvider} from "./components/AuthContext";
 import {AdminRoute} from "./components/AdminRoute";
 import {PrivateRoute} from "./components/PrivateRoute";
 import {Profile} from "./components/Profile";
+import {AddStoreForm} from "./components/AddStoreForm.tsx";
 
 function About() {
     return <h2>About Page</h2>;
@@ -51,6 +52,8 @@ function App() {
                             </AdminRoute>
                         }>
                             <Route path="add-album" element={<FetchAlbumsForm/>}/>
+                            <Route path="add-store" element={<AddStoreForm/>}/>
+                            
                         </Route>
                         <Route path="/cart"></Route>
 

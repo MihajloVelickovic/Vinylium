@@ -1,3 +1,4 @@
+using System.Globalization;
 using app.Models;
 using app.Repositories;
 using app.Requests;
@@ -18,10 +19,15 @@ public class StoreService: IStoreService{
 	}
 
 	public async Task<Store> CreateStoreAsync(AddStoreReq req){
+		var parsedOt = TimeOnly.FromDateTime(DateTime.ParseExact(req.OpeningHours, "HH:mm", CultureInfo.InvariantCulture));
+		var parsedCt = TimeOnly.FromDateTime(DateTime.ParseExact(req.ClosingHours, "HH:mm", CultureInfo.InvariantCulture));
 		var store = new Store{
 			Address = req.Address,
+			City = req.City,
 			ContactNumber = req.ContactNumber,
-			Name = req.Name
+			Name = req.Name,
+			OpeningTime = parsedOt,
+			ClosingTime = parsedCt
 		};
 
 		await _storeRepository.CreateStoreAsync(store);

@@ -53,5 +53,13 @@ public class VinyliumContext: DbContext{
 		builder.Entity<User>()
 			.HasIndex(u => new{ u.Username, u.Password })
 			.IsUnique();
+		
+		builder.Entity<Store>()
+			.HasIndex(s => s.Name)
+			.IsUnique();
+		builder.Entity<Store>()
+			.HasIndex(s => s.ContactNumber)
+			.IsUnique();
+		
 	}
 }

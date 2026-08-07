@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -6,23 +7,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace app.Migrations
 {
     /// <inheritdoc />
-    public partial class _16042026postgre : Migration
+    public partial class _07082026store : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Locations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Locations", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
@@ -45,6 +34,24 @@ namespace app.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Stores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Address = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    City = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    ContactNumber = table.Column<string>(type: "character varying(13)", maxLength: 13, nullable: false),
+                    OpeningTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    ClosingTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stores", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -61,26 +68,30 @@ namespace app.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductStore",
+                name: "StoreStocks",
                 columns: table => new
                 {
-                    AvailableAtId = table.Column<int>(type: "integer", nullable: false),
-                    ProductsBarcode = table.Column<string>(type: "text", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StoreId = table.Column<int>(type: "integer", nullable: false),
+                    ProductId = table.Column<int>(type: "integer", nullable: false),
+                    ProductBarcode = table.Column<string>(type: "text", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductStore", x => new { x.AvailableAtId, x.ProductsBarcode });
+                    table.PrimaryKey("PK_StoreStocks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductStore_Locations_AvailableAtId",
-                        column: x => x.AvailableAtId,
-                        principalTable: "Locations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductStore_Products_ProductsBarcode",
-                        column: x => x.ProductsBarcode,
+                        name: "FK_StoreStocks_Products_ProductBarcode",
+                        column: x => x.ProductBarcode,
                         principalTable: "Products",
                         principalColumn: "Barcode",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StoreStocks_Stores_StoreId",
+                        column: x => x.StoreId,
+                        principalTable: "Stores",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -155,9 +166,9 @@ namespace app.Migrations
                 {
                     table.PrimaryKey("PK_StoreVinylium", x => new { x.StoresId, x.VinyliumId });
                     table.ForeignKey(
-                        name: "FK_StoreVinylium_Locations_StoresId",
+                        name: "FK_StoreVinylium_Stores_StoresId",
                         column: x => x.StoresId,
-                        principalTable: "Locations",
+                        principalTable: "Stores",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -213,17 +224,6 @@ namespace app.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_Barcode_CatalogNumber",
-                table: "Products",
-                columns: new[] { "Barcode", "CatalogNumber" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductStore_ProductsBarcode",
-                table: "ProductStore",
-                column: "ProductsBarcode");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductUser_UserId",
                 table: "ProductUser",
                 column: "UserId");
@@ -232,6 +232,28 @@ namespace app.Migrations
                 name: "IX_ProductWarehouse_WarehouseId",
                 table: "ProductWarehouse",
                 column: "WarehouseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stores_ContactNumber",
+                table: "Stores",
+                column: "ContactNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stores_Name",
+                table: "Stores",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StoreStocks_ProductBarcode",
+                table: "StoreStocks",
+                column: "ProductBarcode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StoreStocks_StoreId",
+                table: "StoreStocks",
+                column: "StoreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StoreVinylium_VinyliumId",
@@ -305,13 +327,13 @@ namespace app.Migrations
                 table: "Vinylium");
 
             migrationBuilder.DropTable(
-                name: "ProductStore");
-
-            migrationBuilder.DropTable(
                 name: "ProductUser");
 
             migrationBuilder.DropTable(
                 name: "ProductWarehouse");
+
+            migrationBuilder.DropTable(
+                name: "StoreStocks");
 
             migrationBuilder.DropTable(
                 name: "StoreVinylium");
@@ -326,7 +348,7 @@ namespace app.Migrations
                 name: "Products");
 
             migrationBuilder.DropTable(
-                name: "Locations");
+                name: "Stores");
 
             migrationBuilder.DropTable(
                 name: "Users");
