@@ -3,6 +3,9 @@ import PopOutCard from "./PopOutCard.tsx";
 import {useEffect, useRef, useState} from "react";
 import Product from "../models/Product.ts";
 import authClient from "../api/AuthClient";
+import Store from "../models/Store.ts";
+import store from "./Store.tsx";
+import StoreQuantityPair from "../models/StoreQuantityPair.ts";
 
 // .focus() on a contentEditable does not move the caret, so it can land in
 // front of an existing value and the next keystroke ends up in the wrong place
@@ -22,18 +25,45 @@ export const AlbumCard = ({product, best}) => {
     // the price is the one field Discogs cannot fill in, so it gets called out
     // until something is typed into it
     const [showPriceHint, setShowPriceHint] = useState(true);
-
+    const [storeQuantities, setStoreQuantities] = useState<Array<StoreQuantityPair>>([])
+    const [loading, setLoading] = useState(true);
     // runs once per mount, and FetchAlbumsForm remounts this card on every
     // fetch and every newly picked match by changing its key
     useEffect(() => {
+
+        const getStores = async () => {
+            const pairs = new Array<StoreQuantityPair>();
+            try {
+                const r = await authClient.get("/Store/GetStores")
+                r.data.data.forEach((store: any) => {
+                    const item = new StoreQuantityPair(new Store(store), "0");
+                    pairs.push(item);
+                })
+            }
+            catch(e){
+                console.error(e);
+            }
+            return pairs;
+        }
+        
         if(priceRef.current)
             focusEnd(priceRef.current);
+
+        getStores().then(p => {
+            console.log(p);
+            setStoreQuantities(p);
+            setLoading(false)
+        }).catch(e => console.error(e));
+        
     }, []);
+    
+    
     
     const acceptProduct = async () => {
         try {
             await authClient.post("/Product/AddProduct", {
-                product
+                product,
+                storeQuantities
             })
         } catch (e) {
             return;
@@ -123,6 +153,34 @@ export const AlbumCard = ({product, best}) => {
                                     })
                                 }
                             </select>
+                        </div>
+                        <div >
+                            <p>Availability:</p>
+                        {
+                            (!loading && storeQuantities !== null) &&
+                            storeQuantities.map((s:StoreQuantityPair) => {
+                                return (
+                                    <div key={s.store.name} className="productInput textBord">
+                                        <p>{s.store.name}</p>
+                                        <div contentEditable="plaintext-only" className="iField" spellCheck="false"
+                                        onInput={(t) => {
+                                            const newQuant = t.currentTarget.textContent ?? "";
+                                            setStoreQuantities(prev =>
+                                                prev.map(ss =>
+                                                    ss.store.name === s.store.name ? 
+                                                    new StoreQuantityPair(new Store(s.store), newQuant) : 
+                                                    ss
+                                                )
+                                            );
+                                            console.log(s.quantity);
+                                            console.log(s.store.contactNumber);
+                                        }}>
+                                            <p>{s.quantity}</p>
+                                        </div>
+                                    </div>
+                            )
+                            })
+                        }
                         </div>
                         <div className="productInput textBord priceRow">
                             <p>Price:</p>

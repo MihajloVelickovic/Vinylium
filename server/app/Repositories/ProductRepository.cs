@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace app.Repositories;
 
 public interface IProductRepository{
-	Task CreateProductAsync(Product product);
+	Task CreateProductAsync(Product product, List<StoreStock> quantities);
 	Task<List<Product>> GetAllAsync();
 	Task<Product> GetByIdAsync(string barcode);
 	Task<(List<Product> result, int pages)> GetFilteredAsync(FilterReq req);
@@ -22,9 +22,20 @@ public class ProductRepository: IProductRepository{
 		_dbContext = dbContext;
 	}
 
-	public async Task CreateProductAsync(Product product){
+	public async Task CreateProductAsync(Product product, List<StoreStock> quantities){
 		var dbProduct = await _dbContext.Products.AddAsync(product) ??
 		                throw new Exception("Failed to add product to database");
+
+		foreach(var ss in quantities){
+			var s = new StoreStock{
+				ProductBarcode = product.Barcode,
+				StoreId = ss.Store.Id,
+				Quantity = ss.Quantity
+			};
+			var _ = await _dbContext.StoreStocks.AddAsync(s) ?? 
+					throw new Exception("Failed to create stock object");
+		}
+		
 		var changes = await _dbContext.SaveChangesAsync();
 		if(changes == 0)
 			throw new Exception("Failed to write to database");

@@ -6,6 +6,7 @@ namespace app.Repositories;
 public interface IStoreRepository{
 	Task CreateStoreAsync(Store store);
 	Task DeleteStoreAsync(int id);
+	Task<List<Store>> GetAllStoresAsync();
 }
 
 public class StoreRepository: IStoreRepository{
@@ -34,5 +35,9 @@ public class StoreRepository: IStoreRepository{
 		_dbContext.StoreStocks.Remove(storeStock);
 		_dbContext.Stores.Remove(store);
 		await _dbContext.SaveChangesAsync();
+	}
+
+	public async Task<List<Store>> GetAllStoresAsync(){
+		return await _dbContext.Stores.ToListAsync();
 	}
 }

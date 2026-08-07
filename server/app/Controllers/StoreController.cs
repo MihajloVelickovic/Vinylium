@@ -58,5 +58,16 @@ public class StoreController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
+
+	[HttpGet("GetStores")]
+	public async Task<ActionResult> GetAllStores(){
+		try{
+			var stores = await _storeService.GetAllStoresAsync();
+			return Ok(new {data = stores});
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
+	}
 	
 }

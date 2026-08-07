@@ -41,6 +41,7 @@ public class ProductService: IProductService{
 		 * so this checking and casting is needed to make it into
 		 * a c# Product object that can be added to the db
 		 */
+		
 		var jobjectstring = req.Product.ToString() ??
 		                    throw new Exception("Failed to create product string from request data.");
 		
@@ -49,7 +50,15 @@ public class ProductService: IProductService{
 		var product = jobject.ToObject<Product>() ?? 
 		              throw new Exception("Failed to cast json to product.");
 		
-		await _productRepository.CreateProductAsync(product);
+		var quantstring = req.StoreQuantities.ToString() ??
+		                  throw new Exception("Failed to create product string from request data.");
+		
+		var quantjobject = JArray.Parse(quantstring);
+		
+		var quantities = quantjobject.ToObject<List<StoreStock>>() ?? 
+						 throw new Exception("Failed to cast json to product.");
+		
+		await _productRepository.CreateProductAsync(product, quantities);
 		return product;
 	}
 

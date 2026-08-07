@@ -45,11 +45,10 @@ public class VinyliumContext: DbContext{
 		builder.Entity<StoreStock>()
 			.HasOne(s => s.Store)
 			.WithMany();
-		
+
 		builder.Entity<StoreStock>()
 			.HasOne(p => p.Product)
 			.WithMany();
-		
 		builder.Entity<User>()
 			.HasIndex(u => new{ u.Username, u.Password })
 			.IsUnique();
@@ -57,6 +56,7 @@ public class VinyliumContext: DbContext{
 		builder.Entity<Store>()
 			.HasIndex(s => s.Name)
 			.IsUnique();
+		
 		builder.Entity<Store>()
 			.HasIndex(s => s.ContactNumber)
 			.IsUnique();
