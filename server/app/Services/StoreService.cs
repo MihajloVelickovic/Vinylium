@@ -8,7 +8,7 @@ namespace app.Services;
 public interface IStoreService{
 	Task<Store> CreateStoreAsync(AddStoreReq req);
 	Task DeleteStoreAsync(int id);
-	Task<List<Store>> GetAllStoresAsync();
+	Task<List<Store>?> GetAllStoresAsync();
 }
 
 public class StoreService: IStoreService{
@@ -39,7 +39,7 @@ public class StoreService: IStoreService{
 		await _storeRepository.DeleteStoreAsync(id);
 	}
 
-	public async Task<List<Store>> GetAllStoresAsync(){
+	public async Task<List<Store>?> GetAllStoresAsync(){
 		return await _storeRepository.GetAllStoresAsync();
 	}
 }
