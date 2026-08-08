@@ -44,6 +44,9 @@ public class Program{
 		builder.Services.AddScoped<IStoreRepository, StoreRepository>();
 		builder.Services.AddScoped<IJwtService, JwtService>();
 		builder.Services.AddScoped<IJwtRepository, JwtRepository>();
+		builder.Services.AddScoped<IStoreStockService, StoreStockService>();
+		builder.Services.AddScoped<IStoreStockRepository, StoreStockRepository>();
+		builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 		
 		builder.Services.AddCors(options => {
 			options.AddPolicy("AllowReact",

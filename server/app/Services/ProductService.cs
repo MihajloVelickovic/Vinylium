@@ -1,3 +1,5 @@
+using System.Net.Quic;
+using System.Runtime.InteropServices;
 using app.Enums;
 using app.Helper;
 using app.Models;
@@ -17,13 +19,17 @@ public interface IProductService{
 	Task<List<Product>> GetRandomProductsAsync();
 	Task<int> GetCount();
 	Task<List<Product>> GetPage(int? page, int? items);
+	Task<List<Store>> GetAvailableStoresByIdAsync(string barcode);
 }
 
 public class ProductService: IProductService{
 	private readonly IProductRepository _productRepository;
-
-	public ProductService(IProductRepository productRepository){
+	private readonly IStoreStockService _storeStockService;
+	private readonly IUnitOfWork _unitOfWork;
+	public ProductService(IProductRepository productRepository, IStoreStockService storeStockService, IUnitOfWork uow){
 		_productRepository = productRepository;
+		_storeStockService = storeStockService;
+		_unitOfWork = uow;
 	}
 
 	public async Task<List<Product>> FetchProducts(AddProductReq request){
@@ -34,31 +40,31 @@ public class ProductService: IProductService{
 		return await _productRepository.GetAllAsync();
 	}
 
-	public async Task<Product> AddProductAsync(AcceptProductReq req){
+	private Product GetProductFromJson(object jsonParam){
 		/* the frontend sends the entire Product "object" in the request
 		 * to make the request itself easier to parse visually
 		 * because it's a weird funky object, its type is 'object',
 		 * so this checking and casting is needed to make it into
 		 * a c# Product object that can be added to the db
 		 */
+		var productJObjectString = jsonParam.ToString() ??
+		                           throw new Exception("Failed to create product string from request data.");
 		
-		var jobjectstring = req.Product.ToString() ??
-		                    throw new Exception("Failed to create product string from request data.");
+		var productJObject = JObject.Parse(productJObjectString);
 		
-		var jobject = JObject.Parse(jobjectstring);
-		
-		var product = jobject.ToObject<Product>() ?? 
+		var product = productJObject.ToObject<Product>() ?? 
 		              throw new Exception("Failed to cast json to product.");
-		
-		var quantstring = req.StoreQuantities.ToString() ??
-		                  throw new Exception("Failed to create product string from request data.");
-		
-		var quantjobject = JArray.Parse(quantstring);
-		
-		var quantities = quantjobject.ToObject<List<StoreStock>>() ?? 
-						 throw new Exception("Failed to cast json to product.");
-		
-		await _productRepository.CreateProductAsync(product, quantities);
+		return product;
+	}
+	
+	public async Task<Product> AddProductAsync(AcceptProductReq req){
+		var product = this.GetProductFromJson(req.Product);
+		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product.Barcode);
+		/* atomically execute product and store stock creation */
+		await _unitOfWork.ExecuteInTransactionAsync(async () => {
+			await _productRepository.CreateProductAsync(product);
+			await _storeStockService.CreateStoreStock(storeStock);
+		});
 		return product;
 	}
 
@@ -100,5 +106,9 @@ public class ProductService: IProductService{
 		var i = items ?? throw new Exception("Need to return some items");
 		
 		return await _productRepository.GetPage(p, i);
+	}
+
+	public Task<List<Store>> GetAvailableStoresByIdAsync(string barcode){
+		throw new NotImplementedException();
 	}
 }

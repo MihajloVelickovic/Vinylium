@@ -9,7 +9,7 @@ export const ProductPage = () => {
     const params = useParams();
     const [url, _] = useState(`/Product/GetProductById/${params.id}`);
     const [product, setProduct] = useState<Product>();
-
+    
     useEffect(() => {
         const fetchData = async () => {
             return await client.get(url);

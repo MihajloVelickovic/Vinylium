@@ -129,5 +129,16 @@ public class ProductController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
+
+	[HttpGet("GetAvailableStoresById/{barcode}")]
+	public async Task<ActionResult> GetAvailableStoresById(string barcode){
+		try{
+			var stores = await _productService.GetAvailableStoresByIdAsync(barcode);
+			return Ok();
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
+	}
 	
 }
