@@ -51,6 +51,9 @@ public class StoreController: ControllerBase{
 
 	[Authorize]
 	[HttpDelete("DeleteStore/{id}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> DeleteStoreById(string id){
 		try{
 			var x = int.TryParse(id, out var idInt);
@@ -64,6 +67,8 @@ public class StoreController: ControllerBase{
 	}
 
 	[HttpGet("GetStores")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> GetAllStores(){
 		try{
 			var stores = await _storeService.GetAllStoresAsync();

@@ -1,0 +1,30 @@
+.storeCard{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 20%;
+    height: 100%;
+    border: var(--vinylium-accent) outset 2px;
+    margin: 2em;
+    transition: scale 0.2s ease, box-shadow 0.2s ease;
+    padding: 1em;
+}
+
+.storeCard:hover{
+    box-shadow: var(--vinylium-accent) 0 0 10px;
+    border: var(--vinylium-accent) outset 2px;
+    background-color: var(--vinylium-accent);
+    cursor: pointer;
+    transition: scale 0.2s ease, box-shadow 0.2s ease;
+    scale: 1.05;
+}
+.storeCard:focus{
+    box-shadow: var(--vinylium-accent) 0 0 10px;
+    border: var(--vinylium-accent) outset 2px;
+    background-color: var(--vinylium-accent);
+    scale: 1.05;
+}
+.item{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}

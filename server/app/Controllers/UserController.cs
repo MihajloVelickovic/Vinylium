@@ -1,4 +1,5 @@
 using app.Helper;
+using app.Models;
 using app.Services;
 using app.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -204,7 +205,22 @@ public class UserController: ControllerBase{
 		catch(Exception e){
 			return BadRequest(e);
 		}
-	} 
+	}
+
+	[Authorize]
+	[HttpGet("GetAllUsers")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> GetAllUsers(){
+		try{
+			var users = await _userService.GetAllUsersAsync();
+			return Ok(new {data = users});
+		}
+		catch(Exception e){
+			return BadRequest(new {message = e.Message});
+		}
+	}
 	
 	
 }

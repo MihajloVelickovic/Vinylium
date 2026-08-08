@@ -10,6 +10,7 @@ public interface IUserService{
 	Task<User> LoginUserAsync(LoginReq request);
 	Task DeleteUserAsync(string username);
 	Task<User?> FindUserByEmailOrUsernameAsync(string username);
+	Task<List<User>> GetAllUsersAsync();
 }
 
 public class UserService: IUserService{
@@ -35,6 +36,10 @@ public class UserService: IUserService{
 
 	public async Task<User?> FindUserByEmailOrUsernameAsync(string username){
 		return await _userRepository.FindUserByEmailOrUsernameAsync(username);
+	}
+
+	public async Task<List<User>> GetAllUsersAsync(){
+		return await _userRepository.GetAllUsersAsync();
 	}
 
 	public async Task<User> LoginUserAsync(LoginReq request){

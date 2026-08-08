@@ -7,6 +7,7 @@ public interface IUserRepository{
 	Task RegisterUserAsync(User user);
 	Task<User?> FindUserByEmailOrUsernameAsync(string emailOrUsername);
 	Task DeleteUserAsync(string username);
+	Task<List<User>> GetAllUsersAsync();
 }
 
 public class UserRepository: IUserRepository{
@@ -48,5 +49,9 @@ public class UserRepository: IUserRepository{
 			throw new Exception($"User {username} not found");
 		_dbContext.Remove(user);
 		await _dbContext.SaveChangesAsync();
+	}
+
+	public async Task<List<User>> GetAllUsersAsync(){
+		return await _dbContext.Users.ToListAsync();
 	}
 }

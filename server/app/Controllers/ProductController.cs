@@ -131,6 +131,8 @@ public class ProductController: ControllerBase{
 	}
 
 	[HttpGet("GetAvailableStoresById/{barcode}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> GetAvailableStoresById(string barcode){
 		try{
 			var stores = await _productService.GetAvailableStoresByIdAsync(barcode);
