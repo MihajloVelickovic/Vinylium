@@ -1,0 +1,9 @@
+.products{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow: hidden;
+    animation-name: scaleAnim;
+    animation-duration: 0.2s;
+}

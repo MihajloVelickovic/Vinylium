@@ -11,6 +11,7 @@ import {AdminRoute} from "./components/AdminRoute";
 import {PrivateRoute} from "./components/PrivateRoute";
 import {Profile} from "./components/Profile";
 import {AddStoreForm} from "./components/AddStoreForm.tsx";
+import {ManageProductsPage} from "./components/ManageProductsPage.tsx";
 
 function About() {
     return <h2>About Page</h2>;
@@ -53,6 +54,7 @@ function App() {
                         }>
                             <Route path="add-album" element={<FetchAlbumsForm/>}/>
                             <Route path="add-store" element={<AddStoreForm/>}/>
+                            <Route path="manage-products" element={<ManageProductsPage/>}/>
                             
                         </Route>
                         <Route path="/cart"></Route>
