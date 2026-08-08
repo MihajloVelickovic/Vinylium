@@ -47,5 +47,4 @@ public class StoreStockService:  IStoreStockService{
 	public async Task<List<StoreStock>> GetStoreStockFromId(string barcode){
 		return await _repo.GetStoreStockFromId(barcode);
 	}
-	
 }

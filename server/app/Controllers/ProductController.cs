@@ -136,7 +136,7 @@ public class ProductController: ControllerBase{
 	public async Task<ActionResult> GetAvailableStoresById(string barcode){
 		try{
 			var stores = await _productService.GetAvailableStoresByIdAsync(barcode);
-			return Ok();
+			return Ok(new {data = stores});
 		}
 		catch(Exception e){
 			return BadRequest(e.Message);

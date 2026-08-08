@@ -1,12 +1,4 @@
-/* Two columns: the cover and the tracklist stack down the left, the fields
- * occupy the right across both rows. Named areas rather than nested wrappers,
- * so the tracklist can sit directly under the image without the two of them
- * needing to share a parent element.
- * The auto margins are what centre the card - align-items/justify-content
- * would only place its children. */
 .mainEditCard{
-    /* the cover and the tracklist share this so they stay the same width and
-     * stay aligned with each other - change it in one place and both follow */
     --cover-width: 320px;
 
     display: grid;
@@ -20,9 +12,6 @@
     margin: 0 auto;
 }
 
-/* AlbumCard.css styles a global `.image img` at width:100%, and every stylesheet
- * in this app is global regardless of which component imports it. This page
- * uses its own class so that rule cannot reach in. */
 .editImage{
     grid-area: cover;
     display: flex;
@@ -37,9 +26,6 @@
     object-fit: cover;
 }
 
-/* stacked, so the list sits beneath its heading. align-items centres the
- * heading and the list block together within the column rather than letting
- * each stretch across it, which keeps them aligned with the cover above. */
 .lower{
     grid-area: tracks;
     display: flex;
@@ -48,8 +34,6 @@
     gap: 0.5em;
 }
 
-/* matches the cover exactly, so the two blocks share a left and right edge.
- * text-align overrides the centred text #root sets globally. */
 .tracks{
     display: flex;
     flex-direction: column;
@@ -58,15 +42,13 @@
     text-align: left;
 }
 
-/* number and input on one row, so the input can take whatever is left and end
- * flush with the cover's right edge */
 .tracks p{
     display: flex;
     align-items: center;
     gap: 0.4em;
 }
 
-.mainInfo{
+.mainInformation{
     grid-area: info;
     display:flex;
     flex-direction: column;
@@ -78,8 +60,6 @@
     grid-template-columns:1fr 2fr;
 }
 
-/* takes the row's leftover space rather than a fixed width, so every input
- * ends on the same line. min-width:0 stops a long title forcing it wider. */
 .track{
     flex: 1;
     min-width: 0;

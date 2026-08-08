@@ -20,6 +20,8 @@ public class StoreStockRepository: IStoreStockRepository{
 	}
 
 	public async Task<List<StoreStock>> GetStoreStockFromId(string barcode){
-		return await _dbContext.StoreStocks.Where(s => s.ProductBarcode == barcode).ToListAsync();
+		return await _dbContext.StoreStocks.Include(s => s.Store)
+										   .Where(s => s.ProductBarcode == barcode)
+										   .ToListAsync();
 	}
 }

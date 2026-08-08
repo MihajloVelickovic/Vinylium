@@ -20,7 +20,7 @@ public interface IProductService{
 	Task<List<Product>> GetRandomProductsAsync();
 	Task<int> GetCount();
 	Task<List<Product>> GetPage(int? page, int? items);
-	Task<List<Store>> GetAvailableStoresByIdAsync(string barcode);
+	Task<List<StoreStock>> GetAvailableStoresByIdAsync(string barcode);
 	Task<bool> ExistsProductId(string barcode);
 }
 
@@ -117,7 +117,7 @@ public class ProductService: IProductService{
 		return await _productRepository.GetPage(p, i);
 	}
 
-	public Task<List<Store>> GetAvailableStoresByIdAsync(string barcode){
-		throw new NotImplementedException();
+	public async Task<List<StoreStock>> GetAvailableStoresByIdAsync(string barcode){
+		return await _storeStockService.GetStoreStockFromId(barcode);
 	}
 }
