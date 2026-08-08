@@ -14,13 +14,10 @@ import {AddStoreForm} from "./components/AddStoreForm.tsx";
 import {ManageProductsPage} from "./components/ManageProductsPage.tsx";
 import {ManageStoresPage} from "./components/ManageStoresPage.tsx";
 import {ManageUsersPage} from "./components/ManageUsersPage.tsx";
+import {ContactPage} from "./components/ContactPage.tsx";
 
 function About() {
     return <h2>About Page</h2>;
-}
-
-function Contact() {
-    return <h2>Contact Page</h2>;
 }
 
 function App() {
@@ -42,7 +39,7 @@ function App() {
                             </PrivateRoute>
                         }/>
                         <Route path="/about" element={<About/>}/>
-                        <Route path="/contact" element={<Contact/>}/>
+                        <Route path="/contact" element={<ContactPage/>}/>
                         <Route path="/products/:id" element={<ProductPage/>}/>
                         <Route path="/login" element={
                             <>
