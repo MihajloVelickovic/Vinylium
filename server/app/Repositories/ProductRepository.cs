@@ -12,6 +12,7 @@ public interface IProductRepository{
 	Task<List<Product>> GetRandomProductsAsync();
 	Task<int> GetCount();
 	Task<List<Product>> GetPage(int page, int items);
+	Task<bool> ExistsProductId(string barcode);
 }
 
 public class ProductRepository: IProductRepository{
@@ -79,5 +80,9 @@ public class ProductRepository: IProductRepository{
 		var skip = (page - 1) * items;
 		return await _dbContext.Products.Select(p => p).Skip(skip).Take(items).ToListAsync();
 
+	}
+
+	public async Task<bool> ExistsProductId(string barcode){
+		return await _dbContext.StoreStocks.FirstOrDefaultAsync(s => s.ProductBarcode == barcode) != null;
 	}
 }

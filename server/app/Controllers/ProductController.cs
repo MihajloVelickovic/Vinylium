@@ -28,19 +28,19 @@ public class ProductController: ControllerBase{
 		try{
 			if(string.IsNullOrWhiteSpace(request.Code))
 				throw new ArgumentNullException(nameof(request.Code));
-
+			
 			var product = await _productService.FetchProducts(request);
 			return Ok(new{ data = product });
 		}
 		catch(BadHttpRequestException r){
 			if(r.StatusCode == 429)
-				return BadRequest($"Too Many Requests to Discogs API. Either the code {request.Code} " +
+				return BadRequest(new {message = $"Too Many Requests to Discogs API. Either the code {request.Code} " +
 				                  $"is not unique enough, or too many requests have been made in a short + " +
-				                  $"amount of time, in which case you should wait a bit before fetching again!");
+				                  $"amount of time, in which case you should wait a bit before fetching again!"});
 			throw;
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{message = e.Message});
 		}
 	}
 

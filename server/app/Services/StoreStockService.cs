@@ -8,6 +8,7 @@ namespace app.Services;
 public interface IStoreStockService{
 	List<StoreStock> CreateStoreStockFromJson(object reqStoreQuantities, string id);
 	Task CreateStoreStock(List<StoreStock> stock);
+	Task<List<StoreStock>> GetStoreStockFromId(string barcode);
 }
 
 public class StoreStockService:  IStoreStockService{
@@ -41,6 +42,10 @@ public class StoreStockService:  IStoreStockService{
 	
 	public async Task CreateStoreStock(List<StoreStock> stock){
 		await _repo.CreateStoreStockAsync(stock);
+	}
+
+	public async Task<List<StoreStock>> GetStoreStockFromId(string barcode){
+		return await _repo.GetStoreStockFromId(barcode);
 	}
 	
 }

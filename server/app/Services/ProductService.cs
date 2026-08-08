@@ -1,5 +1,6 @@
 using System.Net.Quic;
 using System.Runtime.InteropServices;
+using System.Text;
 using app.Enums;
 using app.Helper;
 using app.Models;
@@ -20,6 +21,7 @@ public interface IProductService{
 	Task<int> GetCount();
 	Task<List<Product>> GetPage(int? page, int? items);
 	Task<List<Store>> GetAvailableStoresByIdAsync(string barcode);
+	Task<bool> ExistsProductId(string barcode);
 }
 
 public class ProductService: IProductService{
@@ -33,6 +35,9 @@ public class ProductService: IProductService{
 	}
 
 	public async Task<List<Product>> FetchProducts(AddProductReq request){
+		var exists = await ExistsProductId(request.Code);
+		if(exists)
+			throw new Exception("Product with this barcode is already in the database. Update it instead");
 		return await Discogs.CreateProduct(request.Code);
 	}
 
@@ -66,6 +71,10 @@ public class ProductService: IProductService{
 			await _storeStockService.CreateStoreStock(storeStock);
 		});
 		return product;
+	}
+
+	public async Task<bool> ExistsProductId(string barcode){
+		return await _productRepository.ExistsProductId(barcode);
 	}
 
 	public async Task<Product> GetByIdAsync(string barcode){

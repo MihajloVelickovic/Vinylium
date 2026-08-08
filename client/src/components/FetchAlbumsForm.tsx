@@ -33,23 +33,19 @@ export const FetchAlbumsForm = () => {
                     code
                 }
             );
+            const resultProducts = new Array<Product>();
+            result.data.data.forEach((p: never) => resultProducts.push(new Product(p)))
+            setResults(resultProducts);
+            setSelected(0);
+            setBrowsing(false);
+            setFetchId(id => id + 1);
         } catch (e:any) {
-            if(e.response && e.response.data)
-                setError(e.response.data);
-            console.log("Exception: " + e);
+            console.log(e.response.data.message);
+            setError(e.response.data.message);
             setResults([])
             setBrowsing(false)
             return;
         }
-
-        const resultProducts = new Array<Product>();
-
-        result.data.data.forEach((p: never) => resultProducts.push(new Product(p)))
-
-        setResults(resultProducts);
-        setSelected(0);
-        setBrowsing(false);
-        setFetchId(id => id + 1);
     }
 
     return (
