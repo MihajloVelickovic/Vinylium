@@ -1,66 +1,182 @@
-.mainEditCard{
-    --cover-width: 320px;
-
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-        "cover  info"
-        "tracks info";
-    align-items: start;
-    gap: 1.5em 2em;
-    width: min(1000px, 92%);
-    margin: 0 auto;
+.mainEditCard {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--bg);
+    box-shadow: var(--vinylium-accent) 0 10px 35px -10px;
+    border: 3px solid var(--vinylium-accent);
+    animation: scaleAnim 0.2s ease;
 }
 
-.editImage{
-    grid-area: cover;
+@keyframes scaleAnim {
+    from { filter: blur(10px); }
+    to { filter: blur(0); }
+}
+
+.mainEditCard::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: -30px;
+    left: -30px;
+    right: -30px;
+    bottom: -30px;
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: blur(15px);
+    transform: scale(1.05);
+}
+
+.mainEditCard::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1;
+}
+
+.upperEditCard {
+    position: relative;
+    z-index: 2;
     display: flex;
-    justify-content: center;
+    gap: 40px;
+    padding: 40px;
+    color: white;
 }
 
-.editImage img{
-    width: 100%;
-    max-width: var(--cover-width);
-    height: auto;
-    aspect-ratio: 1;
-    object-fit: cover;
-}
-
-.lower{
-    grid-area: tracks;
+.mainInforation {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 15px;
+}
+
+.infoField {
+    display: flex;
     align-items: center;
-    gap: 0.5em;
+    gap: 20px;
 }
 
-.tracks{
-    display: flex;
-    flex-direction: column;
-    gap: 0.3em;
-    width: min(var(--cover-width), 100%);
-    text-align: left;
+.infoField p {
+    width: 150px;
+    margin: 0;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
 }
 
-.tracks p{
-    display: flex;
-    align-items: center;
-    gap: 0.4em;
-}
-
-.mainInformation{
-    grid-area: info;
-    display:flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.infoField{
-    display: grid;
-    grid-template-columns:1fr 2fr;
-}
-
-.track{
+.infoField input,
+.infoField select {
     flex: 1;
     min-width: 0;
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    outline: none;
+    backdrop-filter: blur(5px);
+    font-family: var(--heading), sans-serif;
+    transition: 0.2s ease;
+}
+
+.infoField input:focus,
+.infoField select:focus {
+    border-color: var(--vinylium-accent);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.infoField select option {
+    background: #333;
+    color: white;
+}
+
+.lowerEditCard {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 0 40px 40px;
+    color: white;
+}
+
+.lowerEditCard > div {
+    background: rgba(0,0,0,0.15);
+    border: 2px solid var(--vinylium-accent);
+    padding: 20px;
+    backdrop-filter: blur(8px);
+}
+
+.lowerEditCard > div > p {
+    margin-top: 0;
+    margin-bottom: 15px;
+
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.tracks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tracks p {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin: 0;
+}
+
+.track {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    outline: none;
+    backdrop-filter: blur(5px);
+    font-family: var(--heading), sans-serif;
+}
+
+.track:focus {
+    border-color: var(--vinylium-accent);
+    background: rgba(255, 255, 255, 0.2);
+    
+}
+
+@media (max-width: 800px) {
+
+    .mainEditCard {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    .upperEditCard {
+        flex-direction: column;
+        padding: 25px;
+    }
+
+    .lowerEditCard {
+        grid-template-columns: 1fr;
+        padding: 0 25px 25px;
+    }
+
+    .infoField {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .infoField p {
+        width: auto;
+    }
 }

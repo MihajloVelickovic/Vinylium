@@ -42,8 +42,11 @@ export const EditProductPage = () => {
     const renderProduct = (product: Product) => {
         return (
             
-            <div className="mainEditCard">
-                    <div className="editImage">
+            <div className="mainEditCard" style={{
+                background: "url("+`${product.imageUrl}`+") center",
+            }}>
+                <div className="upperEditCard">
+                    <div className="editCardImage">
                         <img src={product.imageUrl}
                              width={200}
                              height={200}
@@ -82,13 +85,14 @@ export const EditProductPage = () => {
                                     })
                                 }
                             </select>
-                        </div><div className="infoField">
-                        <p>Name: </p>
-                        <input type="text" value={product.name} />
+                        </div>
+                        <div className="infoField">
+                            <p>Name: </p>
+                            <input type="text" value={product.name} />
+                        </div>
                     </div>
-                        
-                    </div>
-                <div className="lower">
+                </div>
+                <div className="lowerEditCard">
                     <div>
                         <p>Tracklist:</p>
                         <div className="tracks">
