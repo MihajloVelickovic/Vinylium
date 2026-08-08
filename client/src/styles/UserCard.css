@@ -7,7 +7,7 @@
     border: var(--vinylium-accent) outset 2px;
     margin: 2em;
     transition: scale 0.2s ease, box-shadow 0.2s ease;
-    padding: 1em;
+    font-family: var(--heading), sans-serif;
 }
 
 .userCard {
@@ -31,4 +31,27 @@
 .info{
     display: grid;
     grid-template-columns: 1fr 1fr;
+    padding: 0.5em;
+}
+
+.buttons{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.button{
+    margin: 1em;
+    font-family: var(--heading), sans-serif;
+    border: none;
+    background-color: var(--vinylium-accent);
+    height: 2em;
+    
+}
+
+.userInfo{
+    border-bottom: 2px solid var(--vinylium-accent);
+}
+
+.delete{
+    background-color: red;
 }

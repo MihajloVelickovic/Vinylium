@@ -4,4 +4,10 @@
     justify-content: center;
     align-items: center;
     width: 100%;
+    animation: scaleAnim 0.2s ease;
+}
+
+@keyframes scaleAnim {
+    from { filter: blur(10px); }
+    to { filter: blur(0); }
 }
