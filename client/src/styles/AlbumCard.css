@@ -99,21 +99,28 @@ body{
 }
 
 .iField{
-    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
+    /* without this an input's intrinsic width (~20 characters) beats the 2fr
+     * column and shoves the label out of alignment */
+    min-width: 0;
     padding: 2px 4px;
     background-color: transparent;
     outline: none;
     border: none;
+    /* inputs inherit neither the family nor the size, so both are restated */
+    font: inherit;
+    font-size: 10pt;
     color: #f3f4f6;
     text-align: left;
-    font-size: 10pt;
-    min-width: fit-content;
-    overflow-wrap: break-word;
-    word-break: break-all;
     transition: background-color 0.15s ease;
 }
 
-/* contentEditable divs look like plain text, so say that they are typeable */
+.iField::placeholder{
+    color: rgba(243, 244, 246, 0.35);
+}
+
+/* the fields are chromeless to read as plain text, so say that they are typeable */
 .iField:hover{
     background-color: rgba(243, 244, 246, 0.08);
     cursor: text;

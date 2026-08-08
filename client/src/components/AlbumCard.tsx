@@ -4,29 +4,22 @@ import {useEffect, useRef, useState} from "react";
 import Product from "../models/Product.ts";
 import authClient from "../api/AuthClient";
 import Store from "../models/Store.ts";
-import store from "./Store.tsx";
 import StoreQuantityPair from "../models/StoreQuantityPair.ts";
+import {Field} from "./Field.tsx";
+import {useProductDraft} from "../hooks/useProductDraft.ts";
 
-// .focus() on a contentEditable does not move the caret, so it can land in
-// front of an existing value and the next keystroke ends up in the wrong place
-const focusEnd = (el: HTMLElement) => {
-    el.focus();
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    range.collapse(false);
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-}
-//@ts-ignore
-export const AlbumCard = ({product, best}) => {
+export const AlbumCard = ({product, best}: { product: Product, best: boolean }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const priceRef = useRef<HTMLDivElement>(null);
+    const priceRef = useRef<HTMLInputElement>(null);
     // the price is the one field Discogs cannot fill in, so it gets called out
     // until something is typed into it
     const [showPriceHint, setShowPriceHint] = useState(true);
     const [storeQuantities, setStoreQuantities] = useState<Array<StoreQuantityPair>>([])
     const [loading, setLoading] = useState(true);
+    // edits live here and die with the card, which is what we want: picking a
+    // different match remounts this component and should start clean
+    const {draft, setField, toPayload} = useProductDraft(product);
+
     // runs once per mount, and FetchAlbumsForm remounts this card on every
     // fetch and every newly picked match by changing its key
     useEffect(() => {
@@ -45,31 +38,39 @@ export const AlbumCard = ({product, best}) => {
             }
             return pairs;
         }
-        
-        if(priceRef.current)
-            focusEnd(priceRef.current);
+
+        priceRef.current?.focus();
 
         getStores().then(p => {
-            console.log(p);
             setStoreQuantities(p);
             setLoading(false)
         }).catch(e => console.error(e));
-        
+
     }, []);
-    
-    
-    
+
+    // reuses the store instance instead of rebuilding it: Store's constructor
+    // reads openingTime/closingTime off raw json, so feeding it an existing
+    // Store (which has openingHours/closingHours) blanks both
+    const setQuantity = (storeId: number, quantity: string) => {
+        setStoreQuantities(prev => prev.map(p =>
+            p.store.id === storeId ? new StoreQuantityPair(p.store, quantity) : p
+        ));
+    }
+
     const acceptProduct = async () => {
         try {
             await authClient.post("/Product/AddProduct", {
-                product,
-                storeQuantities
+                product: toPayload(),
+                // Quantity is an int server side, so a box the user cleared has
+                // to go out as "0" rather than ""
+                storeQuantities: storeQuantities.map(p =>
+                    new StoreQuantityPair(p.store, p.quantity.trim() || "0"))
             })
         } catch (e) {
             return;
         }
     }
-    
+
     return (
         <>
             <div className={"albumCard" + (best ? " bestCard" : "")} onKeyUp={(e) => {
@@ -78,7 +79,7 @@ export const AlbumCard = ({product, best}) => {
             }}>
                 {/* div za pozadinsku sliku */}
                 <div className="background-style" style={{
-                    background: "url(" + `${product.imageUrl}` + ") center",
+                    background: "url(" + `${draft.imageUrl}` + ") center",
                     zIndex: "-1"
                 }}>
                 </div>
@@ -86,118 +87,73 @@ export const AlbumCard = ({product, best}) => {
                 {/* div za podatke i sliku */}
                 <div className="cardBody">
                     <div className="image">
-                        <img src={product.imageUrl}
+                        <img src={draft.imageUrl}
                              width={220}
                              height={220}
                              style={{pointerEvents: "none"}}/>
                     </div>
 
                     <div className="cardFields">
-                        <div className="productInput textBord">
-                            <p>Barcode:</p>
-                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                                 onInput={(b) => {
-                                     product.barcode = b.currentTarget.textContent;
-                                 }}>
-                                <p>{product.barcode}</p>
-                            </div>
-                        </div>
+                        <Field label="Barcode:" value={draft.barcode}
+                               onChange={v => setField("barcode", v)}/>
 
-                        <div className="productInput textBord">
-                            <p>CatNo:</p>
-                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                                 onInput={(c) => {
-                                     product.catalogNumber = c.currentTarget.textContent;
-                                 }}>
-                                <p>{product.catalogNumber}</p>
-                            </div>
-                        </div>
+                        <Field label="CatNo:" value={draft.catalogNumber}
+                               onChange={v => setField("catalogNumber", v)}/>
 
-                        <div className="productInput textBord">
-                            <p>Title:</p>
-                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                                 onInput={(n) => {
-                                     product.name = n.currentTarget.textContent;
-                                 }}>
-                                <p>{product.name}</p>
-                            </div>
-                        </div>
+                        <Field label="Title:" value={draft.name}
+                               onChange={v => setField("name", v)}/>
 
-                        <div className="productInput textBord">
-                            <p>Artist:</p>
-                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                                 onInput={(a) => {
-                                     product.artist = a.currentTarget.textContent;
-                                 }}>
-                                <p>{product.artist}</p>
-                            </div>
-                        </div>
-                        <div className="productInput textBord">
-                            <p>Release Date:</p>
-                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                                 onInput={(r) => {
-                                     product.releaseDate = r.currentTarget.textContent;
-                                 }}>
-                                <p>{product.releaseDate}</p>
-                            </div>
-                        </div>
+                        <Field label="Artist:" value={draft.artist}
+                               onChange={v => setField("artist", v)}/>
+
+                        <Field label="Release Date:" value={draft.releaseDate}
+                               onChange={v => setField("releaseDate", v)}/>
+
                         <div className="productInput textBord">
                             <p>Type:</p>
-                            <select onChange={(t) => {
-                                product.type = t.target.selectedIndex;
-                            }}>
+                            <select value={draft.type}
+                                    onChange={(t) => setField("type", Number(t.target.value))}>
                                 {
                                     [0, 1, 2].map((item) => {
-                                        return <option
-                                            selected={item === product.type}>{Product.evaluateType(item)}</option>
+                                        return <option key={item}
+                                                       value={item}>{Product.evaluateType(item)}</option>
                                     })
                                 }
                             </select>
                         </div>
-                        <div >
+
+                        <div>
                             <p>Availability:</p>
-                        {
-                            (!loading && storeQuantities !== null) &&
-                            storeQuantities.map((s:StoreQuantityPair) => {
-                                return (
-                                    <div key={s.store.name} className="productInput textBord">
-                                        <p>{s.store.name}</p>
-                                        <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                                        onInput={(t) => {
-                                            const newQuant = t.currentTarget.textContent ?? "";
-                                            setStoreQuantities(prev =>
-                                                prev.map(ss =>
-                                                    ss.store.name === s.store.name ? 
-                                                    new StoreQuantityPair(new Store(s.store), newQuant) : 
-                                                    ss
-                                                )
-                                            );
-                                            console.log(s.quantity);
-                                            console.log(s.store.contactNumber);
-                                        }}>
-                                            <p>{s.quantity}</p>
-                                        </div>
-                                    </div>
-                            )
-                            })
-                        }
+                            {
+                                !loading &&
+                                storeQuantities.map((s: StoreQuantityPair) => {
+                                    return (
+                                        <Field key={s.store.id}
+                                               label={s.store.name}
+                                               value={s.quantity}
+                                               inputMode="numeric"
+                                               onChange={v => setQuantity(s.store.id, v)}/>
+                                    )
+                                })
+                            }
                         </div>
-                        <div className="productInput textBord priceRow">
-                            <p>Price:</p>
-                            <div contentEditable="plaintext-only" className="iField" spellCheck="false"
-                                 onInput={(r) => {
-                                     product.price = r.currentTarget.textContent;
-                                     setShowPriceHint(false);
-                                 }} ref={priceRef}>
-                                <p>{product.price}</p>
-                            </div>
+
+                        <Field label="Price:" value={draft.price}
+                               rowClassName="priceRow"
+                               inputRef={priceRef}
+                               inputMode="decimal"
+                               placeholder="0.00"
+                               onChange={v => {
+                                   setField("price", v);
+                                   setShowPriceHint(false);
+                               }}>
                             {showPriceHint &&
                                 <div className="priceHint" role="tooltip"
                                      onClick={() => setShowPriceHint(false)}>
                                     Set a price before adding
                                 </div>
                             }
-                        </div>
+                        </Field>
                     </div>
                 </div>
 
@@ -213,25 +169,25 @@ export const AlbumCard = ({product, best}) => {
                 <PopOutCard
                     isOpen={isOpen}
                     onClose={() => setIsOpen(false)}
-                    title={product.name}
-                    backgroundImage={product.imageUrl}
+                    title={draft.name}
+                    backgroundImage={draft.imageUrl}
                 >
-                    <img src={product.imageUrl} style={{width: "100%"}}/>
+                    <img src={draft.imageUrl} style={{width: "100%"}}/>
                     <p style={{textAlign: "center"}}><strong>Tracklist:</strong></p>
-                    {product.tracklist.map((_: any, i: number) => {
+                    {/* keying on the index is safe here specifically because the
+                        tracklist is never reordered, filtered or appended to */}
+                    {draft.tracklist.map((track: string, i: number) => {
                         return (
-                            <p contentEditable="plaintext-only" className="iField" spellCheck="false"
-                               onInput={(t) => {
-                                   product.tracklist[i] = t.currentTarget.textContent;
-                                   console.log(t.currentTarget.textContent);
-                               }}>{product.tracklist[i]}</p>)
+                            <input key={i} className="iField" type="text" spellCheck={false}
+                                   value={track}
+                                   onChange={(t) => setField("tracklist",
+                                       draft.tracklist.map((x, j) => j === i ? t.target.value : x))}/>)
                     })}
                     <p style={{textAlign: "center"}}><strong>Runtime:</strong></p>
                     {
-                        <p contentEditable="plaintext-only" className="iField" spellCheck="false"
-                           onInput={(r) => {
-                               product.runtime = r.currentTarget.textContent;
-                           }}>{product.runtime}</p>
+                        <input className="iField" type="text" spellCheck={false}
+                               value={draft.runtime}
+                               onChange={(r) => setField("runtime", r.target.value)}/>
                     }
 
                 </PopOutCard>
