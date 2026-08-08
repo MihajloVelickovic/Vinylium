@@ -29,12 +29,14 @@ public class StoreStockService:  IStoreStockService{
 		
 		List<StoreStock> quantities = [];
 		foreach(var s in storeStock){
-			var x = new StoreStock{
-				ProductBarcode =  id,
-				StoreId = s.Store.Id,
-				Quantity =  s.Quantity
-			};
-			quantities.Add(x);
+			if(s.Quantity > 0){
+				var x = new StoreStock{
+					ProductBarcode = id,
+					StoreId = s.Store.Id,
+					Quantity = s.Quantity
+				};
+				quantities.Add(x);
+			}
 		}
 
 		return quantities;

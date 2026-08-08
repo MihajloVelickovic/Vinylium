@@ -47,7 +47,9 @@ public class ProductRepository: IProductRepository{
 		
 		if(!string.IsNullOrWhiteSpace(req.Search))
 			query = query.Where(p => EF.Functions.ILike(p.Artist, $"%{req.Search}%")  || 
-			                         EF.Functions.ILike(p.Name, $"%{req.Search}%"));
+			                         EF.Functions.ILike(p.Name, $"%{req.Search}%") ||
+			                         EF.Functions.ILike(p.Barcode, $"{req.Search}%") ||
+			                         EF.Functions.ILike(p.CatalogNumber, $"{req.Search}%"));
 		
 		if(req.Type != null)
 			query = query.Where(p => p.Type ==  req.Type);
