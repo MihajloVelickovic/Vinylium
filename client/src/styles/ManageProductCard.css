@@ -50,4 +50,17 @@
 .infoBox{
     display: grid;
     grid-template-columns: 1fr 1fr;
+    column-gap: 0.4em;
+}
+
+/* fr columns swallow every bit of free space, so justify-content has nothing
+ * left to distribute and does nothing here. Aligning inside each column is
+ * what actually moves the text: the label pushes right, the value pushes left,
+ * and the two meet in the middle so the colons line up down the card. */
+.infoBox p:first-child{
+    text-align: right;
+}
+
+.infoBox p:last-child{
+    text-align: left;
 }

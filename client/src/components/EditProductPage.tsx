@@ -26,8 +26,7 @@ export const EditProductPage = () => {
         return (
             
             <div className="mainEditCard">
-                <div className="upper">
-                    <div className="image">
+                    <div className="editImage">
                         <img src={product.imageUrl}
                              width={200}
                              height={200}
@@ -72,20 +71,14 @@ export const EditProductPage = () => {
                     </div>
                         
                     </div>
-                </div>
-                <div className = "lower">
-                    <div className="infoField">
-                        <p>Tracklist: </p>
+                <div className="lower">
+                    <p>Tracklist:</p>
+                    <div className="tracks">
                         {product.tracklist.map((t: string, i: number) => {
                             return (
-                                <>
-                                <p>{i + 1}. <input className="track" type="text" value={t}/></p>
-                                    <br/>
-                                </>
+                                <p key={i}>{i + 1}. <input className="track" type="text" value={t}/></p>
                             )
                         })}
-                    </div>
-                    <div>
                     </div>
                 </div>
             </div>

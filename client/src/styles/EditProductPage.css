@@ -1,25 +1,73 @@
+/* Two columns: the cover and the tracklist stack down the left, the fields
+ * occupy the right across both rows. Named areas rather than nested wrappers,
+ * so the tracklist can sit directly under the image without the two of them
+ * needing to share a parent element.
+ * The auto margins are what centre the card - align-items/justify-content
+ * would only place its children. */
 .mainEditCard{
+    /* the cover and the tracklist share this so they stay the same width and
+     * stay aligned with each other - change it in one place and both follow */
+    --cover-width: 320px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "cover  info"
+        "tracks info";
+    align-items: start;
+    gap: 1.5em 2em;
+    width: min(1000px, 92%);
+    margin: 0 auto;
+}
+
+/* AlbumCard.css styles a global `.image img` at width:100%, and every stylesheet
+ * in this app is global regardless of which component imports it. This page
+ * uses its own class so that rule cannot reach in. */
+.editImage{
+    grid-area: cover;
+    display: flex;
+    justify-content: center;
+}
+
+.editImage img{
+    width: 100%;
+    max-width: var(--cover-width);
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+/* stacked, so the list sits beneath its heading. align-items centres the
+ * heading and the list block together within the column rather than letting
+ * each stretch across it, which keeps them aligned with the cover above. */
+.lower{
+    grid-area: tracks;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    width: 50%;
+    gap: 0.5em;
 }
 
-.upper{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    margin-bottom: 1em;
+/* matches the cover exactly, so the two blocks share a left and right edge.
+ * text-align overrides the centred text #root sets globally. */
+.tracks{
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    width: min(var(--cover-width), 100%);
+    text-align: left;
 }
 
-
-.lower{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    margin-bottom: 1em;
+/* number and input on one row, so the input can take whatever is left and end
+ * flush with the cover's right edge */
+.tracks p{
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
 }
 
 .mainInfo{
+    grid-area: info;
     display:flex;
     flex-direction: column;
     justify-content: center;
@@ -29,6 +77,10 @@
     display: grid;
     grid-template-columns:1fr 2fr;
 }
+
+/* takes the row's leftover space rather than a fixed width, so every input
+ * ends on the same line. min-width:0 stops a long title forcing it wider. */
 .track{
-    width: fit-content;
+    flex: 1;
+    min-width: 0;
 }
