@@ -153,6 +153,49 @@
     
 }
 
+.buttonsEdit {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 0 40px 40px;
+}
+
+.buttonEdit{
+    width: 33%;
+    font-family: var(--heading), sans-serif;
+    outline: none;
+    border: var(--vinylium-accent) 2px solid;
+}
+
+.buttonEdit:hover, .buttonEdit:focus { 
+    cursor: pointer;
+}
+
+.cancelEdit{
+    background-color: var(--bg);
+}
+
+.cancelEdit:hover, .cancelEdit:focus {
+    background-color: darkgray;
+}
+.updateEdit{
+    background-color: green;
+}
+.updateEdit:hover, .buttonEdit:focus {
+    background-color: darkseagreen;
+}
+
+.deleteEdit{
+    background-color: red;
+}
+
+.deleteEdit:hover, .buttonDelete:focus {
+    background-color: indianred;
+}
+
 @media (max-width: 800px) {
 
     .mainEditCard {

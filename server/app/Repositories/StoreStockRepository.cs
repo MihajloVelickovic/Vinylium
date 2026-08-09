@@ -1,5 +1,6 @@
 using app.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using Newtonsoft.Json.Linq;
 
 namespace app.Repositories;

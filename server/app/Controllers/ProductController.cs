@@ -142,5 +142,17 @@ public class ProductController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
+
+	[HttpDelete("DeleteById/{barcode}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	public async Task<ActionResult> DeleteById(string barcode){
+		try{
+			var bc = await _productService.DeleteByIdAsync(barcode);
+			return Ok(new{data = bc});
+		}
+		catch(Exception e){
+			return BadRequest(new{message = e.Message});
+		}
+	}
 	
 }

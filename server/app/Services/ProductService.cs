@@ -22,6 +22,7 @@ public interface IProductService{
 	Task<List<Product>> GetPage(int? page, int? items);
 	Task<List<StoreStock>> GetAvailableStoresByIdAsync(string barcode);
 	Task<bool> ExistsProductId(string barcode);
+	Task<string> DeleteByIdAsync(string barcode);
 }
 
 public class ProductService: IProductService{
@@ -75,6 +76,10 @@ public class ProductService: IProductService{
 
 	public async Task<bool> ExistsProductId(string barcode){
 		return await _productRepository.ExistsProductId(barcode);
+	}
+
+	public async Task<string> DeleteByIdAsync(string barcode){
+		return await _productRepository.DeleteByIdAsync(barcode);
 	}
 
 	public async Task<Product> GetByIdAsync(string barcode){

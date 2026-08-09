@@ -7,7 +7,6 @@ import StoreQuantityPair from "../models/StoreQuantityPair.ts";
 import Store from "../models/Store.ts";
 
 export const EditProductPage = () => {
-
     const params = useParams();
     const [url, _] = useState(`/Product/GetProductById/${params.id}`);
     const [urlQuantity, __] = useState(`/Product/GetAvailableStoresById/${params.id}`);
@@ -39,9 +38,33 @@ export const EditProductPage = () => {
         
     }, [url])
 
+    const noData = () => {
+        setTimeout(() => {
+            return <h1>No Data</h1>
+        }, 1000)
+    }
+    
+    const handleCancel = () => {
+        window.history.back();
+    }
+    
+    const handleDelete = async () => {
+        try {
+            const res = await authClient.delete(`/Product/DeleteById/${params.id}`);
+            console.log(res.data.data);
+            window.history.back();
+        }
+        catch(e){
+            console.error(e);
+        }
+    }
+    
+    const handleUpdate = () => {
+        
+    }
+    
     const renderProduct = (product: Product) => {
         return (
-            
             <div className="mainEditCard" style={{
                 background: "url("+`${product.imageUrl}`+") center",
             }}>
@@ -71,7 +94,7 @@ export const EditProductPage = () => {
                         </div>
                         <div className="infoField">
                             <p>Price: </p>
-                            <input type="text" value={product.price ?? ""} />
+                            <input type="text" value={product.price ?? ""}/>
                         </div>
                         <div className="infoField">
                             <p>Type:</p>
@@ -114,22 +137,21 @@ export const EditProductPage = () => {
                         </div>
                     </div>
                 </div>
+                <div className="buttonsEdit">
+                    <button className="buttonEdit cancelEdit" onClick={handleCancel}>Cancel Update</button>
+                    <button className="buttonEdit updateEdit" onClick={handleUpdate}>Update Product</button>
+                    <button className="buttonEdit deleteEdit" onClick={handleDelete}>Delete Product</button>
+                </div>
             </div>
         )
     }
-
-    const noData = () => {
-        setTimeout(() => {
-            return <h1>No Data</h1>
-        }, 1000)
-    }
-
+    
     return (
         <>
             {
                 product ?
-                    renderProduct(product)
-                    : noData()
+                renderProduct(product):
+                noData()
             }
         </>
     )

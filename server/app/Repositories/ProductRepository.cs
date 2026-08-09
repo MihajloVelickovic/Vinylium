@@ -1,3 +1,4 @@
+using System.Text;
 using app.Models;
 using app.Requests;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ public interface IProductRepository{
 	Task<int> GetCount();
 	Task<List<Product>> GetPage(int page, int items);
 	Task<bool> ExistsProductId(string barcode);
+	Task<string> DeleteByIdAsync(string barcode);
 }
 
 public class ProductRepository: IProductRepository{
@@ -22,21 +24,7 @@ public class ProductRepository: IProductRepository{
 	public ProductRepository(VinyliumContext dbContext){
 		_dbContext = dbContext;
 	}
-
-	public async Task CreateProductAsync(Product product){
-		var _ = await _dbContext.Products.AddAsync(product) ??
-		        throw new Exception("Failed to add product to database");
-	}
-
-	public async Task<List<Product>> GetAllAsync(){
-		return await _dbContext.Products.ToListAsync();
-	}
-
-	public async Task<Product> GetByIdAsync(string barcode){
-		return await _dbContext.Products.FirstOrDefaultAsync(p => p.Barcode == barcode) ??
-		       throw new Exception($"Failed to get product {barcode} from database");
-	}
-
+	
 	public async Task<(List<Product> result, int pages)> GetFilteredAsync(FilterReq req){
 
 		var query = _dbContext.Products.AsQueryable();
@@ -69,8 +57,8 @@ public class ProductRepository: IProductRepository{
 
 	public async Task<List<Product>> GetRandomProductsAsync(){
 		return await _dbContext.Products.OrderBy(p => EF.Functions.Random())
-										.Take(50)
-										.ToListAsync();
+			.Take(50)
+			.ToListAsync();
 	}
 
 	public async Task<int> GetCount(){
@@ -83,8 +71,33 @@ public class ProductRepository: IProductRepository{
 		return await _dbContext.Products.Select(p => p).Skip(skip).Take(items).ToListAsync();
 
 	}
+	
+	public async Task<List<Product>> GetAllAsync(){
+		return await _dbContext.Products.ToListAsync();
+	}
 
+	public async Task<Product> GetByIdAsync(string barcode){
+		return await _dbContext.Products.FirstOrDefaultAsync(p => p.Barcode == barcode) ??
+		       throw new Exception($"Failed to get product {barcode} from database");
+	}
+	
 	public async Task<bool> ExistsProductId(string barcode){
 		return await _dbContext.StoreStocks.FirstOrDefaultAsync(s => s.ProductBarcode == barcode) != null;
+	}
+
+
+	public async Task CreateProductAsync(Product product){
+		var _ = await _dbContext.Products.AddAsync(product) ??
+		        throw new Exception("Failed to add product to database");
+	}
+	
+	public async Task<string> DeleteByIdAsync(string barcode){
+		var p = await _dbContext.Products.FindAsync(barcode) ??
+		        throw new Exception($"Failed to find product {barcode} in db");
+		_dbContext.Products.Remove(p);
+		var changes = await _dbContext.SaveChangesAsync();
+		return changes > 0 ? 
+		barcode : 
+		throw new Exception($"Failed to delete {barcode}");
 	}
 }
