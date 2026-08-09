@@ -8,6 +8,7 @@ namespace app.Repositories;
 public interface IStoreStockRepository{
 	Task CreateStoreStockAsync(List<StoreStock> storeStock);
 	Task<List<StoreStock>> GetStoreStockFromId(string barcode);
+	Task UpdateStock(List<StoreStock> storeStock, string barcode);
 }
 
 public class StoreStockRepository: IStoreStockRepository{
@@ -24,5 +25,18 @@ public class StoreStockRepository: IStoreStockRepository{
 		return await _dbContext.StoreStocks.Include(s => s.Store)
 										   .Where(s => s.ProductBarcode == barcode)
 										   .ToListAsync();
+	}
+
+	public async Task UpdateStock(List<StoreStock> storeStock, string barcode){
+		var existingStocks = await _dbContext.StoreStocks
+									.Where(ss => ss.ProductBarcode == barcode)
+									.ToListAsync();
+
+		foreach (var existing in existingStocks){
+			var updated = storeStock.FirstOrDefault(x => x.StoreId == existing.StoreId);
+			if (updated != null)
+				existing.Quantity = updated.Quantity;
+			
+		}
 	}
 }

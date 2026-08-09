@@ -56,7 +56,7 @@ public class ProductController: ControllerBase{
 			return Ok(new{pages, data = list });
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{message=e.Message});
 		}
 	}
 
@@ -69,7 +69,7 @@ public class ProductController: ControllerBase{
 			return Ok(new{data=random});
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{message=e.Message});
 		}
 	}
 
@@ -99,7 +99,7 @@ public class ProductController: ControllerBase{
 			return Ok(new{pages=filtered.pages, data=filtered.result});
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{message=e.Message});
 		}
 	}
 	
@@ -113,7 +113,7 @@ public class ProductController: ControllerBase{
 			return Ok(new{ data = product });
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{message=e.Message});
 		}
 	}
 
@@ -126,7 +126,7 @@ public class ProductController: ControllerBase{
 			return Ok(new{ data = product });
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{message=e.Message});
 		}
 	}
 
@@ -139,10 +139,24 @@ public class ProductController: ControllerBase{
 			return Ok(new {data = stores});
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{message=e.Message});
 		}
 	}
-
+	
+	[Authorize]
+	[HttpPut("UpdateProduct")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> UpdateProduct([FromBody] AcceptProductReq req){
+		try{
+			var result = await _productService.UpdateProductAsync(req);
+			return Ok(new{data=result});
+		}
+		catch(Exception e){
+			return BadRequest(new{message=e.Message});
+		}
+	}
+	
 	[HttpDelete("DeleteById/{barcode}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<ActionResult> DeleteById(string barcode){

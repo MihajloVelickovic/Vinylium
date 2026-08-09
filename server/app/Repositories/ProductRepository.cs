@@ -15,6 +15,7 @@ public interface IProductRepository{
 	Task<List<Product>> GetPage(int page, int items);
 	Task<bool> ExistsProductId(string barcode);
 	Task<string> DeleteByIdAsync(string barcode);
+	void UpdateProduct(Product product);
 }
 
 public class ProductRepository: IProductRepository{
@@ -99,5 +100,9 @@ public class ProductRepository: IProductRepository{
 		return changes > 0 ? 
 		barcode : 
 		throw new Exception($"Failed to delete {barcode}");
+	}
+
+	public void UpdateProduct(Product product){
+		_dbContext.Products.Update(product);
 	}
 }

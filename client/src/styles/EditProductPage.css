@@ -116,9 +116,14 @@
 .lowerEditCard > div > p {
     margin-top: 0;
     margin-bottom: 15px;
-
     font-size: 18px;
     font-weight: 600;
+}
+
+.imageDiv{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .tracks {
@@ -130,9 +135,7 @@
 .tracks p {
     display: flex;
     align-items: center;
-
     gap: 10px;
-
     margin: 0;
 }
 
@@ -150,7 +153,6 @@
 .track:focus {
     border-color: var(--vinylium-accent);
     background: rgba(255, 255, 255, 0.2);
-    
 }
 
 .buttonsEdit {
@@ -164,6 +166,7 @@
 }
 
 .buttonEdit{
+    height: 4em;
     width: 33%;
     font-family: var(--heading), sans-serif;
     outline: none;

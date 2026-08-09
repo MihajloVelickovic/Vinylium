@@ -23,6 +23,7 @@ public interface IProductService{
 	Task<List<StoreStock>> GetAvailableStoresByIdAsync(string barcode);
 	Task<bool> ExistsProductId(string barcode);
 	Task<string> DeleteByIdAsync(string barcode);
+	Task<(Product, List<StoreStock>)> UpdateProductAsync(AcceptProductReq req);
 }
 
 public class ProductService: IProductService{
@@ -80,6 +81,16 @@ public class ProductService: IProductService{
 
 	public async Task<string> DeleteByIdAsync(string barcode){
 		return await _productRepository.DeleteByIdAsync(barcode);
+	}
+	
+	public async Task<(Product, List<StoreStock>)> UpdateProductAsync(AcceptProductReq req){
+		var product = this.GetProductFromJson(req.Product);
+		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product.Barcode);
+		await _unitOfWork.ExecuteInTransactionAsync(async () => {
+			_productRepository.UpdateProduct(product);
+			await _storeStockService.UpdateStock(storeStock, product.Barcode);
+		});
+		return (product, storeStock);
 	}
 
 	public async Task<Product> GetByIdAsync(string barcode){

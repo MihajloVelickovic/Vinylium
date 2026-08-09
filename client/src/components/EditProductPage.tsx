@@ -9,21 +9,24 @@ import Store from "../models/Store.ts";
 export const EditProductPage = () => {
     const params = useParams();
     const [url, _] = useState(`/Product/GetProductById/${params.id}`);
-    const [urlQuantity, __] = useState(`/Product/GetAvailableStoresById/${params.id}`);
+    const [urlAvail, __] = useState(`/Product/GetAvailableStoresById/${params.id}`);
     const [product, setProduct] = useState<Product>();
-    const [availability, setAvailability] = useState<Array<StoreQuantityPair>>([]);
-        
+    const [availability, setAvailability] = useState<Array<StoreQuantityPair>>();
+    const [loadingP, setLoadingP] = useState(true);
+    const [loadingA, setLoadingA] = useState(true);
+    
     useEffect(() => {
         const fetchProduct = async () => {
             return await authClient.get(url);
         }
-
+    
         const fetchQuantity = async () => {
-            return await authClient.get(urlQuantity);
+            return await authClient.get(urlAvail);
         }
 
         fetchProduct().then(res => {
             setProduct(new Product(res.data.data));
+            setLoadingP(false);
         })
             .catch((error) => console.log(error));
 
@@ -33,10 +36,11 @@ export const EditProductPage = () => {
                 l.push(new StoreQuantityPair(new Store(r.store), r.quantity));
             })
             setAvailability(l);
+            setLoadingA(false);
         })
             .catch((error) => console.log(error));
         
-    }, [url])
+    }, [url, urlAvail])
 
     const noData = () => {
         setTimeout(() => {
@@ -59,8 +63,18 @@ export const EditProductPage = () => {
         }
     }
     
-    const handleUpdate = () => {
-        
+    const handleUpdate = async () => {
+       try{
+           const res = await authClient.put(`/Product/UpdateProduct`, {
+               product,
+               storeQuantities: availability
+           });
+           console.log(res.data.data);
+           window.history.back();
+       }
+       catch(e){
+           console.error(e);
+       }
     }
     
     const renderProduct = (product: Product) => {
@@ -69,37 +83,47 @@ export const EditProductPage = () => {
                 background: "url("+`${product.imageUrl}`+") center",
             }}>
                 <div className="upperEditCard">
-                    <div className="editCardImage">
-                        <img src={product.imageUrl}
-                             width={200}
-                             height={200}
-                             alt={product.barcode + " cover"}/>
+                    <div className="imageDiv">
+                        <div>
+                            <img src={product.imageUrl}
+                                 width={200}
+                                 height={200}
+                                 alt={product.barcode + " cover"}/>
+                        </div>
                     </div>
                     <div className="mainInforation">
                         <div className="infoField">
-                            <p>Name: </p>
-                            <input type="text" value={product.name} />
-                        </div>
-                        <div className="infoField">
-                            <p>Artist: </p>
-                            <input type="text" value={product.artist} />
-                        </div>
-                        <div className="infoField">
                             <p>Barcode: </p>
-                            <input type="text" value={product.barcode} />
+                            <p>{product.barcode}</p>
                         </div>
                         <div className="infoField">
                             <p>Catalog Number: </p>
-                            <input type="text" value={product.catalogNumber} />
+                            <input type="text" value={product.catalogNumber} onChange={(e) => {
+                                setProduct({...product, catalogNumber: e.target.value});
+                            }}/>
+                        </div>
+                        <div className="infoField">
+                            <p>Name: </p>
+                            <input type="text" value={product.name} onChange={(e) => {
+                                setProduct({...product, name: e.target.value});
+                            }}/>
+                        </div>
+                        <div className="infoField">
+                            <p>Artist: </p>
+                            <input type="text" value={product.artist} onChange={(e) => {
+                                setProduct({...product, artist: e.target.value});
+                            }}/>
                         </div>
                         <div className="infoField">
                             <p>Price: </p>
-                            <input type="text" value={product.price ?? ""}/>
+                            <input type="text" value={product.price ?? ""} onChange={(e) => {
+                                setProduct({...product, price: e.target.value});
+                            }}/>
                         </div>
                         <div className="infoField">
                             <p>Type:</p>
-                            <select onChange={(t) => {
-                                product.type = t.target.selectedIndex;
+                            <select onChange={(e) => {
+                                setProduct({...product, type: e.target.selectedIndex})
                             }}>
                                 {
                                     [0, 1, 2].map((item) => {
@@ -109,10 +133,6 @@ export const EditProductPage = () => {
                                 }
                             </select>
                         </div>
-                        <div className="infoField">
-                            <p>Name: </p>
-                            <input type="text" value={product.name} />
-                        </div>
                     </div>
                 </div>
                 <div className="lowerEditCard">
@@ -121,7 +141,14 @@ export const EditProductPage = () => {
                         <div className="tracks">
                             {product.tracklist.map((t: string, i: number) => {
                                 return (
-                                    <p key={i}>{i + 1}. <input className="track" type="text" value={t}/></p>
+                                    <p key={i}>{i + 1}. <input className="track" 
+                                                               type="text" 
+                                                               value={t}
+                                                               onChange={(e) => {
+                                                                   const t = [...product.tracklist];
+                                                                   t[i] = e.target.value;
+                                                                   setProduct({...product, tracklist: t});
+                                                               }}/></p>
                                 )
                             })}
                         </div>
@@ -131,7 +158,16 @@ export const EditProductPage = () => {
                         <div className="tracks">
                             {availability.map((a: StoreQuantityPair, i: number) => {
                                 return (
-                                    <p key={i}>{i + 1}. <input className="track" type="text" value={a.store.name}/> <input className="track" type="text" value={a.quantity}/></p>
+                                    <p key={i}>{i + 1}. {a.store.name}
+                                        <input className="track" 
+                                               type="text" 
+                                               value={a.quantity} 
+                                               onChange={(e) => {
+                                                   const t = [...availability];
+                                                   t[i].quantity = Number.parseInt(e.target.value, 10);
+                                                   setAvailability(t);
+                                               }}/>
+                                    </p>
                                 )
                             })}
                         </div>
@@ -149,7 +185,7 @@ export const EditProductPage = () => {
     return (
         <>
             {
-                product ?
+                (!loadingA && !loadingP && product) ?
                 renderProduct(product):
                 noData()
             }
