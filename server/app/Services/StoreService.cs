@@ -9,6 +9,8 @@ public interface IStoreService{
 	Task<Store> CreateStoreAsync(AddStoreReq req);
 	Task DeleteStoreAsync(int id);
 	Task<List<Store>?> GetAllStoresAsync();
+	Task<Store> GetStoreByIdAsync(int id);
+	Task<Store> UpdateStoreAsync(UpdateStoreReq req);
 }
 
 public class StoreService: IStoreService{
@@ -41,5 +43,29 @@ public class StoreService: IStoreService{
 
 	public async Task<List<Store>?> GetAllStoresAsync(){
 		return await _storeRepository.GetAllStoresAsync();
+	}
+
+	public async Task<Store> GetStoreByIdAsync(int id)
+	{
+		return await _storeRepository.GetStoreByIdAsync(id);
+	}
+
+	public async Task<Store> UpdateStoreAsync(UpdateStoreReq req)
+	{
+		var parseddOt =
+			TimeOnly.FromDateTime(DateTime.ParseExact(req.OpeningHours, "HH:mm", CultureInfo.InvariantCulture));
+		var parsedCt =
+			TimeOnly.FromDateTime(DateTime.ParseExact(req.ClosingHours, "HH:mm", CultureInfo.InvariantCulture));
+
+		var change = new Store
+		{
+			Name = req.Name,
+			Address = req.Address,
+			City = req.City,
+			ContactNumber = req.ContactNumber,
+			OpeningTime = parseddOt,
+			ClosingTime = parsedCt
+		};
+		return await _storeRepository.UpdateStoreAsync(req.Id, change);
 	}
 }

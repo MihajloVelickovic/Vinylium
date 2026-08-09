@@ -1,0 +1,77 @@
+/* mirrors ManageProductCard.css so the manage tabs read as one system.
+ * stores have no cover image, so the left column carries the store's
+ * identity (name, city, hours) in place of the product artwork
+ */
+.manage-store-card {
+    font-family: var(--heading), sans-serif;
+    margin: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    text-align: left;
+    width: 500px;
+    transition: scale 0.2s ease, box-shadow 0.2s ease;
+    border: var(--vinylium-accent) solid 2px;
+    padding: 1em;
+}
+
+.manage-store-card:hover {
+    scale: 1.05;
+    box-shadow: var(--vinylium-accent) 0 0 10px;
+    border: var(--vinylium-accent) outset 2px;
+    background-color: var(--vinylium-accent);
+    cursor: pointer;
+}
+
+.storeIdentity {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-right: 1em;
+    margin-right: 1em;
+    border-right: var(--vinylium-accent) solid 2px;
+    transition: border-color 0.2s ease;
+}
+
+.manage-store-card:hover .storeIdentity {
+    border-right-color: var(--text);
+}
+
+.storeIdentity h2 {
+    margin: 0;
+    /* long store names would otherwise blow the fixed 500px card open */
+    overflow-wrap: anywhere;
+}
+
+.storeCity {
+    margin: 0.2em 0 0 0;
+    opacity: 0.75;
+}
+
+.storeHours {
+    margin: 0.6em 0 0 0;
+    color: var(--accent);
+    transition: color 0.2s ease;
+}
+
+.manage-store-card:hover .storeHours {
+    color: var(--text-h);
+}
+
+.storeInfoBox {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 0.4em;
+}
+
+/* same trick as .infoBox on the product card: fr columns eat all the free
+ * space so justify-content has nothing to distribute. Aligning within each
+ * column is what lines the colons up down the card.
+ */
+.storeInfoBox p:first-child {
+    text-align: right;
+}
+
+.storeInfoBox p:last-child {
+    text-align: left;
+    overflow-wrap: anywhere;
+}

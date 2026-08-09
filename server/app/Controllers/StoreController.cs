@@ -21,26 +21,30 @@ public class StoreController: ControllerBase{
 		_cache =  cache;
 	}
 
+    //both creating and editing endpoints are doing the same validation so we now just have a function that they call instead
+	private static void ValidateStoreInput(string openingHours, string closingHours, string contactNumber){
+		var parsedOt = DateTime.TryParseExact(openingHours, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+
+		if(!RegExp.Check(@"^[0-9]{2}:[0-9]{2}$", openingHours) || !parsedOt)
+			throw new Exception("Opening hours not following valid 00:00 to 24:00 time format");
+
+		var parsedCt = DateTime.TryParseExact(closingHours, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+
+		if(!RegExp.Check(@"^[0-9]{2}:[0-9]{2}$", closingHours) ||  !parsedCt)
+			throw new Exception("Closing hours not following valid 00:00 to 24:00 time format");
+
+		if(!RegExp.Check(@"^(\+381|0)[1-9]\d{7,8}$", contactNumber))
+			throw new Exception("Contact number not valid Serbian phone number");
+	}
+
 	[Authorize]
 	[HttpPost("CreateStore")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> CreateStore([FromBody] AddStoreReq req){
 		try{
-			
-			var parsedOt = DateTime.TryParseExact(req.OpeningHours, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var openingTime);
-			
-			if(!RegExp.Check(@"^[0-9]{2}:[0-9]{2}$", req.OpeningHours) || !parsedOt)
-				throw new Exception("Opening hours not following valid 00:00 to 24:00 time format");
-			
-			var parsedCt = DateTime.TryParseExact(req.ClosingHours, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var closingTime);
-			
-			if(!RegExp.Check(@"^[0-9]{2}:[0-9]{2}$", req.ClosingHours) ||  !parsedCt)
-				throw new Exception("Closing hours not following valid 00:00 to 24:00 time format");
+			ValidateStoreInput(req.OpeningHours, req.ClosingHours, req.ContactNumber);
 
-			if(!RegExp.Check(@"^(\+381|0)[1-9]\d{7,8}$", req.ContactNumber))
-				throw new Exception("Contact number not valid Serbian phone number");
-			
 			var store = await _storeService.CreateStoreAsync(req);
 			return Ok(new{ data = store });
 		}
@@ -78,5 +82,37 @@ public class StoreController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
-	
+
+	[Authorize]
+	[HttpGet("GetStoreById/{id}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> GetStoreById(int id){
+		try{
+			var store = await _storeService.GetStoreByIdAsync(id);
+			return Ok(new{ data = store });
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
+	}
+
+	[Authorize]
+	[HttpPut("UpdateStore")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> UpdateStore([FromBody] UpdateStoreReq req){
+		try{
+			ValidateStoreInput(req.OpeningHours, req.ClosingHours, req.ContactNumber);
+
+			var store = await _storeService.UpdateStoreAsync(req);
+			return Ok(new{ data = store });
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
+	}
+
 }

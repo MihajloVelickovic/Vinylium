@@ -1,3 +1,4 @@
+/* used by ContactPage, which renders the public StoreCard */
 .stores{
     display: flex;
     flex-direction: row;
@@ -5,6 +6,32 @@
     animation: scaleAnim 0.2s ease;
 }
 
+/* the admin grid, matching .products in ManageProductPage.css so both
+ * manage tabs wrap and centre the same way
+ */
+.manage-stores{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow: hidden;
+    animation-name: scaleAnim;
+    animation-duration: 0.2s;
+}
+
+.manage-stores-message{
+    font-family: var(--heading), sans-serif;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.manage-stores-error{
+    color: indianred;
+}
+
+/* .products in ManageProductPage.css animates with this too, so it has to
+ * stay defined here
+ */
 @keyframes scaleAnim {
     from { filter: blur(10px); }
     to { filter: blur(0); }

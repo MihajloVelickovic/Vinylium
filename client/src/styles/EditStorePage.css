@@ -1,0 +1,39 @@
+/* the frame only. The fields come from AlbumCard.css and the button row from
+ * EditProductPage.css, both imported by EditStorePage.tsx
+ */
+.editStoreCard {
+    font-family: var(--heading), sans-serif;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2em;
+    background-color: var(--bg);
+    border: 3px solid var(--vinylium-accent);
+    box-shadow: var(--vinylium-accent) 0 10px 35px -10px;
+    animation: scaleAnim 0.2s ease;
+}
+
+.editStoreTitle {
+    margin: 0 0 1rem 0;
+    text-align: center;
+    /* a long store name must not stretch the card past its max-width */
+    overflow-wrap: anywhere;
+}
+
+.editStoreFields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    margin-bottom: 1.5rem;
+}
+
+.editStoreMessage {
+    font-family: var(--heading), sans-serif;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.editStoreError {
+    color: indianred;
+    text-align: center;
+    overflow-wrap: anywhere;
+}

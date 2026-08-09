@@ -16,6 +16,7 @@ import {ManageStoresPage} from "./components/ManageStoresPage.tsx";
 import {ManageUsersPage} from "./components/ManageUsersPage.tsx";
 import {ContactPage} from "./components/ContactPage.tsx";
 import {EditProductPage} from "./components/EditProductPage.tsx";
+import {EditStorePage} from "./components/EditStorePage.tsx";
 
 function About() {
     return <h2>About Page</h2>;
@@ -57,6 +58,7 @@ function App() {
                             <Route path="manage-products" element={<ManageProductsPage/>}/>
                             <Route path="manage-products/:id" element={<EditProductPage/>}/>
                             <Route path="manage-stores" element={<ManageStoresPage/>}/>
+                            <Route path="manage-stores/:id" element={<EditStorePage/>}/>
                             <Route path="manage-users" element={<ManageUsersPage/>}/>
                             
                         </Route>
