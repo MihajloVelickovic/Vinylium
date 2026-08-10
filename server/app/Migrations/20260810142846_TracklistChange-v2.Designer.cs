@@ -12,8 +12,8 @@ using app.Models;
 namespace app.Migrations
 {
     [DbContext(typeof(VinyliumContext))]
-    [Migration("20260807223820_07082026-store-p")]
-    partial class _07082026storep
+    [Migration("20260810142846_TracklistChange-v2")]
+    partial class TracklistChangev2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,36 +55,6 @@ namespace app.Migrations
                     b.ToTable("ProductWarehouse");
                 });
 
-            modelBuilder.Entity("StoreVinylium", b =>
-                {
-                    b.Property<int>("StoresId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("VinyliumId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("StoresId", "VinyliumId");
-
-                    b.HasIndex("VinyliumId");
-
-                    b.ToTable("StoreVinylium");
-                });
-
-            modelBuilder.Entity("UserVinylium", b =>
-                {
-                    b.Property<int>("UsersId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("VinyliumId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UsersId", "VinyliumId");
-
-                    b.HasIndex("VinyliumId");
-
-                    b.ToTable("UserVinylium");
-                });
-
             modelBuilder.Entity("app.Models.Product", b =>
                 {
                     b.Property<string>("Barcode")
@@ -121,10 +91,6 @@ namespace app.Migrations
                         .IsRequired()
                         .HasMaxLength(11)
                         .HasColumnType("character varying(11)");
-
-                    b.PrimitiveCollection<string[]>("Tracklist")
-                        .IsRequired()
-                        .HasColumnType("text[]");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
@@ -255,24 +221,6 @@ namespace app.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("app.Models.Vinylium", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("WarehouseId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WarehouseId");
-
-                    b.ToTable("Vinylium");
-                });
-
             modelBuilder.Entity("app.Models.Warehouse", b =>
                 {
                     b.Property<int>("Id")
@@ -281,12 +229,7 @@ namespace app.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("VinyliumId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("VinyliumId");
 
                     b.ToTable("Warehouses");
                 });
@@ -321,34 +264,36 @@ namespace app.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("StoreVinylium", b =>
+            modelBuilder.Entity("app.Models.Product", b =>
                 {
-                    b.HasOne("app.Models.Store", null)
-                        .WithMany()
-                        .HasForeignKey("StoresId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsMany("app.Models.Track", "Tracklist", b1 =>
+                        {
+                            b1.Property<string>("ProductBarcode");
 
-                    b.HasOne("app.Models.Vinylium", null)
-                        .WithMany()
-                        .HasForeignKey("VinyliumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd();
 
-            modelBuilder.Entity("UserVinylium", b =>
-                {
-                    b.HasOne("app.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                            b1.Property<int>("Id");
 
-                    b.HasOne("app.Models.Vinylium", null)
-                        .WithMany()
-                        .HasForeignKey("VinyliumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                            b1.Property<string>("Runtime")
+                                .IsRequired();
+
+                            b1.Property<string>("Title")
+                                .IsRequired();
+
+                            b1.HasKey("ProductBarcode", "__synthesizedOrdinal");
+
+                            b1.ToTable("Products");
+
+                            b1
+                                .ToJson("Tracklist")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductBarcode");
+                        });
+
+                    b.Navigation("Tracklist");
                 });
 
             modelBuilder.Entity("app.Models.StoreStock", b =>
@@ -379,28 +324,6 @@ namespace app.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("app.Models.Vinylium", b =>
-                {
-                    b.HasOne("app.Models.Warehouse", "Warehouse")
-                        .WithMany()
-                        .HasForeignKey("WarehouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Warehouse");
-                });
-
-            modelBuilder.Entity("app.Models.Warehouse", b =>
-                {
-                    b.HasOne("app.Models.Vinylium", "Vinylium")
-                        .WithMany()
-                        .HasForeignKey("VinyliumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Vinylium");
                 });
 #pragma warning restore 612, 618
         }

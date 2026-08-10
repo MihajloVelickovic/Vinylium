@@ -46,6 +46,11 @@
     text-align: center;
 }
 
+.tracklistDetail{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
 .priceQuantityInfo{
     
 }

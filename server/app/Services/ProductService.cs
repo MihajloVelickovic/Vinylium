@@ -87,7 +87,7 @@ public class ProductService: IProductService{
 		var product = this.GetProductFromJson(req.Product);
 		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product.Barcode);
 		await _unitOfWork.ExecuteInTransactionAsync(async () => {
-			_productRepository.UpdateProduct(product);
+			await _productRepository.UpdateProduct(product);
 			await _storeStockService.UpdateStock(storeStock, product.Barcode);
 		});
 		return (product, storeStock);

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace app.Migrations
 {
     /// <inheritdoc />
-    public partial class _07082026store : Migration
+    public partial class TracklistChange : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,10 +23,10 @@ namespace app.Migrations
                     ImageUrl = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: true),
                     Type = table.Column<int>(type: "integer", nullable: false),
-                    Tracklist = table.Column<string[]>(type: "text[]", nullable: false),
                     Runtime = table.Column<string>(type: "character varying(11)", maxLength: 11, nullable: false),
                     ReleaseDate = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    InWarehouse = table.Column<bool>(type: "boolean", nullable: false)
+                    InWarehouse = table.Column<bool>(type: "boolean", nullable: false),
+                    Tracklist = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -68,13 +68,24 @@ namespace app.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Warehouses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Warehouses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StoreStocks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StoreId = table.Column<int>(type: "integer", nullable: false),
-                    ProductId = table.Column<int>(type: "integer", nullable: false),
                     ProductBarcode = table.Column<string>(type: "text", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -153,72 +164,10 @@ namespace app.Migrations
                         principalTable: "Products",
                         principalColumn: "Barcode",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StoreVinylium",
-                columns: table => new
-                {
-                    StoresId = table.Column<int>(type: "integer", nullable: false),
-                    VinyliumId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StoreVinylium", x => new { x.StoresId, x.VinyliumId });
                     table.ForeignKey(
-                        name: "FK_StoreVinylium_Stores_StoresId",
-                        column: x => x.StoresId,
-                        principalTable: "Stores",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserVinylium",
-                columns: table => new
-                {
-                    UsersId = table.Column<int>(type: "integer", nullable: false),
-                    VinyliumId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserVinylium", x => new { x.UsersId, x.VinyliumId });
-                    table.ForeignKey(
-                        name: "FK_UserVinylium_Users_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Vinylium",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    WarehouseId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Vinylium", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Warehouses",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    VinyliumId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Warehouses", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Warehouses_Vinylium_VinyliumId",
-                        column: x => x.VinyliumId,
-                        principalTable: "Vinylium",
+                        name: "FK_ProductWarehouse_Warehouses_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -256,11 +205,6 @@ namespace app.Migrations
                 column: "StoreId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StoreVinylium_VinyliumId",
-                table: "StoreVinylium",
-                column: "VinyliumId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Tokens_UserId",
                 table: "Tokens",
                 column: "UserId");
@@ -270,62 +214,11 @@ namespace app.Migrations
                 table: "Users",
                 columns: new[] { "Username", "Password" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserVinylium_VinyliumId",
-                table: "UserVinylium",
-                column: "VinyliumId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Vinylium_WarehouseId",
-                table: "Vinylium",
-                column: "WarehouseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Warehouses_VinyliumId",
-                table: "Warehouses",
-                column: "VinyliumId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_ProductWarehouse_Warehouses_WarehouseId",
-                table: "ProductWarehouse",
-                column: "WarehouseId",
-                principalTable: "Warehouses",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_StoreVinylium_Vinylium_VinyliumId",
-                table: "StoreVinylium",
-                column: "VinyliumId",
-                principalTable: "Vinylium",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_UserVinylium_Vinylium_VinyliumId",
-                table: "UserVinylium",
-                column: "VinyliumId",
-                principalTable: "Vinylium",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Vinylium_Warehouses_WarehouseId",
-                table: "Vinylium",
-                column: "WarehouseId",
-                principalTable: "Warehouses",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Vinylium_Warehouses_WarehouseId",
-                table: "Vinylium");
-
             migrationBuilder.DropTable(
                 name: "ProductUser");
 
@@ -336,13 +229,10 @@ namespace app.Migrations
                 name: "StoreStocks");
 
             migrationBuilder.DropTable(
-                name: "StoreVinylium");
-
-            migrationBuilder.DropTable(
                 name: "Tokens");
 
             migrationBuilder.DropTable(
-                name: "UserVinylium");
+                name: "Warehouses");
 
             migrationBuilder.DropTable(
                 name: "Products");
@@ -352,12 +242,6 @@ namespace app.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Warehouses");
-
-            migrationBuilder.DropTable(
-                name: "Vinylium");
         }
     }
 }

@@ -159,6 +159,11 @@ body{
     cursor: text;
 }
 
+.albumCardPopupRow{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
 .iField:focus{
     background-color: rgba(243, 244, 246, 0.08);
     box-shadow: inset 0 -2px 0 var(--vinylium-accent);

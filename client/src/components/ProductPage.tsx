@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import Product from "../models/Product.ts";
 import "../styles/ProductPage.css"
 import client from "../api/Client.ts";
+import Track from "../models/Track.ts";
 
 export const ProductPage = () => {
 
@@ -91,15 +92,18 @@ export const ProductPage = () => {
                     </div>
                     <div className="productPageColumn">
                         <div className="productDetail">
+                            <div>
                             <p>Tracklist: </p>
-                            {product.tracklist.map((t: string, i: number) => {
+                            </div>
+                            <div>
+                                {product.tracklist.map((t: Track, i: number) => {
                                 return (
-                                    <>
-                                        <p>{i + 1}. {t}</p>
-                                        <br/>
-                                    </>
+                                    <div className="tracklistDetail">
+                                        <p>{i + 1}.</p><p>{t.title}</p><p>{t.runtime}</p>
+                                    </div>
                                 )
                             })}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -195,6 +195,11 @@
     background-color: red;
 }
 
+.buttonRemoveSong{
+    outline: none;
+    border: none;
+}
+
 .deleteEdit:hover, .buttonDelete:focus {
     background-color: indianred;
 }

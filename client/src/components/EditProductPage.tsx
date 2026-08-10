@@ -5,6 +5,7 @@ import "../styles/EditProductPage.css"
 import authClient from "../api/AuthClient.ts";
 import StoreQuantityPair from "../models/StoreQuantityPair.ts";
 import Store from "../models/Store.ts";
+import Track from "../models/Track.ts";
 
 export const EditProductPage = () => {
     const params = useParams();
@@ -77,6 +78,34 @@ export const EditProductPage = () => {
        }
     }
     
+    const calculateRuntime = (list:Array<Track>): string => {
+        const newRuntimeNumber = list.reduce((total, track: Track) => {
+            const splitTime = track.runtime.split(":").map(Number);
+            const hasHours = splitTime.length === 3;
+            const hours = hasHours ? splitTime[0] : 0;
+            const minutes = hasHours ? splitTime[1] : splitTime[0];
+            const seconds = hasHours ? splitTime[2] : splitTime[1];
+            return total + hours + minutes + seconds / 60;
+        }, 0);
+
+        const hours = Math.floor(newRuntimeNumber / 60);
+        const minutes = Math.floor(newRuntimeNumber % 60);
+        const seconds = Math.floor((newRuntimeNumber % 1) * 60);
+        
+        return `${hours !== 0 ? String(hours).padStart(2, "0") +':': ''}`+
+               `${String(minutes).padStart(2, "0")}:`+
+               `${String(seconds).padStart(2, "0")}`;
+    }
+    
+    const handleRemoveSong = (index: number) => {
+        if(!product)
+            return;
+        
+        const newTracklist = product.tracklist.filter((_, i) => i !== index);
+        const newRuntimeString = calculateRuntime(newTracklist);
+        setProduct({...product, tracklist: newTracklist, runtime: newRuntimeString});
+    }
+    
     const renderProduct = (product: Product) => {
         return (
             <div className="mainEditCard" style={{
@@ -137,18 +166,33 @@ export const EditProductPage = () => {
                 </div>
                 <div className="lowerEditCard">
                     <div>
-                        <p>Tracklist:</p>
+                        <p>Tracklist: {product.runtime}</p>
                         <div className="tracks">
-                            {product.tracklist.map((t: string, i: number) => {
+                            {product.tracklist.map((t: Track, i: number) => {
                                 return (
-                                    <p key={i}>{i + 1}. <input className="track" 
-                                                               type="text" 
-                                                               value={t}
-                                                               onChange={(e) => {
-                                                                   const t = [...product.tracklist];
-                                                                   t[i] = e.target.value;
-                                                                   setProduct({...product, tracklist: t});
-                                                               }}/></p>
+                                    <p key={i}>{i + 1}. 
+                                        <input className="track" 
+                                               type="text" 
+                                               value={t.title}
+                                               onChange={(e) => {
+                                                   const t = [...product.tracklist];
+                                                   t[i].title = e.target.value;
+                                                   setProduct({...product, tracklist: t});
+                                               }}/>
+                                        <input className="track"
+                                               type="text"
+                                               value={t.runtime}
+                                               onChange={(e) => {
+                                                   const t = [...product.tracklist];
+                                                   t[i].runtime = e.target.value;
+                                                   const newRuntime = calculateRuntime(t);
+                                                   setProduct({...product, tracklist: t, runtime: newRuntime});
+                                               }}/>
+                                        <button className="buttonRemoveSong deleteEdit"
+                                                onClick={() => handleRemoveSong(i)}>
+                                            X
+                                        </button>
+                                    </p>
                                 )
                             })}
                         </div>

@@ -15,7 +15,7 @@ public interface IProductRepository{
 	Task<List<Product>> GetPage(int page, int items);
 	Task<bool> ExistsProductId(string barcode);
 	Task<string> DeleteByIdAsync(string barcode);
-	void UpdateProduct(Product product);
+	Task UpdateProduct(Product product);
 }
 
 public class ProductRepository: IProductRepository{
@@ -102,7 +102,10 @@ public class ProductRepository: IProductRepository{
 		throw new Exception($"Failed to delete {barcode}");
 	}
 
-	public void UpdateProduct(Product product){
-		_dbContext.Products.Update(product);
+	public async Task UpdateProduct(Product product){
+		var p = await _dbContext.FindAsync<Product>(product.Barcode) ??
+		        throw new Exception($"Failed to find product {product.Barcode} in db");
+		_dbContext.Entry(p).CurrentValues.SetValues(product);
+		p.Tracklist =  product.Tracklist;
 	}
 }

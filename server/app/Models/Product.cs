@@ -18,7 +18,7 @@ public class Product{
 
 	public required ProductType Type{ get; init; }
 	
-	public ICollection<string> Tracklist{ get; init; } = [];
+	public ICollection<Track> Tracklist{ get; set; } = [];
 
 	[StringLength(11)] public required string Runtime{ get; init; }
 

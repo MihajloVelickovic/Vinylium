@@ -1,3 +1,5 @@
+import Track from "./Track.ts";
+
 export default class Product {
     name: string;
     artist: string;
@@ -9,7 +11,7 @@ export default class Product {
     inwarehouse: boolean;
     runtime: string;
     price: string | null;
-    tracklist: Array<string>;
+    tracklist: Array<Track>;
 
     constructor(jsonData: any) {
         ({
@@ -21,13 +23,12 @@ export default class Product {
             price: this.price,
             runtime: this.runtime,
             type: this.type,
+            tracklist: this.tracklist,
             releaseDate: this.releaseDate,
             inwarehouse: this.inwarehouse,
-            tracklist: this.tracklist
         } = jsonData);
-
     }
-
+    
     public static evaluateType = (type: number) => {
         switch (type) {
             case 0:

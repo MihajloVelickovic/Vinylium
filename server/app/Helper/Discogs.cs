@@ -102,7 +102,7 @@ public static class Discogs{
 			}
 			
 			barcode ??= GenerateNumericCode();
-			
+			var (tracklist, runtime) = GetTracklist(releaseData);
 			list.Add(new Product(){
 				Barcode = barcode,
 				CatalogNumber = ((string?)product["catno"]) ?? "",
@@ -110,11 +110,11 @@ public static class Discogs{
 				Artist = (string?)(releaseData["artists"]?[0]?["name"]) ?? "",
 				ImageUrl = (string?)(releaseData["images"]?[0]?["resource_url"]) ?? "",
 				Price = null,
-				Runtime = GetRuntime(releaseData),
+				Runtime = runtime,
 				Type = GetFormat(formatString),
 				ReleaseDate = (string?)product["year"] ?? "",
 				InWarehouse = false,
-				Tracklist = GetTracklist(releaseData),
+				Tracklist = tracklist,
 			});
 		}
 		
@@ -129,7 +129,7 @@ public static class Discogs{
 				   ).ToList() : 
 			   throw new Exception("No valid items found");
 	}
-
+	
 	private static async Task<JToken?> GetEntryData(string code, bool barcodeSearch){
 		
 		var prefix = SearchPrefix();
@@ -170,12 +170,13 @@ public static class Discogs{
 			formatString.ToUpper().Contains("CASSETTE") ? ProductType.Cassette :
 			ProductType.Unknown;
 	}
-
-	private static string GetRuntime(JObject o){
-		var tracklist = o["tracklist"] ?? null;
+	
+	private static (List<Track>, string) GetTracklist(JObject o){
+		var tracklist = o["tracklist"];
 		if(tracklist == null)
 			throw new Exception("No tracklist found");
-
+		
+		var list = new List<Track>();
 		var runtime = TimeSpan.Zero;
 		foreach(var track in tracklist){
 			var type = (string?)track["type_"];
@@ -187,37 +188,26 @@ public static class Discogs{
 					var splits = durationString.Split(':');
 					if(splits[0].Length != 2)
 						splits[0] = $"0{splits[0]}";
-					durationString = string.Join(":", splits);
-					var parsed = TimeSpan.TryParseExact(durationString, @"mm\:ss", CultureInfo.InvariantCulture,
-						out var tempTime);
-					if(parsed)
+					
+					var takeAmount = string.Equals(splits[0], "00") ? 1 : 0;
+					durationString = string.Join(":", splits.Take(takeAmount..));
+					var parsed = TimeSpan.TryParseExact(durationString, 
+														@"mm\:ss",
+														CultureInfo.InvariantCulture,
+														out var tempTime);
+					if (parsed)
 						runtime += tempTime;
+					list.Add(new Track{
+						Title = (string?)track["title"] ?? "No title found",
+						Runtime = parsed ? durationString : "00:00",
+					});
 					break;
 				}
 			}
 		}
-
-		return runtime.ToString();
-	}
-
-	private static List<string> GetTracklist(JObject o){
-		var tracklist = o["tracklist"];
-		if(tracklist == null)
-			throw new Exception("No tracklist found");
-
-		var list = new List<string>();
-		foreach(var track in tracklist){
-			var type = (string?)track["type_"];
-			switch(type){
-				case null:
-					throw new Exception("Track has no type_ field");
-				case "track":
-					list.Add((string?)track["title"] ?? throw new Exception("Track has no title field"));
-					break;
-			}
-		}
-
-		return list;
+		var splitRuntime = runtime.ToString().Split(':');
+		var take = string.Equals(splitRuntime[0], "00") ? 1 : 0;
+		return (list, string.Join(":", splitRuntime.Take(take..)));
 	}
 
 	private static string AuthSuffix(){

@@ -4,7 +4,6 @@ namespace app.Models;
 
 public class VinyliumContext: DbContext{
 	public DbSet<Warehouse> Warehouses{ get; set; } = null!;
-	public DbSet<Vinylium> Vinylium{ get; set; } = null!;
 	public DbSet<User> Users{ get; set; } = null!;
 	public DbSet<Store> Stores{ get; set; } = null!;
 	public DbSet<Product> Products{ get; set; } = null!;
@@ -15,25 +14,9 @@ public class VinyliumContext: DbContext{
 
 	protected override void OnModelCreating(ModelBuilder builder){
 		builder.Entity<Warehouse>()
-			.HasOne(v => v.Vinylium)
-			.WithMany();
-
-		builder.Entity<Warehouse>()
 			.HasMany(p => p.Products)
 			.WithMany();
-
-		builder.Entity<Vinylium>()
-			.HasOne(w => w.Warehouse)
-			.WithMany();
-
-		builder.Entity<Vinylium>()
-			.HasMany(u => u.Users)
-			.WithMany();
-
-		builder.Entity<Vinylium>()
-			.HasMany(l => l.Stores)
-			.WithMany();
-
+		
 		builder.Entity<User>()
 			.HasMany(p => p.Cart)
 			.WithMany();
@@ -60,6 +43,11 @@ public class VinyliumContext: DbContext{
 		builder.Entity<Store>()
 			.HasIndex(s => s.ContactNumber)
 			.IsUnique();
-		
+
+		builder.Entity<Product>()
+			.OwnsMany(p => p.Tracklist, t => {
+				t.ToJson();
+			});
+
 	}
 }
