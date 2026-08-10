@@ -78,8 +78,31 @@ export const EditProductPage = () => {
        }
     }
     
-    const handleRemoveSong = async () => {
-        //TODO
+    const handleRemoveSong = (index: number) => {
+        if(!product)
+            return;
+        
+        const firstHalf = product.tracklist.slice(0, index);
+        const secondHalf = product.tracklist.slice(index+1);
+        const mergedTracklist = firstHalf.concat(secondHalf);
+        
+        const newRuntimeNumber = mergedTracklist.reduce((total, track) => {
+            const splitTime = track.runtime.split(":").map(Number);
+            const hasHours = splitTime.length === 3;
+            const hours = hasHours ? splitTime[0] : 0;
+            const minutes = hasHours ? splitTime[1] : splitTime[0];
+            const seconds = hasHours ? splitTime[2] : splitTime[1];
+            return total + hours + minutes + seconds / 60;
+        }, 0);
+
+        const hours = Math.floor(newRuntimeNumber / 60);
+        const minutes = Math.floor(newRuntimeNumber % 60);
+        const seconds = Math.floor((newRuntimeNumber % 1) * 60);
+        const newRuntimeString = `${hours !== 0 ? String(hours).padStart(2, "0") +':': ''}`+
+                                        `${String(minutes).padStart(2, "0")}:`+
+                                        `${String(seconds).padStart(2, "0")}`;
+        console.log(newRuntimeString);
+        setProduct({...product, tracklist: mergedTracklist, runtime: newRuntimeString});
     }
     
     const renderProduct = (product: Product) => {
@@ -142,7 +165,7 @@ export const EditProductPage = () => {
                 </div>
                 <div className="lowerEditCard">
                     <div>
-                        <p>Tracklist:</p>
+                        <p>Tracklist: {product.runtime}</p>
                         <div className="tracks">
                             {product.tracklist.map((t: Track, i: number) => {
                                 return (
@@ -164,7 +187,7 @@ export const EditProductPage = () => {
                                                    setProduct({...product, tracklist: t});
                                                }}/>
                                         <button className="buttonRemoveSong deleteEdit"
-                                                onClick={handleRemoveSong}>
+                                                onClick={() => handleRemoveSong(i)}>
                                             X
                                         </button>
                                     </p>

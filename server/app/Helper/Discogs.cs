@@ -188,7 +188,9 @@ public static class Discogs{
 					var splits = durationString.Split(':');
 					if(splits[0].Length != 2)
 						splits[0] = $"0{splits[0]}";
-					durationString = string.Join(":", splits);
+					
+					var takeAmount = string.Equals(splits[0], "00") ? 1 : 0;
+					durationString = string.Join(":", splits.Take(takeAmount..));
 					var parsed = TimeSpan.TryParseExact(durationString, 
 														@"mm\:ss",
 														CultureInfo.InvariantCulture,
@@ -197,13 +199,15 @@ public static class Discogs{
 						runtime += tempTime;
 					list.Add(new Track{
 						Title = (string?)track["title"] ?? "No title found",
-						Runtime = parsed ? tempTime.ToString() : string.Empty,
+						Runtime = parsed ? durationString : string.Empty,
 					});
 					break;
 				}
 			}
 		}
-		return (list, runtime.ToString());
+		var splitRuntime = runtime.ToString().Split(':');
+		var take = string.Equals(splitRuntime[0], "00") ? 1 : 0;
+		return (list, string.Join(":", splitRuntime.Take(take..)));
 	}
 
 	private static string AuthSuffix(){
