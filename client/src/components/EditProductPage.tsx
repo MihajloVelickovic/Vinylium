@@ -78,6 +78,10 @@ export const EditProductPage = () => {
        }
     }
     
+    const handleRemoveSong = async () => {
+        //TODO
+    }
+    
     const renderProduct = (product: Product) => {
         return (
             <div className="mainEditCard" style={{
@@ -142,22 +146,28 @@ export const EditProductPage = () => {
                         <div className="tracks">
                             {product.tracklist.map((t: Track, i: number) => {
                                 return (
-                                    <p key={i}>{i + 1}. <input className="track" 
-                                                               type="text" 
-                                                               value={t.title}
-                                                               onChange={(e) => {
-                                                                   const t = [...product.tracklist];
-                                                                   t[i].title = e.target.value;
-                                                                   setProduct({...product, tracklist: t});
-                                                               }}/>
-                                                                <input className="track"
-                                                                       type="text"
-                                                                       value={t.runtime}
-                                                                       onChange={(e) => {
-                                                                           const t = [...product.tracklist];
-                                                                           t[i].runtime = e.target.value;
-                                                                           setProduct({...product, tracklist: t});
-                                                                       }}/></p>
+                                    <p key={i}>{i + 1}. 
+                                        <input className="track" 
+                                               type="text" 
+                                               value={t.title}
+                                               onChange={(e) => {
+                                                   const t = [...product.tracklist];
+                                                   t[i].title = e.target.value;
+                                                   setProduct({...product, tracklist: t});
+                                               }}/>
+                                        <input className="track"
+                                               type="text"
+                                               value={t.runtime}
+                                               onChange={(e) => {
+                                                   const t = [...product.tracklist];
+                                                   t[i].runtime = e.target.value;
+                                                   setProduct({...product, tracklist: t});
+                                               }}/>
+                                        <button className="buttonRemoveSong deleteEdit"
+                                                onClick={handleRemoveSong}>
+                                            X
+                                        </button>
+                                    </p>
                                 )
                             })}
                         </div>
