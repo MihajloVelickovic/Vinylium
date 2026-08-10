@@ -33,8 +33,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                     const item = new StoreQuantityPair(new Store(store), "0");
                     pairs.push(item);
                 })
-            }
-            catch(e){
+            } catch (e) {
                 console.error(e);
             }
             return pairs;
@@ -64,6 +63,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                 product: toPayload(),
                 // Quantity is an int server side, so a box the user cleared has
                 // to go out as "0" rather than ""
+                //TODO
                 storeQuantities: storeQuantities.map(p =>
                     new StoreQuantityPair(p.store, p.quantity.trim() || "0"))
             })
@@ -179,18 +179,24 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                         tracklist is never reordered, filtered or appended to */}
                     {draft.tracklist.map((track: Track, i: number) => {
                         return (
-                            <input key={i} className="iField" type="text" spellCheck={false}
-                                   value={track.title}
-                                   onChange={(t) => setField("tracklist",
-                                       draft.tracklist.map((x, j) => j === i ? t.target.value : x))}/>)
+                            <div className="albumCardPopupRow">
+                                <input key={i} className="iField" type="text" spellCheck={false}
+                                     value={track.title}
+                                     onChange={(t) => setField("tracklist",
+                                         draft.tracklist.map((x: Track, j) => {
+                                             return j === i ? new Track({title: t.target.value, runtime: x.runtime}) : x;
+                                         }))}/>
+                                <input key={i}
+                                       className="iField"
+                                       type="text"
+                                       spellCheck={false}
+                                       value={track.runtime}
+                                       onChange={(t) => setField("tracklist",
+                                           draft.tracklist.map((x: Track, j) => {
+                                               return j === i ? new Track({title: x.title, runtime: t.target.value}) : x;
+                                           }))}/>
+                            </div>)
                     })}
-                    <p style={{textAlign: "center"}}><strong>Runtime:</strong></p>
-                    {
-                        <input className="iField" type="text" spellCheck={false}
-                               value={draft.runtime}
-                               onChange={(r) => setField("runtime", r.target.value)}/>
-                    }
-
                 </PopOutCard>
             </div>
         </>
