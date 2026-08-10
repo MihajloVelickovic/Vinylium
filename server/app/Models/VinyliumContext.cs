@@ -45,7 +45,9 @@ public class VinyliumContext: DbContext{
 			.IsUnique();
 
 		builder.Entity<Product>()
-			.OwnsMany(p => p.Tracklist, t => t.ToJson());
+			.OwnsMany(p => p.Tracklist, t => {
+				t.ToJson();
+			});
 
 	}
 }
