@@ -78,15 +78,8 @@ export const EditProductPage = () => {
        }
     }
     
-    const handleRemoveSong = (index: number) => {
-        if(!product)
-            return;
-        
-        const firstHalf = product.tracklist.slice(0, index);
-        const secondHalf = product.tracklist.slice(index+1);
-        const mergedTracklist = firstHalf.concat(secondHalf);
-        
-        const newRuntimeNumber = mergedTracklist.reduce((total, track) => {
+    const calculateRuntime = (list:Array<Track>): string => {
+        const newRuntimeNumber = list.reduce((total, track: Track) => {
             const splitTime = track.runtime.split(":").map(Number);
             const hasHours = splitTime.length === 3;
             const hours = hasHours ? splitTime[0] : 0;
@@ -98,11 +91,19 @@ export const EditProductPage = () => {
         const hours = Math.floor(newRuntimeNumber / 60);
         const minutes = Math.floor(newRuntimeNumber % 60);
         const seconds = Math.floor((newRuntimeNumber % 1) * 60);
-        const newRuntimeString = `${hours !== 0 ? String(hours).padStart(2, "0") +':': ''}`+
-                                        `${String(minutes).padStart(2, "0")}:`+
-                                        `${String(seconds).padStart(2, "0")}`;
-        console.log(newRuntimeString);
-        setProduct({...product, tracklist: mergedTracklist, runtime: newRuntimeString});
+        
+        return `${hours !== 0 ? String(hours).padStart(2, "0") +':': ''}`+
+               `${String(minutes).padStart(2, "0")}:`+
+               `${String(seconds).padStart(2, "0")}`;
+    }
+    
+    const handleRemoveSong = (index: number) => {
+        if(!product)
+            return;
+        
+        const newTracklist = product.tracklist.filter((_, i) => i !== index);
+        const newRuntimeString = calculateRuntime(newTracklist);
+        setProduct({...product, tracklist: newTracklist, runtime: newRuntimeString});
     }
     
     const renderProduct = (product: Product) => {
@@ -184,7 +185,8 @@ export const EditProductPage = () => {
                                                onChange={(e) => {
                                                    const t = [...product.tracklist];
                                                    t[i].runtime = e.target.value;
-                                                   setProduct({...product, tracklist: t});
+                                                   const newRuntime = calculateRuntime(t);
+                                                   setProduct({...product, tracklist: t, runtime: newRuntime});
                                                }}/>
                                         <button className="buttonRemoveSong deleteEdit"
                                                 onClick={() => handleRemoveSong(i)}>

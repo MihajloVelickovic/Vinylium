@@ -199,7 +199,7 @@ public static class Discogs{
 						runtime += tempTime;
 					list.Add(new Track{
 						Title = (string?)track["title"] ?? "No title found",
-						Runtime = parsed ? durationString : string.Empty,
+						Runtime = parsed ? durationString : "00:00",
 					});
 					break;
 				}

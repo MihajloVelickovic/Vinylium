@@ -128,7 +128,7 @@ body{
 
 .albumCardPopupRow{
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
 }
 
 .iField:focus{
