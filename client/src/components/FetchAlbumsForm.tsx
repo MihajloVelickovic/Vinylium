@@ -35,6 +35,7 @@ export const FetchAlbumsForm = () => {
             );
             const resultProducts = new Array<Product>();
             result.data.data.forEach((p: never) => resultProducts.push(new Product(p)))
+            console.log(resultProducts);
             setResults(resultProducts);
             setSelected(0);
             setBrowsing(false);

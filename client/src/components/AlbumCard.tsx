@@ -7,6 +7,7 @@ import Store from "../models/Store.ts";
 import StoreQuantityPair from "../models/StoreQuantityPair.ts";
 import {Field} from "./Field.tsx";
 import {useProductDraft} from "../hooks/useProductDraft.ts";
+import Track from "../models/Track.ts";
 
 export const AlbumCard = ({product, best}: { product: Product, best: boolean }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -176,10 +177,10 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                     <p style={{textAlign: "center"}}><strong>Tracklist:</strong></p>
                     {/* keying on the index is safe here specifically because the
                         tracklist is never reordered, filtered or appended to */}
-                    {draft.tracklist.map((track: string, i: number) => {
+                    {draft.tracklist.map((track: Track, i: number) => {
                         return (
                             <input key={i} className="iField" type="text" spellCheck={false}
-                                   value={track}
+                                   value={track.title}
                                    onChange={(t) => setField("tracklist",
                                        draft.tracklist.map((x, j) => j === i ? t.target.value : x))}/>)
                     })}

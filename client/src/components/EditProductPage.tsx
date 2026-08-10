@@ -5,6 +5,7 @@ import "../styles/EditProductPage.css"
 import authClient from "../api/AuthClient.ts";
 import StoreQuantityPair from "../models/StoreQuantityPair.ts";
 import Store from "../models/Store.ts";
+import Track from "../models/Track.ts";
 
 export const EditProductPage = () => {
     const params = useParams();
@@ -139,16 +140,24 @@ export const EditProductPage = () => {
                     <div>
                         <p>Tracklist:</p>
                         <div className="tracks">
-                            {product.tracklist.map((t: string, i: number) => {
+                            {product.tracklist.map((t: Track, i: number) => {
                                 return (
                                     <p key={i}>{i + 1}. <input className="track" 
                                                                type="text" 
-                                                               value={t}
+                                                               value={t.title}
                                                                onChange={(e) => {
                                                                    const t = [...product.tracklist];
-                                                                   t[i] = e.target.value;
+                                                                   t[i].title = e.target.value;
                                                                    setProduct({...product, tracklist: t});
-                                                               }}/></p>
+                                                               }}/>
+                                                                <input className="track"
+                                                                       type="text"
+                                                                       value={t.runtime}
+                                                                       onChange={(e) => {
+                                                                           const t = [...product.tracklist];
+                                                                           t[i].runtime = e.target.value;
+                                                                           setProduct({...product, tracklist: t});
+                                                                       }}/></p>
                                 )
                             })}
                         </div>
