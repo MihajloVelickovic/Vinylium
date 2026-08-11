@@ -38,6 +38,7 @@ export const AddStoreForm = () => {
                 contactNumber: storeContact,
                 openingHours: storeOpening,
                 closingHours: storeClosing,
+                isWarehouse: warehouse,
             })
         }
         catch(e: any) {

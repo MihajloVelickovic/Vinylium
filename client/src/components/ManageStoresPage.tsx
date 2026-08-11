@@ -14,7 +14,7 @@ export const ManageStoresPage = () => {
     useEffect(() => {
         const getStores = async () => {
             const pairs = new Array<Store>();
-            const r = await authClient.get("/Store/GetStores")
+            const r = await authClient.get("/Store/GetAllStores")
             r.data.data.forEach((store: any) => {
                 const item = new Store(store);
                 pairs.push(item);

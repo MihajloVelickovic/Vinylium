@@ -11,6 +11,7 @@ public interface IStoreRepository{
 	Task<List<Store>?> GetAllStoresAsync();
 	Task<Store> GetStoreByIdAsync(int id);
 	Task<Store> UpdateStoreAsync(int id, Store change);
+	Task<List<Store>?> GetStoresAsync();
 }
 
 public class StoreRepository: IStoreRepository{
@@ -23,14 +24,13 @@ public class StoreRepository: IStoreRepository{
 		_cache = cache;
 	}
 
-	private async Task InvalidateStoresCacheAsync()
-	{
-		try
-		{
+	private async Task InvalidateStoresCacheAsync(bool invalidator){
+		try{
 			await _cache.RemoveAsync("allstores");
+			if(!invalidator)
+				await _cache.RemoveAsync("stores");
 		}
-		catch (Exception e)
-		{
+		catch (Exception e){
 			Console.Error.WriteLine($"Failed to invalidate allstores cache: {e.Message}");
 		}
 	}
@@ -54,7 +54,7 @@ public class StoreRepository: IStoreRepository{
 		if(changes == 0)
 			throw new Exception("Failed to write store to database");
 
-		await InvalidateStoresCacheAsync();
+		await InvalidateStoresCacheAsync(store.IsWarehouse);
 
 	}
 
@@ -71,8 +71,7 @@ public class StoreRepository: IStoreRepository{
 		
 		_dbContext.Stores.Remove(store);
 		await _dbContext.SaveChangesAsync();
-		await InvalidateStoresCacheAsync();
-
+		await InvalidateStoresCacheAsync(store.IsWarehouse);
 	}
 
 	public async Task<List<Store>?> GetAllStoresAsync(){
@@ -83,20 +82,17 @@ public class StoreRepository: IStoreRepository{
 			stores = await _dbContext.Stores.ToListAsync();
 			await _cache.SetStringAsync("allstores", JsonConvert.SerializeObject(stores));
 		}
-		else{
+		else
 			stores = JsonConvert.DeserializeObject<List<Store>>(st);
-		}
 		return stores;
 	}
 
-	public async Task<Store> GetStoreByIdAsync(int id)
-	{
+	public async Task<Store> GetStoreByIdAsync(int id){
 		return await _dbContext.Stores.FirstOrDefaultAsync(s => s.Id == id) ??
 		       throw new Exception($"Store with id {id} doesn't exist");
 	}
 
-	public async Task<Store> UpdateStoreAsync(int id, Store change)
-	{
+	public async Task<Store> UpdateStoreAsync(int id, Store change){
 		var store = await _dbContext.Stores.FirstOrDefaultAsync(s => s.Id == id) ??
 		            throw new Exception($"Store with id {id} doesn't exist");
 		await EnsureNoConflictAsync(change.Name, change.ContactNumber, id);
@@ -107,10 +103,25 @@ public class StoreRepository: IStoreRepository{
 		store.ContactNumber = change.ContactNumber;
 		store.OpeningTime = change.OpeningTime;
 		store.ClosingTime = change.ClosingTime;
+		store.IsWarehouse = change.IsWarehouse;
 
 		await _dbContext.SaveChangesAsync();
-		await InvalidateStoresCacheAsync();
+		await InvalidateStoresCacheAsync(store.IsWarehouse);
 
 		return store;
+	}
+
+	public async Task<List<Store>?> GetStoresAsync(){
+		List<Store>? stores;
+		var cached = await _cache.GetStringAsync("stores");
+		if (string.IsNullOrEmpty(cached)){
+			stores = await _dbContext.Stores.Where(s => !s.IsWarehouse)
+										  .ToListAsync();
+			await _cache.SetStringAsync("stores",JsonConvert.SerializeObject(stores));
+		}
+		else
+			stores = JsonConvert.DeserializeObject<List<Store>>(cached);
+		return stores;
+
 	}
 }

@@ -11,6 +11,7 @@ public interface IStoreService{
 	Task<List<Store>?> GetAllStoresAsync();
 	Task<Store> GetStoreByIdAsync(int id);
 	Task<Store> UpdateStoreAsync(UpdateStoreReq req);
+	Task<List<Store>> GetStoresAsync();
 }
 
 public class StoreService: IStoreService{
@@ -28,7 +29,7 @@ public class StoreService: IStoreService{
 			Address = req.Address,
 			City = req.City,
 			ContactNumber = req.ContactNumber,
-			Name = req.Name,
+			Name = req.Name + (req.IsWarehouse ? " Warehouse" : ""),
 			OpeningTime = parsedOt,
 			ClosingTime = parsedCt,
 			IsWarehouse = req.IsWarehouse
@@ -68,5 +69,9 @@ public class StoreService: IStoreService{
 			IsWarehouse = req.IsWarehouse
 		};
 		return await _storeRepository.UpdateStoreAsync(req.Id, change);
+	}
+
+	public async Task<List<Store>> GetStoresAsync(){
+		return await _storeRepository.GetStoresAsync();
 	}
 }

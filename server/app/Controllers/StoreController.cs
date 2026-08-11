@@ -69,13 +69,27 @@ public class StoreController: ControllerBase{
 			return BadRequest(e.Message);
 		}
 	}
-
-	[HttpGet("GetStores")]
+	
+	[Authorize]
+	[HttpGet("GetAllStores")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> GetAllStores(){
 		try{
 			var stores = await _storeService.GetAllStoresAsync();
+			return Ok(new {data = stores});
+		}
+		catch(Exception e){
+			return BadRequest(e.Message);
+		}
+	}
+	
+	[HttpGet("GetStores")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> GetStores(){
+		try{
+			var stores = await _storeService.GetStoresAsync();
 			return Ok(new {data = stores});
 		}
 		catch(Exception e){
