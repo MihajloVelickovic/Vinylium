@@ -25,4 +25,6 @@ public class Product{
 	[StringLength(10)] public required string ReleaseDate{ get; init; }
 	
 	public required bool InWarehouse{ get; set; }
+	[Required]
+	public bool InStock{ get; set; } 
 }

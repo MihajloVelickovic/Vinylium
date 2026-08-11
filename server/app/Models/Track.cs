@@ -1,6 +1,6 @@
 namespace app.Models;
 
 public class Track{
-    public string Title{ get; set; }
-    public string Runtime{ get; set; }
+    public required string Title{ get; set; }
+    public required string Runtime{ get; set; }
 }

@@ -11,7 +11,7 @@ public interface IStoreService{
 	Task<List<Store>?> GetAllStoresAsync();
 	Task<Store> GetStoreByIdAsync(int id);
 	Task<Store> UpdateStoreAsync(UpdateStoreReq req);
-	Task<List<Store>> GetStoresAsync();
+	Task<List<Store>?> GetStoresAsync();
 }
 
 public class StoreService: IStoreService{
@@ -71,7 +71,7 @@ public class StoreService: IStoreService{
 		return await _storeRepository.UpdateStoreAsync(req.Id, change);
 	}
 
-	public async Task<List<Store>> GetStoresAsync(){
+	public async Task<List<Store>?> GetStoresAsync(){
 		return await _storeRepository.GetStoresAsync();
 	}
 }
