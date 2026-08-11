@@ -10,4 +10,5 @@ public class Store{
 	[StringLength(13)] public required string ContactNumber{ get; set; }
 	public required TimeOnly OpeningTime{ get; set; }
 	public required TimeOnly ClosingTime{ get; set; }
+	public required bool IsWarehouse{ get; set; }
 }

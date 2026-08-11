@@ -43,8 +43,12 @@ export const ManageStoreCard = ({store}: { store: Store }) => {
                             <p>{trimSeconds(store.openingHours)}</p>
                         </div>
                         <div className="storeInfoBox">
-                            <p>Closes:</p>
+                            <p>Clossses:</p>
                             <p>{trimSeconds(store.closingHours)}</p>
+                        </div>
+                        <div className="storeInfoBox">
+                            <p>Warehouse?:</p>
+                            <p>{store.isWarehouse ? "Yes" : "No"}</p>
                         </div>
                     </div>
                 </div>

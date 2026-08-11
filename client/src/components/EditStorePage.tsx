@@ -81,6 +81,11 @@ const EditStoreForm = ({store}: { store: Store }) => {
                 <Field label="Closes:" value={draft.closingHours}
                        onChange={v => setField("closingHours", v)}
                        placeholder="HH:MM"/>
+                <Field label="Warehouse?:"
+                       contentEditable={false}
+                       onClick={v => setField("isWarehouse", !draft.isWarehouse)}
+                       onChange={()=>{}}
+                       value={draft.isWarehouse ? "Yes" : "No"}/>
             </div>
 
             {error && <p className="editStoreError">{error}</p>}

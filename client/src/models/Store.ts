@@ -6,7 +6,8 @@ export default class Store {
     contactNumber: string;
     openingHours: string;
     closingHours: string;
-
+    isWarehouse: boolean;
+    
     constructor(jsonData: any) {
         ({
             id: this.id,
@@ -16,6 +17,7 @@ export default class Store {
             contactNumber: this.contactNumber,
             openingTime: this.openingHours,
             closingTime: this.closingHours,
+            isWarehouse: this.isWarehouse,
         } = jsonData);
 
     }

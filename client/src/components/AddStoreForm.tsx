@@ -11,6 +11,7 @@ export const AddStoreForm = () => {
     const [storeContact, setStoreContact] = useState("");
     const [storeOpening, setStoreOpening] = useState("");
     const [storeClosing, setStoreClosing] = useState("");
+    const [warehouse, setWarehouse] = useState(false);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     
@@ -89,6 +90,14 @@ export const AddStoreForm = () => {
                        e.target.value = validateTime(e.target.value);
                        setStoreClosing(e.target.value);
                    }}></input>
+            <div className="item">
+                <p>Warehouse</p>
+                <input type="checkbox"
+                       checked={warehouse}
+                       onChange={(e) => {
+                           setWarehouse(e.target.checked);
+                       }}/>
+            </div>
             <button type="submit">Add Store</button>
             <h1 style={{color: "indianred"}}>{error}</h1>
             <h1 style={{color: "lightgreen"}}>{message}</h1>

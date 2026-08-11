@@ -30,7 +30,8 @@ public class StoreService: IStoreService{
 			ContactNumber = req.ContactNumber,
 			Name = req.Name,
 			OpeningTime = parsedOt,
-			ClosingTime = parsedCt
+			ClosingTime = parsedCt,
+			IsWarehouse = req.IsWarehouse
 		};
 
 		await _storeRepository.CreateStoreAsync(store);
@@ -57,14 +58,14 @@ public class StoreService: IStoreService{
 		var parsedCt =
 			TimeOnly.FromDateTime(DateTime.ParseExact(req.ClosingHours, "HH:mm", CultureInfo.InvariantCulture));
 
-		var change = new Store
-		{
+		var change = new Store{
 			Name = req.Name,
 			Address = req.Address,
 			City = req.City,
 			ContactNumber = req.ContactNumber,
 			OpeningTime = parseddOt,
-			ClosingTime = parsedCt
+			ClosingTime = parsedCt,
+			IsWarehouse = req.IsWarehouse
 		};
 		return await _storeRepository.UpdateStoreAsync(req.Id, change);
 	}

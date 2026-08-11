@@ -8,7 +8,6 @@ export default class Product {
     type: number;
     barcode: string;
     catalogNumber: string;
-    inwarehouse: boolean;
     runtime: string;
     price: string | null;
     tracklist: Array<Track>;
@@ -25,7 +24,6 @@ export default class Product {
             type: this.type,
             tracklist: this.tracklist,
             releaseDate: this.releaseDate,
-            inwarehouse: this.inwarehouse,
         } = jsonData);
     }
     
