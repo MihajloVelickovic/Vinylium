@@ -1,11 +1,13 @@
 import "../styles/AlbumCard.css";
+/* the card deliberately borrows EditProductPage's layout so the add and edit
+ * screens read as the same thing at different stages */
+import "../styles/EditProductPage.css";
 import PopOutCard from "./PopOutCard.tsx";
 import {useEffect, useRef, useState} from "react";
 import Product from "../models/Product.ts";
 import authClient from "../api/AuthClient";
 import Store from "../models/Store.ts";
 import StoreQuantityPair from "../models/StoreQuantityPair.ts";
-import {Field} from "./Field.tsx";
 import {useProductDraft} from "../hooks/useProductDraft.ts";
 import Track from "../models/Track.ts";
 
@@ -60,7 +62,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
 
     const calculateRuntime = (list: Array<Track>): string => {
         const totalMinutes = list.reduce((total, track) => {
-            
+
             const splitTime = track.runtime.split(":").map(Number);
 
             const hasHours = splitTime.length === 3;
@@ -74,24 +76,24 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
         const hours = Math.floor(totalMinutes / 60);
         const minutes = Math.floor(totalMinutes % 60);
         const seconds = Math.floor((totalMinutes % 1) * 60);
-        
+
         return (hours > 0 ? `${String(hours).padStart(2, "0")}:` : ``) +
                `${String(minutes).padStart(2, "0")}:` +
                `${String(seconds).padStart(2, "0")}`;
-        
-        
+
+
     };
 
     const updateTrack = (index: number, field: keyof Track, value: string) => {
         const tracklist = draft.tracklist.map((track, i) => {
-                return i === index ? 
-                       {...track, [field]: value} : 
+                return i === index ?
+                       {...track, [field]: value} :
                        track;
             }
         );
         setField("tracklist", tracklist);
         setField("runtime", calculateRuntime(tracklist));
-        
+
     };
 
     const handleRemoveSong = (index: number) => {
@@ -114,96 +116,75 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
     return (
         <>
             <div
-                className={"albumCard" + (best ? " bestCard" : "")}
+                className={"mainEditCard" + (best ? " bestCard" : "")}
+                style={{background: `url(${draft.imageUrl}) center`}}
                 onKeyUp={(e) => {
                     if (e.key === "Escape" && isOpen)
                         setIsOpen(false);
                 }}>
-                <div
-                    className="background-style"
-                    style={{
-                        background: `url(${draft.imageUrl}) center`,
-                        zIndex: "-1"
-                    }}/>
 
-                <div className="cardBody">
-                    <div className="image">
-                        <img
-                            src={draft.imageUrl}
-                            width={220}
-                            height={220}
-                            style={{pointerEvents: "none"}}/>
+                <div className="upperEditCard">
+                    <div className="imageDiv">
+                        <div>
+                            <img
+                                src={draft.imageUrl}
+                                width={200}
+                                height={200}
+                                alt={draft.barcode + " cover"}
+                                style={{pointerEvents: "none"}}/>
+                        </div>
                     </div>
 
-                    <div className="cardFields">
-                        <Field
-                            label="Barcode:"
-                            value={draft.barcode}
-                            onChange={v => setField("barcode", v)}/>
-
-                        <Field
-                            label="CatNo:"
-                            value={draft.catalogNumber}
-                            onChange={v => setField("catalogNumber", v)}/>
-
-                        <Field
-                            label="Title:"
-                            value={draft.name}
-                            onChange={v => setField("name", v)}/>
-
-                        <Field
-                            label="Artist:"
-                            value={draft.artist}
-                            onChange={v => setField("artist", v)}/>
-
-                        <Field
-                            label="Release Date:"
-                            value={draft.releaseDate}
-                            onChange={v => setField("releaseDate", v)}/>
-
-                        <div className="productInput textBord">
-                            <p>Type:</p>
-
-                            <select
-                                value={draft.type}
-                                onChange={e =>
-                                    setField("type", Number(e.target.value))
-                                }>
-                                {[0, 1, 2].map(item => (
-                                    <option key={item} value={item}>
-                                        {Product.evaluateType(item)}
-                                    </option>
-                                ))}
-                            </select>
+                    <div className="mainInforation">
+                        <div className="infoField">
+                            <p>Barcode: </p>
+                            <input type="text" spellCheck={false}
+                                   value={draft.barcode}
+                                   onChange={e => setField("barcode", e.target.value)}/>
                         </div>
 
-                        <div>
-                            <p>Availability:</p>
-
-                            {!loading &&
-                                storeQuantities.map((s: StoreQuantityPair) => (
-                                    <Field
-                                        key={s.store.id}
-                                        label={s.store.name}
-                                        value={s.quantity.toString()}
-                                        inputMode="numeric"
-                                        onChange={(v) =>
-                                            setQuantity(s.store.id, v)
-                                        }/>
-                                ))}
+                        <div className="infoField">
+                            <p>Catalog Number: </p>
+                            <input type="text" spellCheck={false}
+                                   value={draft.catalogNumber}
+                                   onChange={e => setField("catalogNumber", e.target.value)}/>
                         </div>
 
-                        <Field
-                            label="Price:"
-                            value={draft.price}
-                            rowClassName="priceRow"
-                            inputRef={priceRef}
-                            inputMode="decimal"
-                            placeholder="0.00"
-                            onChange={v => {
-                                setField("price", v);
-                                setShowPriceHint(false);
-                            }}>
+                        <div className="infoField">
+                            <p>Name: </p>
+                            <input type="text" spellCheck={false}
+                                   value={draft.name}
+                                   onChange={e => setField("name", e.target.value)}/>
+                        </div>
+
+                        <div className="infoField">
+                            <p>Artist: </p>
+                            <input type="text" spellCheck={false}
+                                   value={draft.artist}
+                                   onChange={e => setField("artist", e.target.value)}/>
+                        </div>
+
+                        <div className="infoField">
+                            <p>Release Date: </p>
+                            <input type="text" spellCheck={false}
+                                   value={draft.releaseDate}
+                                   onChange={e => setField("releaseDate", e.target.value)}/>
+                        </div>
+
+                        {/* priceRow anchors the hint tooltip to this row rather
+                            than to the whole card */}
+                        <div className="infoField priceRow">
+                            <p>Price: </p>
+                            {/* ?? "" keeps the input controlled from the first
+                                render, otherwise React swaps it from
+                                uncontrolled and drops the first character */}
+                            <input type="text" inputMode="decimal" placeholder="0.00"
+                                   ref={priceRef}
+                                   value={draft.price ?? ""}
+                                   onChange={e => {
+                                       setField("price", e.target.value);
+                                       setShowPriceHint(false);
+                                   }}/>
                             {showPriceHint && (
                                 <div
                                     className="priceHint"
@@ -212,31 +193,81 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                                     Set a price before adding
                                 </div>
                             )}
-                        </Field>
+                        </div>
+
+                        <div className="infoField">
+                            <p>Type:</p>
+                            <select
+                                value={draft.type}
+                                onChange={e => setField("type", Number(e.target.value))}>
+                                {[0, 1, 2].map(item => (
+                                    <option key={item} value={item}>
+                                        {Product.evaluateType(item)}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <div className="cardActions">
-                    <button
-                        className="acceptButton"
-                        onClick={acceptProduct}>
+                <div className="lowerEditCard">
+                    <div>
+                        <p>Tracklist: {draft.runtime}</p>
+                        <div className="tracks">
+                            {draft.tracklist.map((track: Track, i: number) => (
+                                <p key={i}>{i + 1}.
+                                    <input className="track" type="text" spellCheck={false}
+                                           value={track.title}
+                                           onChange={e => updateTrack(i, "title", e.target.value)}/>
+
+                                    <input className="track" type="text" spellCheck={false}
+                                           value={track.runtime}
+                                           onChange={e => updateTrack(i, "runtime", e.target.value)}/>
+
+                                    <button className="buttonRemoveSong deleteEdit"
+                                            type="button"
+                                            onClick={() => handleRemoveSong(i)}>
+                                        X
+                                    </button>
+                                </p>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <p>Availability:</p>
+                        <div className="tracks">
+                            {!loading &&
+                                storeQuantities.map((s: StoreQuantityPair) => (
+                                    <p key={s.store.id}>
+                                        {s.store.name}
+                                        <input className="track" type="text" inputMode="numeric"
+                                               value={s.quantity.toString()}
+                                               onChange={e => setQuantity(s.store.id, e.target.value)}/>
+                                    </p>
+                                ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="buttonsEdit">
+                    <button className="buttonEdit updateEdit"
+                            type="button"
+                            onClick={acceptProduct}>
                         Add Product
                     </button>
 
-                    <button
-                        className="acceptButton detailsButton"
-                        onClick={() => setIsOpen(true)}>
+                    <button className="buttonEdit cancelEdit"
+                            type="button"
+                            onClick={() => setIsOpen(true)}>
                         Details
                     </button>
                 </div>
             </div>
 
-            <div
-                className="pop-out"
-                onKeyUp={(e) => {
-                    if (e.key === "Escape" && isOpen)
-                        setIsOpen(false);
-                }}>
+            {/* the tracklist moved inline above, so the pop-out is now just the
+                full-size artwork */}
+            <div className="pop-out">
                 <PopOutCard
                     isOpen={isOpen}
                     onClose={() => setIsOpen(false)}
@@ -245,47 +276,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                     <img
                         src={draft.imageUrl}
                         style={{width: "100%"}}
-                    />
-
-                    <p style={{textAlign: "center"}}>
-                        <strong>Tracklist:</strong>
-                    </p>
-
-                    {draft.tracklist.map((track: Track, i: number) => (
-                        <div
-                            className="albumCardPopupRow"
-                            key={i}>
-                            <input
-                                className="iField"
-                                type="text"
-                                spellCheck={false}
-                                value={track.title}
-                                onChange={e =>
-                                    updateTrack(
-                                        i,
-                                        "title",
-                                        e.target.value
-                                    )
-                                }/>
-
-                            <input
-                                className="iField"
-                                type="text"
-                                spellCheck={false}
-                                value={track.runtime}
-                                onChange={e =>
-                                    updateTrack(
-                                        i,
-                                        "runtime",
-                                        e.target.value
-                                    )
-                                }/>
-
-                            <button onClick={() => handleRemoveSong(i)}>
-                                X
-                            </button>
-                        </div>
-                    ))}
+                        alt={draft.barcode + " cover"}/>
                 </PopOutCard>
             </div>
         </>

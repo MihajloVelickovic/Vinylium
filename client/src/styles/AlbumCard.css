@@ -17,10 +17,12 @@ body{
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* gold means this is the release Discogs ranked first */
-.bestCard{
-    border: solid var(--accent);
-    box-shadow: var(--accent) 0 0 10px;
+/* gold means this is the release Discogs ranked first. Qualified with
+ * .mainEditCard so it outranks that rule's own border — the two classes tie at
+ * 0,1,0 otherwise and the winner would come down to CSS import order */
+.mainEditCard.bestCard{
+    border: 3px solid var(--accent);
+    box-shadow: var(--accent) 0 10px 35px -10px;
 }
 
 .cardBody{

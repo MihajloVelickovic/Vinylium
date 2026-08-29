@@ -11,6 +11,7 @@ body{
     flex-direction: row;
     justify-content: space-evenly;
     padding-bottom: 5%;
+    height: 2em;
 }
 
 .admin-sidebar .admin-sidebar-content{

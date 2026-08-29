@@ -50,43 +50,45 @@ export const FetchAlbumsForm = () => {
     }
 
     return (
-        <div className="fetchForm">
-            <div className={"formAndBest" + (browsing ? " browsing" : "")}>
-                <form onSubmit={handleSubmit} className="form">
-                        <input type="text"
-                               value={code}
-                               placeholder="Code"
-                               onChange={(f) => setCode(f.target.value)}/>
-                        <button className="fetchButton" type="submit">Fetch</button>
-                </form>
-                {results.length > 0 ?
-                    <div className={"mainMatch" + (browsing ? " hidden" : "")}>
-                        <h2>{selected === 0 ? "Top match" : `Match ${selected + 1} of ${results.length}`}</h2>
+        <>
+            <div className="fetchForm">
+                <div className={"formAndBest" + (browsing ? " browsing" : "")}>
+                    <form onSubmit={handleSubmit} className="form">
+                            <input type="text"
+                                   value={code}
+                                   placeholder="Code"
+                                   onChange={(f) => setCode(f.target.value)}/>
+                            <button className="fetchButton" type="submit">Fetch</button>
+                        
+                    </form>
+                    {results.length > 0 ?
+                        <div className={"mainMatch" + (browsing ? " hidden" : "")}>
+                            <h2>{selected === 0 ? "Top match" : `Match ${selected + 1} of ${results.length}`}</h2>
                             <AlbumCard key={`${fetchId}-${selected}`} product={results[selected]} best={selected === 0}/>
-                        {results.length > 1 && <button className="altButton" onClick={()=>setBrowsing(true)}>
-                            Not this one? See {results.length - 1} other matches
-                        </button>
-                        }
+                            {results.length > 1 && <button className="altButton" onClick={()=>setBrowsing(true)}>
+                                Not this one? See {results.length - 1} other matches
+                            </button>
+                            }
+                        </div>
+                        :
+                        <h2 className="fetchError">{error}</h2>
+                    }
+                </div>
+                {browsing &&
+                    <div className="crate">
+                        <button className="backButton" onClick={()=> setBrowsing(false)}>←Back</button>
+                        <h2>Other matches</h2>
+                        <div className="crateGrid">
+                            {results
+                                .map((p: Product, i: number) => ({p, i}))
+                                .filter(({i}) => i !== selected)
+                                .map(({p, i}) =>
+                                    <AlbumMatchCard key={`${fetchId}-${i}`} product={p} rank={i + 1} onPick={() => pickMatch(i)}/>)}
+                        </div>
                     </div>
-                    :
-                    <h2 className="fetchError">{error}</h2>
                 }
             </div>
-            
-            {browsing &&
-                <div className="crate">
-                    <button className="backButton" onClick={()=> setBrowsing(false)}>←Back</button>
-                    <h2>Other matches</h2>
-                    <div className="crateGrid">
-                        {results
-                            .map((p: Product, i: number) => ({p, i}))
-                            .filter(({i}) => i !== selected)
-                            .map(({p, i}) =>
-                                <AlbumMatchCard key={`${fetchId}-${i}`} product={p} rank={i + 1} onPick={() => pickMatch(i)}/>)}
-                    </div>
-                </div>
-            }
-        </div>
+        </>
     );
 
 }

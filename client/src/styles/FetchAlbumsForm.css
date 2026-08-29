@@ -11,12 +11,14 @@
 }
 
 .formAndBest{
-    display:grid;
-    grid-template-columns:1fr 1fr;
+    display:flex;
+    /*grid-template-columns:1fr 1fr;*/
+    flex-direction: column;
     gap: 2em;
     align-items: center;
-    width: 75%;
-    margin: 0 auto 3em auto;
+    width: 92%;
+    margin: auto auto 3em auto;
+    height: 20em;
 }
 
 /* the crate needs the whole width, so the form drops to a single bar on top */
@@ -31,7 +33,7 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 26em;
+    height: 10em;
     animation: scaleAnim 0.2s ease;
 }
 
@@ -48,7 +50,7 @@
 }
 
 .formAndBest.browsing .form input{
-    width: 40%;
+    /*width: 40%;*/
     margin: 0;
 }
 
@@ -56,7 +58,7 @@
     margin: 0;
 }
 
-.fetchForm input{
+.fetchForm .form input{
     height: 2vh;
     outline: none;
     border-bottom: var(--text) solid 1px;
@@ -70,14 +72,14 @@
     margin-bottom: 3%;
     text-align: center;
     margin-left: 5px;
-    width: 60%;
+    /*width: 60%;*/
 }
 
-.fetchForm input:focus{
+.fetchForm .form input:focus{
     border-bottom: 2px solid var(--vinylium-accent);
 }
 
-.fetchForm input::placeholder{
+.fetchForm .form input::placeholder{
     font-family: var(--heading), sans-serif;
     font-style: italic;
 }
@@ -101,6 +103,14 @@
     display: flex;
     flex-direction: column;
     gap: 0.6em;
+    align-items: center;
+    width: 100%;
+}
+
+.mainMatch .mainEditCard{
+    width: 75%;
+    max-width: none;
+    margin: 0;
 }
 
 /* stays mounted while the crate is open so typed-in edits survive the detour */
@@ -109,8 +119,12 @@
 }
 
 .mainMatch h2{
-    text-align: left;
+    text-align: center;
     margin: 0;
+}
+
+.altButton{
+    margin-bottom: 2em;
 }
 
 .altButton,
