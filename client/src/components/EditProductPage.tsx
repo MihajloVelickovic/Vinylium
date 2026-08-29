@@ -6,6 +6,7 @@ import authClient from "../api/AuthClient.ts";
 import StoreQuantityPair from "../models/StoreQuantityPair.ts";
 import Store from "../models/Store.ts";
 import Track from "../models/Track.ts";
+import {Navbar} from "./Navbar.tsx";
 
 export const EditProductPage = () => {
     const params = useParams();
@@ -104,6 +105,10 @@ export const EditProductPage = () => {
         const newTracklist = product.tracklist.filter((_, i) => i !== index);
         const newRuntimeString = calculateRuntime(newTracklist);
         setProduct({...product, tracklist: newTracklist, runtime: newRuntimeString});
+    }
+    
+    const handleDeleteFromStore = (index: number) => {
+        return;
     }
     
     const renderProduct = (product: Product) => {

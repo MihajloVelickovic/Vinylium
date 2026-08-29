@@ -4,12 +4,13 @@ using Newtonsoft.Json.Linq;
 
 namespace app.Services;
 
-
 public interface IStoreStockService{
 	List<StoreStock> CreateStoreStockFromJson(object reqStoreQuantities, Product product);
 	Task CreateStoreStock(List<StoreStock> stock);
 	Task<List<StoreStock>> GetStoreStockFromId(string barcode);
 	Task UpdateStock(List<StoreStock> storeStock, string barcode);
+	Task MoveToWarehouse(int id, int wh);
+	Task CreateStockForNewStore(int storeId);
 }
 
 public class StoreStockService:  IStoreStockService{
@@ -61,5 +62,13 @@ public class StoreStockService:  IStoreStockService{
 
 	public async Task UpdateStock(List<StoreStock> storeStock, string barcode){
 		await _repo.UpdateStock(storeStock, barcode);
+	}
+
+	public async Task MoveToWarehouse(int id, int wh){
+		await _repo.MoveToWarehouse(id, wh);
+	}
+
+	public async Task CreateStockForNewStore(int storeId){
+		await _repo.CreateStockForNewStore(storeId);
 	}
 }

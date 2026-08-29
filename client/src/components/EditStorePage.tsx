@@ -31,7 +31,7 @@ const EditStoreForm = ({store}: { store: Store }) => {
             navigate("/admin/manage-stores");
         }
         catch (e: any) {
-            setError(e.response?.data ?? e.message ?? "Failed to update store");
+            setError(e.response?.data?.message ??  "Failed to update store");
         }
         finally {
             setBusy(false);

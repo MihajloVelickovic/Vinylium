@@ -22,7 +22,8 @@ export const useStoreDraft = (store: Store) => {
         city: draft.city.trim(),
         contactNumber: draft.contactNumber.trim(),
         openingHours: toHourMinute(draft.openingHours),
-        closingHours: toHourMinute(draft.closingHours)
+        closingHours: toHourMinute(draft.closingHours),
+        isWarehouse: draft.isWarehouse
     });
     return {draft, setField, toPayload};
 }
