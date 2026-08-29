@@ -3,20 +3,14 @@ using Microsoft.EntityFrameworkCore;
 namespace app.Models;
 
 public class VinyliumContext: DbContext{
-	public DbSet<Warehouse> Warehouses{ get; set; } = null!;
 	public DbSet<User> Users{ get; set; } = null!;
 	public DbSet<Store> Stores{ get; set; } = null!;
 	public DbSet<Product> Products{ get; set; } = null!;
 	public DbSet<Token> Tokens{ get; set; } = null!;
 	public DbSet<StoreStock> StoreStocks{ get; set; } = null!;
-
 	public VinyliumContext(DbContextOptions options): base(options){}
 
 	protected override void OnModelCreating(ModelBuilder builder){
-		builder.Entity<Warehouse>()
-			.HasMany(p => p.Products)
-			.WithMany();
-		
 		builder.Entity<User>()
 			.HasMany(p => p.Cart)
 			.WithMany();

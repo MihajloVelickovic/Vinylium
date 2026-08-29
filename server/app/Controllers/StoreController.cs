@@ -15,10 +15,8 @@ namespace app.Controllers;
 public class StoreController: ControllerBase{
 	
 	private readonly IStoreService _storeService;
-	private readonly IDistributedCache _cache;
-	public StoreController(IStoreService storeService,  IDistributedCache cache){
+	public StoreController(IStoreService storeService){
 		_storeService = storeService;
-		_cache =  cache;
 	}
 
     //both creating and editing endpoints are doing the same validation so we now just have a function that they call instead
@@ -44,15 +42,28 @@ public class StoreController: ControllerBase{
 	public async Task<ActionResult> CreateStore([FromBody] AddStoreReq req){
 		try{
 			ValidateStoreInput(req.OpeningHours, req.ClosingHours, req.ContactNumber);
-
 			var store = await _storeService.CreateStoreAsync(req);
 			return Ok(new{ data = store });
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{ message = e.Message});
 		}	
 	}
 
+	[HttpGet("HasWarehouse")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> HasWarehouse(){
+		try{
+			var wh = await _storeService.HasWarehouse();
+			return Ok(new {data = wh});
+		}
+		catch(Exception e){
+			return BadRequest(new{ message = e.Message});
+		}
+	}
+	
 	[Authorize]
 	[HttpDelete("DeleteStore/{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
@@ -66,11 +77,12 @@ public class StoreController: ControllerBase{
 			return Ok();
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{ message = e.Message});
 		}
 	}
-
-	[HttpGet("GetStores")]
+	
+	[Authorize]
+	[HttpGet("GetAllStores")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> GetAllStores(){
@@ -79,7 +91,20 @@ public class StoreController: ControllerBase{
 			return Ok(new {data = stores});
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{ message = e.Message});
+		}
+	}
+	
+	[HttpGet("GetStores")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> GetStores(){
+		try{
+			var stores = await _storeService.GetStoresAsync();
+			return Ok(new {data = stores});
+		}
+		catch(Exception e){
+			return BadRequest(new{ message = e.Message});
 		}
 	}
 
@@ -94,7 +119,7 @@ public class StoreController: ControllerBase{
 			return Ok(new{ data = store });
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{ message = e.Message});
 		}
 	}
 
@@ -106,12 +131,13 @@ public class StoreController: ControllerBase{
 	public async Task<ActionResult> UpdateStore([FromBody] UpdateStoreReq req){
 		try{
 			ValidateStoreInput(req.OpeningHours, req.ClosingHours, req.ContactNumber);
-
+			if(req.IsWarehouse && await _storeService.HasWarehouse())
+				throw new Exception("Warehouse already exists");
 			var store = await _storeService.UpdateStoreAsync(req);
 			return Ok(new{ data = store });
 		}
 		catch(Exception e){
-			return BadRequest(e.Message);
+			return BadRequest(new{ message = e.Message});
 		}
 	}
 

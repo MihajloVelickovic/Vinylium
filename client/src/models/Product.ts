@@ -8,10 +8,10 @@ export default class Product {
     type: number;
     barcode: string;
     catalogNumber: string;
-    inwarehouse: boolean;
     runtime: string;
     price: string | null;
     tracklist: Array<Track>;
+    inStock: boolean;
 
     constructor(jsonData: any) {
         ({
@@ -25,7 +25,7 @@ export default class Product {
             type: this.type,
             tracklist: this.tracklist,
             releaseDate: this.releaseDate,
-            inwarehouse: this.inwarehouse,
+            inStock: this.inStock
         } = jsonData);
     }
     

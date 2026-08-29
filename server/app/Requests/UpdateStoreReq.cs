@@ -8,4 +8,5 @@ public record UpdateStoreReq{
 	public required string ContactNumber{ get; init; }
 	public required string OpeningHours{ get; init; }
 	public required string ClosingHours{ get; init; }
+	public required bool IsWarehouse{ get; init; }
 }

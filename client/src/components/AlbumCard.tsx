@@ -24,7 +24,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
             const pairs = new Array<StoreQuantityPair>();
 
             try {
-                const r = await authClient.get("/Store/GetStores");
+                const r = await authClient.get("/Store/GetAllStores");
 
                 r.data.data.forEach((store: any) => {
                     const item = new StoreQuantityPair(new Store(store), 0);

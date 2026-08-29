@@ -3,7 +3,7 @@ import "../styles/ProductCard.css"
 import {Link} from "react-router-dom";
 
 //@ts-ignore
-export const ProductCard = ({product}) => {
+export const ProductCard = ({product}: {product: Product}) => {
 
     return (
         <div className="productCard">
@@ -12,7 +12,8 @@ export const ProductCard = ({product}) => {
                     <img src={product.imageUrl}
                          width={200}
                          height={200}
-                         alt={product.artist+ ' - ' + product.name}/>
+                         alt={product.artist+ ' - ' + product.name}
+                         style={!product.inStock ? {filter: "sepia(100%)"} : {}}/>
                 </div>
                 <div>
                     <p>{product.artist} - {product.name} ({Product.evaluateType(product.type)})</p>

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace app.Migrations
 {
     /// <inheritdoc />
-    public partial class TracklistChange : Migration
+    public partial class WarehouseMig : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,7 +25,7 @@ namespace app.Migrations
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Runtime = table.Column<string>(type: "character varying(11)", maxLength: 11, nullable: false),
                     ReleaseDate = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    InWarehouse = table.Column<bool>(type: "boolean", nullable: false),
+                    InStock = table.Column<bool>(type: "boolean", nullable: false),
                     Tracklist = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
@@ -44,7 +44,8 @@ namespace app.Migrations
                     City = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     ContactNumber = table.Column<string>(type: "character varying(13)", maxLength: 13, nullable: false),
                     OpeningTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
-                    ClosingTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false)
+                    ClosingTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    IsWarehouse = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,18 +66,6 @@ namespace app.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Warehouses",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Warehouses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -148,39 +137,10 @@ namespace app.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "ProductWarehouse",
-                columns: table => new
-                {
-                    ProductsBarcode = table.Column<string>(type: "text", nullable: false),
-                    WarehouseId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductWarehouse", x => new { x.ProductsBarcode, x.WarehouseId });
-                    table.ForeignKey(
-                        name: "FK_ProductWarehouse_Products_ProductsBarcode",
-                        column: x => x.ProductsBarcode,
-                        principalTable: "Products",
-                        principalColumn: "Barcode",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductWarehouse_Warehouses_WarehouseId",
-                        column: x => x.WarehouseId,
-                        principalTable: "Warehouses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_ProductUser_UserId",
                 table: "ProductUser",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductWarehouse_WarehouseId",
-                table: "ProductWarehouse",
-                column: "WarehouseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stores_ContactNumber",
@@ -223,16 +183,10 @@ namespace app.Migrations
                 name: "ProductUser");
 
             migrationBuilder.DropTable(
-                name: "ProductWarehouse");
-
-            migrationBuilder.DropTable(
                 name: "StoreStocks");
 
             migrationBuilder.DropTable(
                 name: "Tokens");
-
-            migrationBuilder.DropTable(
-                name: "Warehouses");
 
             migrationBuilder.DropTable(
                 name: "Products");

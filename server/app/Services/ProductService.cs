@@ -66,7 +66,7 @@ public class ProductService: IProductService{
 	
 	public async Task<Product> AddProductAsync(AcceptProductReq req){
 		var product = this.GetProductFromJson(req.Product);
-		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product.Barcode);
+		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product);
 		/* atomically execute product and store stock creation */
 		await _unitOfWork.ExecuteInTransactionAsync(async () => {
 			await _productRepository.CreateProductAsync(product);
@@ -85,7 +85,7 @@ public class ProductService: IProductService{
 	
 	public async Task<(Product, List<StoreStock>)> UpdateProductAsync(AcceptProductReq req){
 		var product = this.GetProductFromJson(req.Product);
-		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product.Barcode);
+		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product);
 		await _unitOfWork.ExecuteInTransactionAsync(async () => {
 			await _productRepository.UpdateProduct(product);
 			await _storeStockService.UpdateStock(storeStock, product.Barcode);

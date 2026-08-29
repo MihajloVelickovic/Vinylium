@@ -1,5 +1,5 @@
 import "../styles/AddStoreForm.css"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import authClient from "../api/AuthClient.ts";
 import * as React from "react";
 
@@ -11,8 +11,24 @@ export const AddStoreForm = () => {
     const [storeContact, setStoreContact] = useState("");
     const [storeOpening, setStoreOpening] = useState("");
     const [storeClosing, setStoreClosing] = useState("");
+    const [warehouse, setWarehouse] = useState(false);
+    const [warehouseVisible, setWarehouseVisible] = useState(true);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    
+    useEffect(() => {
+        const hasWarehouse = async () => {
+            try {
+                const res = await authClient.get("/Store/HasWarehouse");
+                return res.data.data;
+            }
+            catch(e: any){
+                setError(e.response?.data ?? e.message ?? "Undefined error");
+                return;
+            }
+        }
+        hasWarehouse().then(res => setWarehouseVisible(!res));
+    }, [])
     
     const validateTime = (time) => {
         const timeRegex = /^[0-9]{2}:[0-9]{2}$/
@@ -37,6 +53,7 @@ export const AddStoreForm = () => {
                 contactNumber: storeContact,
                 openingHours: storeOpening,
                 closingHours: storeClosing,
+                isWarehouse: warehouse,
             })
         }
         catch(e: any) {
@@ -50,10 +67,9 @@ export const AddStoreForm = () => {
         }, 2000);
         
         e.target.reset();
-        
+        setWarehouseVisible(warehouse ?  false : warehouseVisible);
         console.log("Added store \"" + result?.data.data.name + "\"");
     }
-    
     
     return (
         <form onSubmit={addStore} className="addStoreForm">
@@ -89,6 +105,16 @@ export const AddStoreForm = () => {
                        e.target.value = validateTime(e.target.value);
                        setStoreClosing(e.target.value);
                    }}></input>
+            {warehouseVisible && 
+                <div className="item">
+                    <p>Warehouse</p>
+                    <input type="checkbox"
+                           checked={warehouse}
+                           onChange={(e) => {
+                               setWarehouse(e.target.checked);
+                           }}/>
+                </div>
+            }
             <button type="submit">Add Store</button>
             <h1 style={{color: "indianred"}}>{error}</h1>
             <h1 style={{color: "lightgreen"}}>{message}</h1>

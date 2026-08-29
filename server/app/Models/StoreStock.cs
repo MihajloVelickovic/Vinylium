@@ -7,7 +7,7 @@ public class StoreStock{
 	public int StoreId{ get; set; }
 	public Store Store{ get; init; } = null!;
 	
-	public string ProductBarcode{ get; set; }
+	public required string ProductBarcode{ get; set; }
 	public Product Product{ get; init; } = null!;
 	
 	public int Quantity{ get; set; }

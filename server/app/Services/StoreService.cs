@@ -11,14 +11,20 @@ public interface IStoreService{
 	Task<List<Store>?> GetAllStoresAsync();
 	Task<Store> GetStoreByIdAsync(int id);
 	Task<Store> UpdateStoreAsync(UpdateStoreReq req);
+	Task<List<Store>?> GetStoresAsync();
+	public Task<bool> HasWarehouse();
 }
 
 public class StoreService: IStoreService{
 	
 	private readonly IStoreRepository _storeRepository;
+	private readonly IStoreStockService _storeStockService;
+	private readonly IUnitOfWork _unitOfWork;
 
-	public StoreService(IStoreRepository storeRepository){
+	public StoreService(IStoreRepository storeRepository, IStoreStockService storeStockService, IUnitOfWork unitOfWork){
 		_storeRepository = storeRepository;
+		_storeStockService = storeStockService;
+		_unitOfWork = unitOfWork;
 	}
 
 	public async Task<Store> CreateStoreAsync(AddStoreReq req){
@@ -28,17 +34,37 @@ public class StoreService: IStoreService{
 			Address = req.Address,
 			City = req.City,
 			ContactNumber = req.ContactNumber,
-			Name = req.Name,
+			Name = req.Name + (req.IsWarehouse ? " Warehouse" : ""),
 			OpeningTime = parsedOt,
-			ClosingTime = parsedCt
+			ClosingTime = parsedCt,
+			IsWarehouse = req.IsWarehouse
 		};
 
-		await _storeRepository.CreateStoreAsync(store);
+		await _unitOfWork.ExecuteInTransactionAsync(async () => {
+			var s = await _storeRepository.CreateStoreAsync(store);
+			await _storeStockService.CreateStockForNewStore(s.Id);
+		});
+		
 		return store;
 	}
 
+	public async Task<bool> HasWarehouse(){
+		return await _storeRepository.HasWarehouse();
+	}
+	
 	public async Task DeleteStoreAsync(int id){
-		await _storeRepository.DeleteStoreAsync(id);
+		var store = await GetStoreByIdAsync(id);
+		int? wh;
+		await _unitOfWork.ExecuteInTransactionAsync(async () => {
+			if(!store.IsWarehouse && (wh = await GetWarehouseId()) != null)
+				await _storeStockService.MoveToWarehouse(id, wh.Value);
+			await _storeRepository.DeleteStoreAsync(id);
+		});
+		
+	}
+
+	private async Task<int?> GetWarehouseId(){
+		return await _storeRepository.GetWarehouseId();
 	}
 
 	public async Task<List<Store>?> GetAllStoresAsync(){
@@ -56,16 +82,20 @@ public class StoreService: IStoreService{
 			TimeOnly.FromDateTime(DateTime.ParseExact(req.OpeningHours, "HH:mm", CultureInfo.InvariantCulture));
 		var parsedCt =
 			TimeOnly.FromDateTime(DateTime.ParseExact(req.ClosingHours, "HH:mm", CultureInfo.InvariantCulture));
-
-		var change = new Store
-		{
+		
+		var change = new Store{
 			Name = req.Name,
 			Address = req.Address,
 			City = req.City,
 			ContactNumber = req.ContactNumber,
 			OpeningTime = parseddOt,
-			ClosingTime = parsedCt
+			ClosingTime = parsedCt,
+			IsWarehouse = req.IsWarehouse
 		};
 		return await _storeRepository.UpdateStoreAsync(req.Id, change);
+	}
+
+	public async Task<List<Store>?> GetStoresAsync(){
+		return await _storeRepository.GetStoresAsync();
 	}
 }
