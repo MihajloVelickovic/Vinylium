@@ -12,8 +12,8 @@ using app.Models;
 namespace app.Migrations
 {
     [DbContext(typeof(VinyliumContext))]
-    [Migration("20260810130644_TracklistChange")]
-    partial class TracklistChange
+    [Migration("20260829194626_WarehouseMig")]
+    partial class WarehouseMig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,21 +40,6 @@ namespace app.Migrations
                     b.ToTable("ProductUser");
                 });
 
-            modelBuilder.Entity("ProductWarehouse", b =>
-                {
-                    b.Property<string>("ProductsBarcode")
-                        .HasColumnType("text");
-
-                    b.Property<int>("WarehouseId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ProductsBarcode", "WarehouseId");
-
-                    b.HasIndex("WarehouseId");
-
-                    b.ToTable("ProductWarehouse");
-                });
-
             modelBuilder.Entity("app.Models.Product", b =>
                 {
                     b.Property<string>("Barcode")
@@ -72,7 +57,7 @@ namespace app.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("InWarehouse")
+                    b.Property<bool>("InStock")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
@@ -125,6 +110,9 @@ namespace app.Migrations
                         .IsRequired()
                         .HasMaxLength(13)
                         .HasColumnType("character varying(13)");
+
+                    b.Property<bool>("IsWarehouse")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -221,19 +209,6 @@ namespace app.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("app.Models.Warehouse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Warehouses");
-                });
-
             modelBuilder.Entity("ProductUser", b =>
                 {
                     b.HasOne("app.Models.Product", null)
@@ -245,21 +220,6 @@ namespace app.Migrations
                     b.HasOne("app.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ProductWarehouse", b =>
-                {
-                    b.HasOne("app.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsBarcode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("app.Models.Warehouse", null)
-                        .WithMany()
-                        .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

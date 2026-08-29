@@ -26,6 +26,7 @@ public class StoreStockRepository: IStoreStockRepository{
 	public async Task<List<StoreStock>> GetStoreStockFromId(string barcode){
 		return await _dbContext.StoreStocks.Include(s => s.Store)
 										   .Where(s => s.ProductBarcode == barcode)
+										   .OrderBy(s => s.StoreId)
 										   .ToListAsync();
 	}
 

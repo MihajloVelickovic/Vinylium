@@ -57,9 +57,6 @@ namespace app.Migrations
                     b.Property<bool>("InStock")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("InWarehouse")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");

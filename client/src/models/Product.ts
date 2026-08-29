@@ -11,6 +11,7 @@ export default class Product {
     runtime: string;
     price: string | null;
     tracklist: Array<Track>;
+    inStock: boolean;
 
     constructor(jsonData: any) {
         ({
@@ -24,6 +25,7 @@ export default class Product {
             type: this.type,
             tracklist: this.tracklist,
             releaseDate: this.releaseDate,
+            inStock: this.inStock
         } = jsonData);
     }
     

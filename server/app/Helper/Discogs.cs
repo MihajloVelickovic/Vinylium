@@ -113,8 +113,8 @@ public static class Discogs{
 				Runtime = runtime,
 				Type = GetFormat(formatString),
 				ReleaseDate = (string?)product["year"] ?? "",
-				InWarehouse = false,
 				Tracklist = tracklist,
+				InStock = false
 			});
 		}
 		

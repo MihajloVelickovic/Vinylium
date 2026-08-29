@@ -41,7 +41,7 @@ public class StoreRepository: IStoreRepository{
 			var x = await _dbContext.Stores.Where(s => s.IsWarehouse).SingleOrDefaultAsync();
 			return x?.Id;
 		}
-		catch(Exception e){
+		catch(Exception){
 			return null;
 		}
 	}
@@ -77,7 +77,7 @@ public class StoreRepository: IStoreRepository{
 		List<Store>? stores;
 		var st = await _cache.GetStringAsync("stores");
 		if(string.IsNullOrEmpty(st)){
-			stores = await _dbContext.Stores.ToListAsync();
+			stores = await _dbContext.Stores.OrderBy(s => s.Id).ToListAsync();
 			await _cache.SetStringAsync("stores", JsonConvert.SerializeObject(stores));
 		}
 		else

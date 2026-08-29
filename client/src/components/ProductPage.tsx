@@ -85,7 +85,11 @@ export const ProductPage = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <button className="button-main" type="button">Add to cart</button>
+                                    <button className="button-main" type="button">{
+                                        product.inStock ? 
+                                            "Add to cart" : 
+                                            "Out of Stock"}
+                                    </button>
                                 </div>
                             </div>
                         </div>
