@@ -79,34 +79,29 @@ export const ProductPage = () => {
                                 </div>
 
                                 <div className="priceQuantityInfo">
-                                    <div className="title">
-                                        <p>{product.price} RSD</p>
-                                        <></>
-                                    </div>
+                                    <p className="price">{product.price} RSD</p>
                                 </div>
                                 <div>
-                                    <button className="button-main" type="button">{
+                                    <button className="add-to-cart" type="button">{
                                         product.inStock ? 
                                             "Add to cart" : 
                                             "Out of Stock"}
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="productPageColumn">
-                        <div className="productDetail">
-                            <div>
-                            <p>Tracklist: </p>
-                            </div>
-                            <div>
-                                {product.tracklist.map((t: Track, i: number) => {
-                                return (
-                                    <div className="tracklistDetail">
-                                        <p>{i + 1}.</p><p>{t.title}</p><p>{t.runtime}</p>
+                                <div className="tracklist">
+                                    <div>
+                                        <p>Tracklist: </p>
                                     </div>
-                                )
-                            })}
+                                    <div>
+                                        {product.tracklist.map((t: Track, i: number) => {
+                                            return (
+                                                <div className="tracklistDetail">
+                                                    <p>{i + 1}.</p><p>{t.title}</p><p>{t.runtime}</p>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

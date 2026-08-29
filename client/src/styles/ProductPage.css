@@ -7,8 +7,16 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: var(--width);
+    width: var(--product-page-width);
     margin: 0 auto;
+}
+
+.add-to-cart {
+    border: none;
+    outline: white;
+    height: 4vh;
+    font-family: var(--heading), sans-serif;
+    font-size: 1.2rem;
 }
 
 .productPageColumn{
@@ -18,7 +26,7 @@
     z-index: 1;
     background-color: var(--bg);
     border: 2px solid var(--vinylium-accent);
-    padding: 20px;
+    padding: 0;
     height: fit-content;
     box-shadow: var(--vinylium-accent) 0 0 10px;
     animation-name: scaleAnim;
@@ -31,28 +39,65 @@
 }
 
 .mainRightSide{
+    box-sizing: border-box;
     display: grid;
-    height: fit-content;    
+    height: fit-content;
+    padding: 1.25rem 1.25rem 0 1.25rem;
+    gap: 1.5em;
 }
 
 .mainLeftSide{
-    margin-right: 1em;
+    box-sizing: border-box;
+    border-right: 3px solid var(--vinylium-accent);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
 }
 
-.productDetail{
+.mainLeftSide > img{
+    align-self: center;
+}
+
+.mainLeftSide > div{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.tracklist{
+    margin: 0 -1.25rem;
+    padding: 1em 1.25rem;
     display: grid;
     grid-template-columns: 2fr 3fr;
-    border-bottom: var(--vinylium-accent) solid 1px;
+    text-align: center;
+    border-top: var(--vinylium-accent) solid 0.125rem;
+}
+.productDetail{
+    margin: 0 -1.25rem;
+    padding: 0 1.25rem;
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    border-bottom: var(--vinylium-accent) solid 2px;
     text-align: center;
 }
 
 .tracklistDetail{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: var(--vinylium-accent) solid 1px;
 }
 
 .priceQuantityInfo{
-    
+    display: flex;
+    justify-content: center;
+}
+
+.priceQuantityInfo .price{
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
 .background-style-prod-page{
@@ -81,7 +126,6 @@
     text-wrap: balance;
     word-break: break-word;
     text-align: center;
-    padding-bottom: 2em;
 }
 
 .title h1{
