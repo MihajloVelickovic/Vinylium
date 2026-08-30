@@ -1,56 +1,35 @@
 
-import {useEffect, useState} from "react";
-import Store from "../models/Store.ts";
 import authClient from "../api/AuthClient.ts";
 import {ManageStoreCard} from "./ManageStoreCard.tsx";
+import {Filters} from "./Filters.tsx";
+import {StoreFilterFields} from "./StoreFilterFields.tsx";
+import {useStoreFilters} from "../hooks/useStoreFilters.ts";
 import "../styles/ManageStoresPage.css"
 
 export const ManageStoresPage = () => {
 
-    const [stores, setStores] = useState<Array<Store>>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-
-    useEffect(() => {
-        const getStores = async () => {
-            const pairs = new Array<Store>();
-            const r = await authClient.get("/Store/GetAllStores")
-            r.data.data.forEach((store: any) => {
-                const item = new Store(store);
-                pairs.push(item);
-            })
-            return pairs;
-        }
-
-        getStores().then(p => {
-            setStores(p);
-            setLoading(false);
-        }).catch(e => {
-            /* surfaced instead of only logged, so a failing request reads as an
-             * error rather than as an empty list of stores
-             */
-            setError(e.response?.data ?? e.message ?? "Failed to load stores");
-            setLoading(false);
-        });
-
-    }, [])
-
-    if (loading)
-        return <h2 className="manage-stores-message">Loading stores...</h2>
-
-    if (error)
-        return <h2 className="manage-stores-message manage-stores-error">{error}</h2>
-
-    if (stores.length === 0)
-        return <h2 className="manage-stores-message">No stores yet.</h2>
+    const {stores, filters, setFilters, change, setChange, searchRef, loading, error} = useStoreFilters(authClient);
 
     return (
-        <div className="manage-stores">
+        <>
+            <Filters searchRef={searchRef} params={{filters, setFilters, change, setChange}}>
+                <StoreFilterFields params={{filters, setFilters, change, setChange}}/>
+            </Filters>
             {
-                stores.map(s => {
-                    return <ManageStoreCard key={s.id} store={s}/>
-                })
+                loading ?
+                    <h2 className="manage-stores-message">Loading stores...</h2> :
+                error ?
+                    <h2 className="manage-stores-message manage-stores-error">{error}</h2> :
+                stores.length === 0 ?
+                    <h2 className="manage-stores-message">No stores yet.</h2> :
+                    <div className="manage-stores">
+                        {
+                            stores.map(s => {
+                                return <ManageStoreCard key={s.id} store={s}/>
+                            })
+                        }
+                    </div>
             }
-        </div>
+        </>
     )
 }

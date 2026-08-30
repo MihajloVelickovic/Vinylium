@@ -11,6 +11,7 @@ public interface IUserService{
 	Task DeleteUserAsync(string username);
 	Task<User?> FindUserByEmailOrUsernameAsync(string username);
 	Task<List<User>> GetAllUsersAsync();
+	Task<(List<User> result, int pages)> GetFilteredAsync(int? page, int? items, string? search, bool? admin);
 }
 
 public class UserService: IUserService{
@@ -40,6 +41,16 @@ public class UserService: IUserService{
 
 	public async Task<List<User>> GetAllUsersAsync(){
 		return await _userRepository.GetAllUsersAsync();
+	}
+
+	public async Task<(List<User> result, int pages)> GetFilteredAsync(int? page, int? items, string? search, bool? admin){
+		var filter = new UserFilterReq{
+			Page = page,
+			PerPage = items,
+			Search = search,
+			Admin = admin
+		};
+		return await _userRepository.GetFilteredAsync(filter);
 	}
 
 	public async Task<User> LoginUserAsync(LoginReq request){

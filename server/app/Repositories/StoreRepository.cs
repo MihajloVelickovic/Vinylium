@@ -1,5 +1,6 @@
 using System.Reflection.Metadata;
 using app.Models;
+using app.Requests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ public interface IStoreRepository{
 	Task<List<Store>?> GetStoresAsync();
 	public Task<bool> HasWarehouse();
 	Task<int?> GetWarehouseId();
+	Task<(List<Store> result, int pages)> GetFilteredAsync(StoreFilterReq req);
 }
 
 public class StoreRepository: IStoreRepository{
@@ -47,7 +49,7 @@ public class StoreRepository: IStoreRepository{
 	}
 
 	public async Task<Store> CreateStoreAsync(Store store){
-		if(store.IsWarehouse == true && await HasWarehouse())
+		if(store.IsWarehouse && await HasWarehouse())
 			throw new Exception("Warehouse already created");
 		var dbStore = await _dbContext.Stores.AddAsync(store) ??
 		              throw new Exception("Failed to add store to database");
@@ -116,5 +118,29 @@ public class StoreRepository: IStoreRepository{
 		if(wh != null)
 			stores?.Remove(wh);
 		return stores;
+	}
+
+	public async Task<(List<Store> result, int pages)> GetFilteredAsync(StoreFilterReq req){
+
+		var query = _dbContext.Stores.AsQueryable();
+
+		var page = req.Page ?? 1;
+		var perPage = req.PerPage ?? 20;
+		var skip = (page - 1) * perPage;
+
+		if(!string.IsNullOrWhiteSpace(req.Search))
+			query = query.Where(s => EF.Functions.ILike(s.Name, $"%{req.Search}%") ||
+			                         EF.Functions.ILike(s.Address, $"%{req.Search}%") ||
+			                         EF.Functions.ILike(s.City, $"%{req.Search}%") ||
+			                         EF.Functions.ILike(s.ContactNumber, $"%{req.Search}%"));
+
+		if(req.IsWarehouse != null)
+			query = query.Where(s => s.IsWarehouse == req.IsWarehouse);
+
+		var totalCount = await query.CountAsync();
+		var pages = totalCount / perPage + 1;
+		var result = await query.OrderBy(s => s.Id).Skip(skip).Take(perPage).ToListAsync();
+		return (result, pages);
+
 	}
 }

@@ -1,4 +1,5 @@
 using app.Models;
+using app.Requests;
 using Microsoft.EntityFrameworkCore;
 
 namespace app.Repositories;
@@ -8,6 +9,7 @@ public interface IUserRepository{
 	Task<User?> FindUserByEmailOrUsernameAsync(string emailOrUsername);
 	Task DeleteUserAsync(string username);
 	Task<List<User>> GetAllUsersAsync();
+	Task<(List<User> result, int pages)> GetFilteredAsync(UserFilterReq req);
 }
 
 public class UserRepository: IUserRepository{
@@ -53,5 +55,27 @@ public class UserRepository: IUserRepository{
 
 	public async Task<List<User>> GetAllUsersAsync(){
 		return await _dbContext.Users.ToListAsync();
+	}
+
+	public async Task<(List<User> result, int pages)> GetFilteredAsync(UserFilterReq req){
+
+		var query = _dbContext.Users.AsQueryable();
+
+		var page = req.Page ?? 1;
+		var perPage = req.PerPage ?? 20;
+		var skip = (page - 1) * perPage;
+
+		if(!string.IsNullOrWhiteSpace(req.Search))
+			query = query.Where(u => EF.Functions.ILike(u.Username, $"%{req.Search}%") ||
+			                         EF.Functions.ILike(u.Email, $"%{req.Search}%"));
+
+		if(req.Admin != null)
+			query = query.Where(u => u.Admin == req.Admin);
+
+		var totalCount = await query.CountAsync();
+		var pages = totalCount / perPage + 1;
+		var result = await query.Skip(skip).Take(perPage).ToListAsync();
+		return (result, pages);
+
 	}
 }
