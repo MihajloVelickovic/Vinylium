@@ -8,6 +8,10 @@ public class VinyliumContext: DbContext{
 	public DbSet<Product> Products{ get; set; } = null!;
 	public DbSet<Token> Tokens{ get; set; } = null!;
 	public DbSet<StoreStock> StoreStocks{ get; set; } = null!;
+	public DbSet<Cart> Carts{ get; set; } = null!;
+	public DbSet<CartItem> CartItems{ get; set; } = null!;
+	public DbSet<Order> Orders{ get; set; } = null!;
+	public DbSet<OrderItem> OrderItems{ get; set; } = null!;
 	public VinyliumContext(DbContextOptions options): base(options){}
 
 	protected override void OnModelCreating(ModelBuilder builder){
@@ -26,8 +30,13 @@ public class VinyliumContext: DbContext{
 		builder.Entity<StoreStock>()
 			.HasOne(p => p.Product)
 			.WithMany();
+		
 		builder.Entity<User>()
-			.HasIndex(u => new{ u.Username, u.Password })
+			.HasIndex(u => u.Username)
+			.IsUnique();
+		
+		builder.Entity<User>()
+			.HasIndex(u => u.Email)
 			.IsUnique();
 		
 		builder.Entity<Store>()
@@ -42,6 +51,38 @@ public class VinyliumContext: DbContext{
 			.OwnsMany(p => p.Tracklist, t => {
 				t.ToJson();
 			});
+
+		builder.Entity<Cart>()
+			.HasMany(c => c.Items)
+			.WithOne()
+			.HasForeignKey(i => i.CartId);
+
+		builder.Entity<CartItem>()
+			.HasOne<Product>()
+			.WithMany();
+
+		builder.Entity<CartItem>()
+			.HasOne<Store>()
+			.WithMany();
+
+		builder.Entity<Order>()
+			.HasMany(o => o.Items)
+			.WithOne();
+		
+		builder.Entity<Order>()
+			.HasOne<User>()
+			.WithMany()
+			.IsRequired(false);
+
+		builder.Entity<OrderItem>()
+			.HasOne<Product>()
+			.WithMany()
+			.OnDelete(DeleteBehavior.Restrict);
+
+		builder.Entity<OrderItem>()
+			.HasOne<Store>()
+			.WithMany()
+			.OnDelete(DeleteBehavior.Restrict);
 
 	}
 }

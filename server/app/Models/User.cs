@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace app.Models;
 
 public class User{
-	public int Id{ get; init; }
+	public Guid Id{ get; init; } = Guid.CreateVersion7();
 
 	[StringLength(254)] [EmailAddress] public required string Email{ get; set; }
 
