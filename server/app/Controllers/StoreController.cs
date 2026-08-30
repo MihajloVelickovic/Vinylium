@@ -15,8 +15,10 @@ namespace app.Controllers;
 public class StoreController: ControllerBase{
 	
 	private readonly IStoreService _storeService;
-	public StoreController(IStoreService storeService){
+	private readonly IProductService _productService;
+	public StoreController(IStoreService storeService, IProductService productService){
 		_storeService = storeService;
+		_productService = productService;
 	}
 
     //both creating and editing endpoints are doing the same validation so we now just have a function that they call instead
@@ -42,7 +44,8 @@ public class StoreController: ControllerBase{
 	public async Task<ActionResult> CreateStore([FromBody] AddStoreReq req){
 		try{
 			ValidateStoreInput(req.OpeningHours, req.ClosingHours, req.ContactNumber);
-			var store = await _storeService.CreateStoreAsync(req);
+			var products = await _productService.GetAll();
+			var store = await _storeService.CreateStoreAsync(req, products.Select(p => p.Barcode).ToList());
 			return Ok(new{ data = store });
 		}
 		catch(Exception e){
@@ -71,10 +74,10 @@ public class StoreController: ControllerBase{
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> DeleteStoreById(string id){
 		try{
-			var storeId = int.TryParse(id, out var idInt);
+			var storeId = Guid.TryParse(id, out var idGuid);
 			if(!storeId)
 				throw new Exception($"Couldnt parse store id: {id}");
-			await _storeService.DeleteStoreAsync(idInt);
+			await _storeService.DeleteStoreAsync(idGuid);
 			return Ok();
 		}
 		catch(Exception e){
@@ -132,7 +135,7 @@ public class StoreController: ControllerBase{
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult> GetStoreById(int id){
+	public async Task<ActionResult> GetStoreById(Guid id){
 		try{
 			var store = await _storeService.GetStoreByIdAsync(id);
 			return Ok(new{ data = store });

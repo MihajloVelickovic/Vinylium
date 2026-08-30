@@ -9,13 +9,13 @@ namespace app.Repositories;
 
 public interface IStoreRepository{
 	Task<Store> CreateStoreAsync(Store store);
-	Task DeleteStoreAsync(int id);
+	Task DeleteStoreAsync(Guid id);
 	Task<List<Store>?> GetAllStoresAsync();
-	Task<Store> GetStoreByIdAsync(int id);
-	Task<Store> UpdateStoreAsync(int id, Store change);
+	Task<Store> GetStoreByIdAsync(Guid id);
+	Task<Store> UpdateStoreAsync(Guid id, Store change);
 	Task<List<Store>?> GetStoresAsync();
 	public Task<bool> HasWarehouse();
-	Task<int?> GetWarehouseId();
+	Task<Guid?> GetWarehouseId();
 	Task<(List<Store> result, int pages)> GetFilteredAsync(StoreFilterReq req);
 }
 
@@ -38,7 +38,7 @@ public class StoreRepository: IStoreRepository{
 		return JsonConvert.DeserializeObject<bool>(cached);
 	}
 
-	public async Task<int?> GetWarehouseId(){
+	public async Task<Guid?> GetWarehouseId(){
 		try{
 			var x = await _dbContext.Stores.Where(s => s.IsWarehouse).SingleOrDefaultAsync();
 			return x?.Id;
@@ -62,7 +62,7 @@ public class StoreRepository: IStoreRepository{
 		return dbStore.Entity;
 	}
 
-	public async Task DeleteStoreAsync(int id){
+	public async Task DeleteStoreAsync(Guid id){
 		var store =  await _dbContext.Stores.FindAsync(id) ?? 
 		             throw new Exception($"Store with id {id} doesnt exist");
 		
@@ -87,12 +87,12 @@ public class StoreRepository: IStoreRepository{
 		return stores;
 	}
 
-	public async Task<Store> GetStoreByIdAsync(int id){
+	public async Task<Store> GetStoreByIdAsync(Guid id){
 		return await _dbContext.Stores.FirstOrDefaultAsync(s => s.Id == id) ??
 		       throw new Exception($"Store with id {id} doesn't exist");
 	}
 
-	public async Task<Store> UpdateStoreAsync(int id, Store change){
+	public async Task<Store> UpdateStoreAsync(Guid id, Store change){
 		var store = await _dbContext.Stores.FirstOrDefaultAsync(s => s.Id == id) ??
 		            throw new Exception($"Store with id {id} doesn't exist");
 		

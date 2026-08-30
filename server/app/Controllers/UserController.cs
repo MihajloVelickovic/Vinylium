@@ -49,7 +49,7 @@ public class UserController: ControllerBase{
 			
 			var guid = Guid.NewGuid().ToString();
 
-			var token = _jwtService.GenerateAccessToken(user.Username, user.Email, user.Admin);
+			var token = _jwtService.GenerateAccessToken(user.Id, user.Username, user.Email, user.Admin);
 			var refreshToken = await _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
 			
 			return Ok(new{ message = "Successfully Registered", user, token, refreshToken});
@@ -82,7 +82,7 @@ public class UserController: ControllerBase{
 
 			var guid = Guid.NewGuid().ToString();
 
-			var token = _jwtService.GenerateAccessToken(user.Username, user.Email, user.Admin);
+			var token = _jwtService.GenerateAccessToken(user.Id, user.Username, user.Email, user.Admin);
 			var refreshToken = await _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
 			
 			return Ok(new{
@@ -116,7 +116,7 @@ public class UserController: ControllerBase{
 			
 			var guid = Guid.NewGuid().ToString();
 
-			var newToken = _jwtService.GenerateAccessToken(user.Username, user.Email, user.Admin);
+			var newToken = _jwtService.GenerateAccessToken(user.Id, user.Username, user.Email, user.Admin);
 			var newRefreshToken = await _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
 
 			return Ok(new{

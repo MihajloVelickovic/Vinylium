@@ -6,10 +6,10 @@ using app.Requests;
 namespace app.Services;
 
 public interface IStoreService{
-	Task<Store> CreateStoreAsync(AddStoreReq req);
-	Task DeleteStoreAsync(int id);
+	Task<Store> CreateStoreAsync(AddStoreReq req, List<string> barcodes);
+	Task DeleteStoreAsync(Guid id);
 	Task<List<Store>?> GetAllStoresAsync();
-	Task<Store> GetStoreByIdAsync(int id);
+	Task<Store> GetStoreByIdAsync(Guid id);
 	Task<Store> UpdateStoreAsync(UpdateStoreReq req);
 	Task<List<Store>?> GetStoresAsync();
 	public Task<bool> HasWarehouse();
@@ -28,7 +28,7 @@ public class StoreService: IStoreService{
 		_unitOfWork = unitOfWork;
 	}
 
-	public async Task<Store> CreateStoreAsync(AddStoreReq req){
+	public async Task<Store> CreateStoreAsync(AddStoreReq req, List<string> barcodes){
 		var parsedOt = TimeOnly.FromDateTime(DateTime.ParseExact(req.OpeningHours, "HH:mm", CultureInfo.InvariantCulture));
 		var parsedCt = TimeOnly.FromDateTime(DateTime.ParseExact(req.ClosingHours, "HH:mm", CultureInfo.InvariantCulture));
 		var store = new Store{
@@ -43,7 +43,7 @@ public class StoreService: IStoreService{
 
 		await _unitOfWork.ExecuteInTransactionAsync(async () => {
 			var s = await _storeRepository.CreateStoreAsync(store);
-			await _storeStockService.CreateStockForNewStore(s.Id);
+			await _storeStockService.CreateStockForNewStore(s.Id, barcodes);
 		});
 		
 		return store;
@@ -53,18 +53,18 @@ public class StoreService: IStoreService{
 		return await _storeRepository.HasWarehouse();
 	}
 	
-	public async Task DeleteStoreAsync(int id){
+	public async Task DeleteStoreAsync(Guid id){
 		var store = await GetStoreByIdAsync(id);
-		int? wh;
+		Guid? wh;
 		await _unitOfWork.ExecuteInTransactionAsync(async () => {
 			if(!store.IsWarehouse && (wh = await GetWarehouseId()) != null)
 				await _storeStockService.MoveToWarehouse(id, wh.Value);
 			await _storeRepository.DeleteStoreAsync(id);
 		});
-		
+
 	}
 
-	private async Task<int?> GetWarehouseId(){
+	private async Task<Guid?> GetWarehouseId(){
 		return await _storeRepository.GetWarehouseId();
 	}
 
@@ -72,7 +72,7 @@ public class StoreService: IStoreService{
 		return await _storeRepository.GetAllStoresAsync();
 	}
 
-	public async Task<Store> GetStoreByIdAsync(int id)
+	public async Task<Store> GetStoreByIdAsync(Guid id)
 	{
 		return await _storeRepository.GetStoreByIdAsync(id);
 	}

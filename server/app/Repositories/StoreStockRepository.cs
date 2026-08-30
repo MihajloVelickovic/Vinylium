@@ -9,8 +9,10 @@ public interface IStoreStockRepository{
 	Task CreateStoreStockAsync(List<StoreStock> storeStock);
 	Task<List<StoreStock>> GetStoreStockFromId(string barcode);
 	Task UpdateStock(List<StoreStock> storeStock, string barcode);
-	Task MoveToWarehouse(int id, int wh);
-	Task CreateStockForNewStore(int storeId);
+	Task MoveToWarehouse(Guid id, Guid wh);
+	Task CreateStockForNewStore(Guid storeId, List<string> barcodes);
+	Task DecrementStockAsync(Guid storeId, string barcode, int quantity);
+	Task IncrementStockAsync(Guid storeId, string barcode, int quantity);
 }
 
 public class StoreStockRepository: IStoreStockRepository{
@@ -43,7 +45,7 @@ public class StoreStockRepository: IStoreStockRepository{
 		}
 	}
 
-	public async Task MoveToWarehouse(int id, int wh){
+	public async Task MoveToWarehouse(Guid id, Guid wh){
 		var stockToMove = await _dbContext.StoreStocks
 										  .Where(ss => ss.StoreId == id)
 										  .ToListAsync();
@@ -59,20 +61,33 @@ public class StoreStockRepository: IStoreStockRepository{
 		}
 	}
 
-	public async Task CreateStockForNewStore(int storeId){
-		var products = await _dbContext.StoreStocks.Select(ss => ss.ProductBarcode)
-												   .Distinct()
-												   .ToListAsync();
-
+	public async Task CreateStockForNewStore(Guid storeId, List<string> barcodes){
 		List<StoreStock> toAdd =[
-			.. products.Select(product => new StoreStock{
-				StoreId = storeId, 
-				ProductBarcode = product, 
+			.. barcodes.Select(barcode => new StoreStock{
+				StoreId = storeId,
+				ProductBarcode = barcode,
 				Quantity = 0
 			})
 		];
-
 		await _dbContext.StoreStocks.AddRangeAsync(toAdd);
-		
+	}
+
+	public async Task DecrementStockAsync(Guid storeId, string barcode, int quantity){
+		var stock = await _dbContext.StoreStocks
+									.FirstOrDefaultAsync(ss => ss.StoreId == storeId && ss.ProductBarcode == barcode) ??
+					throw new Exception($"No stock record for store {storeId} / product {barcode}");
+
+		if(stock.Quantity < quantity)
+			throw new Exception($"Insufficient stock for {barcode} at the selected store");
+
+		stock.Quantity -= quantity;
+	}
+
+	public async Task IncrementStockAsync(Guid storeId, string barcode, int quantity){
+		var stock = await _dbContext.StoreStocks
+									.FirstOrDefaultAsync(ss => ss.StoreId == storeId && ss.ProductBarcode == barcode) ??
+					throw new Exception($"No stock record for store {storeId} / product {barcode}");
+
+		stock.Quantity += quantity;
 	}
 }
