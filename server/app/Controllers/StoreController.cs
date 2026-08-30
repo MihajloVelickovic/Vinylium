@@ -71,9 +71,10 @@ public class StoreController: ControllerBase{
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
 	public async Task<ActionResult> DeleteStoreById(string id){
 		try{
-			var x = int.TryParse(id, out var idInt);
+			var storeId = int.TryParse(id, out var idInt);
+			if(!storeId)
+				throw new Exception($"Couldnt parse store id: {id}");
 			await _storeService.DeleteStoreAsync(idInt);
-
 			return Ok();
 		}
 		catch(Exception e){
@@ -95,6 +96,24 @@ public class StoreController: ControllerBase{
 		}
 	}
 	
+	[Authorize]
+	[HttpGet("GetStoresFiltered")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> GetStoresFiltered([FromQuery] int? page,
+													[FromQuery] int? items,
+													[FromQuery] string? search,
+													[FromQuery] bool? isWarehouse){
+		try{
+			var filtered = await _storeService.GetFilteredAsync(page, items, search, isWarehouse);
+			return Ok(new{ pages = filtered.pages, data = filtered.result });
+		}
+		catch(Exception e){
+			return BadRequest(new{ message = e.Message});
+		}
+	}
+
 	[HttpGet("GetStores")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]

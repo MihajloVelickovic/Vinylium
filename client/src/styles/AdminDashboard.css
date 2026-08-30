@@ -10,7 +10,7 @@ body{
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    padding-bottom: 5%;
+    padding-bottom: 1em;
     height: 2em;
 }
 

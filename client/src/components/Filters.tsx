@@ -1,10 +1,8 @@
-import {useContext} from "react";
 import "../styles/Filters.css"
-import Product from "../models/Product";
 // import Search from "../assets/search.svg"
 
-export const Filters = ({searchRef, params}) => {
-    
+export const Filters = ({searchRef, params, children}) => {
+
     return (
         <div className="filtersFull">
             <div>
@@ -26,37 +24,15 @@ export const Filters = ({searchRef, params}) => {
                             })
                         }
                     </select>
-                    <input ref={searchRef} type="text" placeholder="Search" 
+                    <input ref={searchRef} type="text" placeholder="Search"
                     onInput={(e) => {
                         params.setFilters({...params.filters, search: e.currentTarget.value})
                         params.setChange(!params.change)
                     }}></input>
-                    <select onChange={(t) => {
-                        console.log(t.target.selectedIndex)
-                        params.setFilters({...params.filters, type: t.target.selectedIndex <= 0 ? null : t.target.selectedIndex-1})
-                        params.setChange(!params.change)
-                    }}>
-                        <option selected>Type</option>
-                        {
-                            //TODO remove literals
-                            [0, 1, 2].map((item) => {
-                                return <option>{Product.evaluateType(item)}</option>
-                            })
-                        }
-                    </select>
-                    <input placeholder="Price from" type="number"
-                    onInput={(e) => {
-                        params.setFilters({...params.filters, priceLow: e.currentTarget.value})
-                        params.setChange(!params.change)
-                    }}></input>
-                    <input placeholder="Price to" type="number"
-                    onInput={(e) => {
-                        params.setFilters({...params.filters, priceHigh: e.currentTarget.value})
-                        params.setChange(!params.change)
-                    }}></input>
-                    
+                    {children}
+
                     {/*<input type="image" alt="Search" src={Search}></input>*/}
-                    
+
                 </form>
             </div>
             <div className="pages">

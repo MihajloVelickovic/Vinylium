@@ -221,6 +221,25 @@ public class UserController: ControllerBase{
 			return BadRequest(new {message = e.Message});
 		}
 	}
+
+	[Authorize]
+	[HttpGet("GetUsersFiltered")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> GetUsersFiltered([FromQuery] int? page,
+													[FromQuery] int? items,
+													[FromQuery] string? search,
+													[FromQuery] bool? admin){
+		try{
+			var filtered = await _userService.GetFilteredAsync(page, items, search, admin);
+			var data = filtered.result.Select(u => new { u.Id, u.Email, u.Username, u.Admin });
+			return Ok(new{ pages = filtered.pages, data });
+		}
+		catch(Exception e){
+			return BadRequest(new{ message = e.Message });
+		}
+	}
 	
 	
 }
