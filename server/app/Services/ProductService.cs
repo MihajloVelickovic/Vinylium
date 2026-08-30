@@ -24,16 +24,30 @@ public interface IProductService{
 	Task<bool> ExistsProductId(string barcode);
 	Task<string> DeleteByIdAsync(string barcode);
 	Task<(Product, List<StoreStock>)> UpdateProductAsync(AcceptProductReq req);
+	Task RecalculateInStockAsync(string barcode);
 }
 
 public class ProductService: IProductService{
 	private readonly IProductRepository _productRepository;
 	private readonly IStoreStockService _storeStockService;
+	private readonly IStoreService _storeService;
 	private readonly IUnitOfWork _unitOfWork;
-	public ProductService(IProductRepository productRepository, IStoreStockService storeStockService, IUnitOfWork uow){
+	public ProductService(IProductRepository productRepository, IStoreStockService storeStockService,
+		IStoreService storeService, IUnitOfWork uow){
 		_productRepository = productRepository;
 		_storeStockService = storeStockService;
+		_storeService = storeService;
 		_unitOfWork = uow;
+	}
+	
+	private async Task ValidateStoreIdsExist(List<StoreStock> storeStock){
+		var validStoreIds = (await _storeService.GetAllStoresAsync())?
+			.Select(s => s.Id).ToHashSet() ?? [];
+
+		foreach(var stock in storeStock){
+			if(!validStoreIds.Contains(stock.StoreId))
+				throw new Exception($"Store {stock.StoreId} not found - refresh the page and try again");
+		}
 	}
 
 	public async Task<List<Product>> FetchProducts(AddProductReq request){
@@ -67,7 +81,7 @@ public class ProductService: IProductService{
 	public async Task<Product> AddProductAsync(AcceptProductReq req){
 		var product = this.GetProductFromJson(req.Product);
 		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product);
-		/* atomically execute product and store stock creation */
+		await ValidateStoreIdsExist(storeStock);
 		await _unitOfWork.ExecuteInTransactionAsync(async () => {
 			await _productRepository.CreateProductAsync(product);
 			await _storeStockService.CreateStoreStock(storeStock);
@@ -86,6 +100,7 @@ public class ProductService: IProductService{
 	public async Task<(Product, List<StoreStock>)> UpdateProductAsync(AcceptProductReq req){
 		var product = this.GetProductFromJson(req.Product);
 		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product);
+		await ValidateStoreIdsExist(storeStock);
 		await _unitOfWork.ExecuteInTransactionAsync(async () => {
 			await _productRepository.UpdateProduct(product);
 			await _storeStockService.UpdateStock(storeStock, product.Barcode);
@@ -135,5 +150,11 @@ public class ProductService: IProductService{
 
 	public async Task<List<StoreStock>> GetAvailableStoresByIdAsync(string barcode){
 		return await _storeStockService.GetStoreStockFromId(barcode);
+	}
+	
+	public async Task RecalculateInStockAsync(string barcode){
+		var stores = await GetAvailableStoresByIdAsync(barcode);
+		var totalQuantity = stores.Sum(s => s.Quantity);
+		await _productRepository.UpdateInStockAsync(barcode, totalQuantity > 0);
 	}
 }

@@ -3,10 +3,8 @@ using app.Models;
 
 namespace app.Repositories;
 
-//TODO replace the JWT table in sqlite with some in memory solution
-
 public interface IJwtRepository{
-	public Task StoreJtiAsync(string jti, int userId);
+	public Task StoreJtiAsync(string jti, Guid userId);
 	public Task DeleteJtiAsync(string jti);
 	public Task FindJtiAndDeleteAsync(string jti);
 	public Task<Token> FindJtiAsync(string jti);
@@ -19,7 +17,7 @@ public class JwtRepository: IJwtRepository{
 		_dbContext = context;
 	}
 
-	public async Task StoreJtiAsync(string jti, int userId){
+	public async Task StoreJtiAsync(string jti, Guid userId){
 		/* jti is guid
 		 * guids can be assumed to always be unique
 		 */

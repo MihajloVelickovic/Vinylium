@@ -9,8 +9,10 @@ public interface IStoreStockService{
 	Task CreateStoreStock(List<StoreStock> stock);
 	Task<List<StoreStock>> GetStoreStockFromId(string barcode);
 	Task UpdateStock(List<StoreStock> storeStock, string barcode);
-	Task MoveToWarehouse(int id, int wh);
-	Task CreateStockForNewStore(int storeId);
+	Task MoveToWarehouse(Guid id, Guid wh);
+	Task CreateStockForNewStore(Guid storeId, List<string> barcodes);
+	Task DecrementStockAsync(Guid storeId, string barcode, int quantity);
+	Task IncrementStockAsync(Guid storeId, string barcode, int quantity);
 }
 
 public class StoreStockService:  IStoreStockService{
@@ -64,11 +66,19 @@ public class StoreStockService:  IStoreStockService{
 		await _repo.UpdateStock(storeStock, barcode);
 	}
 
-	public async Task MoveToWarehouse(int id, int wh){
+	public async Task MoveToWarehouse(Guid id, Guid wh){
 		await _repo.MoveToWarehouse(id, wh);
 	}
 
-	public async Task CreateStockForNewStore(int storeId){
-		await _repo.CreateStockForNewStore(storeId);
+	public async Task CreateStockForNewStore(Guid storeId, List<string> barcodes){
+		await _repo.CreateStockForNewStore(storeId, barcodes);
+	}
+
+	public async Task DecrementStockAsync(Guid storeId, string barcode, int quantity){
+		await _repo.DecrementStockAsync(storeId, barcode, quantity);
+	}
+
+	public async Task IncrementStockAsync(Guid storeId, string barcode, int quantity){
+		await _repo.IncrementStockAsync(storeId, barcode, quantity);
 	}
 }

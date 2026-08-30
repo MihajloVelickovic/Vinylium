@@ -16,9 +16,11 @@ public interface IUserService{
 
 public class UserService: IUserService{
 	private readonly IUserRepository _userRepository;
+	private readonly IOrderService _orderService;
 
-	public UserService(IUserRepository repository){
+	public UserService(IUserRepository repository, IOrderService orderService){
 		_userRepository = repository;
+		_orderService = orderService;
 	}
 
 	public async Task<User> RegisterUserAsync(RegisterReq req){
@@ -32,6 +34,14 @@ public class UserService: IUserService{
 		};
 
 		await _userRepository.RegisterUserAsync(user);
+		
+		try{
+			await _orderService.BackfillGuestOrdersAsync(user.Id, user.Email);
+		}
+		catch{
+			// ignored
+		}
+
 		return user;
 	}
 

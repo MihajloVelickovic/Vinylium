@@ -4,13 +4,19 @@ import Product from "../models/Product.ts";
 import "../styles/ProductPage.css"
 import client from "../api/Client.ts";
 import Track from "../models/Track.ts";
+import Store from "../models/Store.ts";
+import StoreQuantityPair from "../models/StoreQuantityPair.ts";
+import {useCart} from "./CartContext.tsx";
 
 export const ProductPage = () => {
 
     const params = useParams();
     const [url, _] = useState(`/Product/GetProductById/${params.id}`);
     const [product, setProduct] = useState<Product>();
-    
+    const [storeQuantities, setStoreQuantities] = useState<Array<StoreQuantityPair>>([]);
+    const [selectedStoreId, setSelectedStoreId] = useState("");
+    const {addItem} = useCart();
+
     useEffect(() => {
         const fetchData = async () => {
             return await client.get(url);
@@ -22,6 +28,19 @@ export const ProductPage = () => {
             .catch((error) => console.log(error));
 
     }, [url])
+    
+    useEffect(() => {
+        client.get(`/Product/GetAvailableStoresById/${params.id}`)
+            .then(res => {
+                const pairs = res.data.data.map((s: any) => new StoreQuantityPair(new Store(s.store), s.quantity));
+                setStoreQuantities(pairs);
+                const firstAvailable = pairs.find((p: StoreQuantityPair) => p.quantity > 0);
+                setSelectedStoreId(firstAvailable?.store.id ?? "");
+            })
+            .catch((error) => console.log(error));
+    }, [params.id])
+
+    const selectedQuantity = storeQuantities.find(p => p.store.id === selectedStoreId)?.quantity ?? 0;
 
     const renderProduct = (product: Product) => {
         return (
@@ -81,10 +100,23 @@ export const ProductPage = () => {
                                 <div className="priceQuantityInfo">
                                     <p className="price">{product.price} RSD</p>
                                 </div>
+                                <div className="storeSelect">
+                                    <select value={selectedStoreId}
+                                            onChange={e => setSelectedStoreId(e.target.value)}>
+                                        <option value="" disabled>Select a store</option>
+                                        {storeQuantities.map(p => (
+                                            <option key={p.store.id} value={p.store.id} disabled={p.quantity === 0}>
+                                                {p.store.name} ({p.quantity > 0 ? `${p.quantity} in stock` : "out of stock"})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <div>
-                                    <button className="add-to-cart" type="button">{
-                                        product.inStock ? 
-                                            "Add to cart" : 
+                                    <button className="add-to-cart" type="button"
+                                            disabled={!product.inStock || !selectedStoreId || selectedQuantity === 0}
+                                            onClick={() => addItem(product.barcode, selectedStoreId, 1)}>{
+                                        product.inStock ?
+                                            "Add to cart" :
                                             "Out of Stock"}
                                     </button>
                                 </div>

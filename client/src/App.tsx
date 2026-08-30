@@ -7,6 +7,9 @@ import {ProductPage} from "./components/ProductPage";
 import {AdminDashboard} from "./components/AdminDashboard";
 import {Navbar} from "./components/Navbar";
 import {AuthProvider} from "./components/AuthContext";
+import {CartProvider} from "./components/CartContext";
+import {CartPage} from "./components/CartPage.tsx";
+import {CheckoutPage} from "./components/CheckoutPage.tsx";
 import {AdminRoute} from "./components/AdminRoute";
 import {PrivateRoute} from "./components/PrivateRoute";
 import {Profile} from "./components/Profile";
@@ -28,6 +31,7 @@ function App() {
             
             <BrowserRouter>
                 <AuthProvider>
+                <CartProvider>
                     {/* Navigation */}
                     <Navbar/>
                     {/* Routes */}
@@ -62,9 +66,11 @@ function App() {
                             <Route path="manage-users" element={<ManageUsersPage/>}/>
                             
                         </Route>
-                        <Route path="/cart"></Route>
+                        <Route path="/cart" element={<CartPage/>}/>
+                        <Route path="/checkout" element={<CheckoutPage/>}/>
 
                     </Routes>
+                </CartProvider>
                 </AuthProvider>
             </BrowserRouter>
                 

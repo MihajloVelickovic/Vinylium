@@ -1,5 +1,5 @@
 export default class Store {
-    id: number;
+    id: string;
     name: string;
     address: string;
     city: string;

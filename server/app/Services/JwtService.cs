@@ -8,8 +8,8 @@ using app.Repositories;
 namespace app.Services;
 
 public interface IJwtService{
-	string GenerateAccessToken(string username, string email, bool admin);
-	Task<string> GenerateRefreshToken(string username, int userId, string id);
+	string GenerateAccessToken(Guid id, string username, string email, bool admin);
+	Task<string> GenerateRefreshToken(string username, Guid userId, string id);
 	Task<ClaimsPrincipal?> ValidateToken(string token, bool refresh = false);
 	Task<string?> GetUsernameFromToken(string token, bool refresh = false);
 	Task<bool> GetAdminStatus(string token);
@@ -34,15 +34,15 @@ public class JwtService: IJwtService{
 		_jwtRepository = jwtRepo;
 	}
 
-	public string GenerateAccessToken(string username, string email, bool admin){
+	public string GenerateAccessToken(Guid id, string username, string email, bool admin){
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var key = Encoding.ASCII.GetBytes(_jwtSecret);
 
 		var claims = new List<Claim>{
 			new(ClaimTypes.Name, username),
-			new(ClaimTypes.Email, email),
 			new("username", username),
 			new("email", email),
+			new("id", id.ToString()),
 		};
 
 		if(admin)
@@ -60,7 +60,7 @@ public class JwtService: IJwtService{
 		return tokenHandler.WriteToken(token);
 	}
 
-	public async Task<string> GenerateRefreshToken(string username, int userId, string id){
+	public async Task<string> GenerateRefreshToken(string username, Guid userId, string id){
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var key = Encoding.ASCII.GetBytes(_refreshSecret);
 

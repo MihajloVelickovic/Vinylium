@@ -46,6 +46,10 @@ public class Program{
 		builder.Services.AddScoped<IJwtRepository, JwtRepository>();
 		builder.Services.AddScoped<IStoreStockService, StoreStockService>();
 		builder.Services.AddScoped<IStoreStockRepository, StoreStockRepository>();
+		builder.Services.AddScoped<ICartService, CartService>();
+		builder.Services.AddScoped<ICartRepository, CartRepository>();
+		builder.Services.AddScoped<IOrderService, OrderService>();
+		builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 		builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 		
 		builder.Services.AddCors(options => {

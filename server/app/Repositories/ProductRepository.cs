@@ -16,6 +16,7 @@ public interface IProductRepository{
 	Task<bool> ExistsProductId(string barcode);
 	Task<string> DeleteByIdAsync(string barcode);
 	Task UpdateProduct(Product product);
+	Task UpdateInStockAsync(string barcode, bool inStock);
 }
 
 public class ProductRepository: IProductRepository{
@@ -107,5 +108,14 @@ public class ProductRepository: IProductRepository{
 		        throw new Exception($"Failed to find product {product.Barcode} in db");
 		_dbContext.Entry(p).CurrentValues.SetValues(product);
 		p.Tracklist =  product.Tracklist;
+	}
+
+	public async Task UpdateInStockAsync(string barcode, bool inStock){
+		/* no SaveChangesAsync here - this is only ever called from
+		 * OrderService.CheckoutAsync inside a UnitOfWork transaction
+		 */
+		var product = await _dbContext.Products.FindAsync(barcode) ??
+		              throw new Exception($"Product {barcode} not found");
+		product.InStock = inStock;
 	}
 }
