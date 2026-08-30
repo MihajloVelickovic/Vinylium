@@ -19,6 +19,31 @@
     font-size: 1.2rem;
 }
 
+.storeSelect {
+    display: flex;
+    justify-content: center;
+}
+
+.storeSelect select {
+    font-size: 1rem;
+    height: 4vh;
+    font-family: var(--heading) sans-serif;
+    text-align: center;
+    border-radius: 0;
+    background: none;
+    border: 1px solid var(--vinylium-accent);
+    transition: background-color 0.1s ease;
+}
+
+.storeSelect select:focus {
+    background-color: var(--vinylium-accent);
+    outline: none;
+}
+
+.storeSelect select:hover {
+    background-color: var(--vinylium-accent);
+}
+
 .productPageColumn{
     width: 90%;
     display: flex;

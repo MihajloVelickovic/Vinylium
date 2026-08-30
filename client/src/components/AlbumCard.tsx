@@ -49,7 +49,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
             .catch(e => console.error(e));
     }, []);
 
-    const setQuantity = (storeId: number, quantity: string) => {
+    const setQuantity = (storeId: string, quantity: string) => {
         setStoreQuantities(prev =>
             prev.map(p => {
                 return p.store.id === storeId ?

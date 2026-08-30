@@ -4,3 +4,22 @@
     align-items: center;
     justify-content: center;
 }
+
+.my-orders {
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+.order-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile .error {
+    color: red;
+}
