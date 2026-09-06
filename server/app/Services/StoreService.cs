@@ -13,6 +13,7 @@ public interface IStoreService{
 	Task<Store> UpdateStoreAsync(UpdateStoreReq req);
 	Task<List<Store>?> GetStoresAsync();
 	public Task<bool> HasWarehouse();
+	Task<Guid?> GetWarehouseIdAsync();
 	Task<(List<Store> result, int pages)> GetFilteredAsync(int? page, int? items, string? search, bool? isWarehouse);
 }
 
@@ -65,6 +66,10 @@ public class StoreService: IStoreService{
 	}
 
 	private async Task<Guid?> GetWarehouseId(){
+		return await _storeRepository.GetWarehouseId();
+	}
+
+	public async Task<Guid?> GetWarehouseIdAsync(){
 		return await _storeRepository.GetWarehouseId();
 	}
 

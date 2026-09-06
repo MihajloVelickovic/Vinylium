@@ -107,7 +107,8 @@ public class StoreRepository: IStoreRepository{
 		var changes = await _dbContext.SaveChangesAsync();
 		if(changes > 0){
 			await _cache.SetStringAsync("stores", JsonConvert.SerializeObject(await _dbContext.Stores.ToListAsync()));
-			await _cache.SetStringAsync("warehouse", JsonConvert.SerializeObject(change.IsWarehouse));
+			await _cache.SetStringAsync("warehouse",
+				JsonConvert.SerializeObject(await _dbContext.Stores.AnyAsync(s => s.IsWarehouse)));
 		}
 		return store;
 	}

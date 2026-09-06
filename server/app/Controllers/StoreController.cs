@@ -153,8 +153,11 @@ public class StoreController: ControllerBase{
 	public async Task<ActionResult> UpdateStore([FromBody] UpdateStoreReq req){
 		try{
 			ValidateStoreInput(req.OpeningHours, req.ClosingHours, req.ContactNumber);
-			if(req.IsWarehouse && await _storeService.HasWarehouse())
-				throw new Exception("Warehouse already exists");
+			if(req.IsWarehouse){
+				var warehouseId = await _storeService.GetWarehouseIdAsync();
+				if(warehouseId != null && warehouseId != req.Id)
+					throw new Exception("Warehouse already exists");
+			}
 			var store = await _storeService.UpdateStoreAsync(req);
 			return Ok(new{ data = store });
 		}
