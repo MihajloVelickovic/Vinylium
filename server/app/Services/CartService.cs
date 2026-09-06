@@ -31,6 +31,9 @@ public class CartService: ICartService{
 		if(!product.InStock)
 			throw new Exception($"Product {barcode} is out of stock");
 
+		if(product.Price == null)
+			throw new Exception($"Product {barcode} is not available for purchase yet");
+
 		var existingCart = cartId != null ?
 						   await _cartRepository.GetCartAsync(cartId.Value) :
 						   null;

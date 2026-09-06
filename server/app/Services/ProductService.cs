@@ -40,7 +40,26 @@ public class ProductService: IProductService{
 		_unitOfWork = uow;
 	}
 	
-	private async Task ValidateStoreIdsExist(List<StoreStock> storeStock){
+	private const decimal MaxPrice = 10_000_000m;
+
+	private static void ValidatePrice(Product product){
+		var price = product.Price ??
+		            throw new Exception("Price is required - set a price before saving the product");
+
+		if(price <= 0)
+			throw new Exception("Price must be greater than zero");
+
+		if(price > MaxPrice)
+			throw new Exception($"Price cannot be higher than {MaxPrice:N0}");
+
+		if(decimal.Round(price, 2) != price)
+			throw new Exception("Price cannot have more than 2 decimal places");
+	}
+
+	private async Task ValidateStores(List<StoreStock> storeStock){
+		if(storeStock.Count == 0)
+			throw new Exception("A product needs at least one store - create a store before adding products");
+
 		var validStoreIds = (await _storeService.GetAllStoresAsync())?
 			.Select(s => s.Id).ToHashSet() ?? [];
 
@@ -80,8 +99,9 @@ public class ProductService: IProductService{
 	
 	public async Task<Product> AddProductAsync(AcceptProductReq req){
 		var product = this.GetProductFromJson(req.Product);
+		ValidatePrice(product);
 		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product);
-		await ValidateStoreIdsExist(storeStock);
+		await ValidateStores(storeStock);
 		await _unitOfWork.ExecuteInTransactionAsync(async () => {
 			await _productRepository.CreateProductAsync(product);
 			await _storeStockService.CreateStoreStock(storeStock);
@@ -99,8 +119,9 @@ public class ProductService: IProductService{
 	
 	public async Task<(Product, List<StoreStock>)> UpdateProductAsync(AcceptProductReq req){
 		var product = this.GetProductFromJson(req.Product);
+		ValidatePrice(product);
 		var storeStock = _storeStockService.CreateStoreStockFromJson(req.StoreQuantities, product);
-		await ValidateStoreIdsExist(storeStock);
+		await ValidateStores(storeStock);
 		await _unitOfWork.ExecuteInTransactionAsync(async () => {
 			await _productRepository.UpdateProduct(product);
 			await _storeStockService.UpdateStock(storeStock, product.Barcode);
