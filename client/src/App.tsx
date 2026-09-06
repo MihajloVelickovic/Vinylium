@@ -8,6 +8,7 @@ import {AdminDashboard} from "./components/AdminDashboard";
 import {Navbar} from "./components/Navbar";
 import {AuthProvider} from "./components/AuthContext";
 import {CartProvider} from "./components/CartContext";
+import {ToastProvider} from "./components/ToastContext";
 import {CartPage} from "./components/CartPage.tsx";
 import {CheckoutPage} from "./components/CheckoutPage.tsx";
 import {AdminRoute} from "./components/AdminRoute";
@@ -30,6 +31,7 @@ function App() {
     return (
             
             <BrowserRouter>
+                <ToastProvider>
                 <AuthProvider>
                 <CartProvider>
                     {/* Navigation */}
@@ -72,6 +74,7 @@ function App() {
                     </Routes>
                 </CartProvider>
                 </AuthProvider>
+                </ToastProvider>
             </BrowserRouter>
                 
             

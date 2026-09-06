@@ -231,3 +231,79 @@
         width: auto;
     }
 }
+/* anchors the price tooltip to this row instead of to the whole card */
+.priceRow{
+    position: relative;
+}
+
+.priceHint{
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    width: max-content;
+    max-width: 100%;
+    padding: 4px 8px;
+    font-family: var(--heading), sans-serif;
+    font-size: 12pt;
+    color: #08060d;
+    background: var(--accent);
+    box-shadow: var(--vinylium-accent) 0 0 10px;
+    cursor: pointer;
+    animation: hintIn 0.18s ease;
+}
+
+/* the little arrow: an empty box whose only visible border side mitres
+ * into a triangle */
+.priceHint::before{
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: var(--accent);
+}
+
+/* an animation replaces the element's transform while it runs, so the
+ * centring translateX has to be carried through every keyframe */
+@keyframes hintIn {
+    from { opacity: 0; transform: translate(-50%, -4px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .priceHint{
+        animation: none;
+    }
+}
+
+.formStatus{
+    margin-top: 10pt;
+    padding: 6px 10px;
+    font-family: var(--heading), sans-serif;
+    font-size: 12pt;
+    border-left: 4px solid var(--accent);
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.formStatusOk{
+    color: #8ee0ae;
+    border-left-color: #3fa66b;
+}
+
+.formStatusError{
+    color: #ff9aa8;
+    border-left-color: #d1435b;
+}
+
+.noStores{
+    font-style: italic;
+    opacity: 0.75;
+}
+
+.buttonEdit:disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
+}

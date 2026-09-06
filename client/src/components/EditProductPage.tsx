@@ -1,5 +1,5 @@
 import {useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import Product from "../models/Product.ts";
 import "../styles/EditProductPage.css"
 import authClient from "../api/AuthClient.ts";
@@ -7,6 +7,9 @@ import StoreQuantityPair from "../models/StoreQuantityPair.ts";
 import Store from "../models/Store.ts";
 import Track from "../models/Track.ts";
 import {Navbar} from "./Navbar.tsx";
+import {normalizePrice, validatePrice} from "../helpers/price.ts";
+import {apiError} from "../helpers/apiError.ts";
+import {useToast} from "./ToastContext.tsx";
 
 export const EditProductPage = () => {
     const params = useParams();
@@ -16,6 +19,11 @@ export const EditProductPage = () => {
     const [availability, setAvailability] = useState<Array<StoreQuantityPair>>();
     const [loadingP, setLoadingP] = useState(true);
     const [loadingA, setLoadingA] = useState(true);
+    const [priceHint, setPriceHint] = useState<string | null>(null);
+    const [status, setStatus] = useState<{ kind: "ok" | "error", message: string } | null>(null);
+    const [saving, setSaving] = useState(false);
+    const priceRef = useRef<HTMLInputElement>(null);
+    const {notify} = useToast();
     
     useEffect(() => {
         const fetchProduct = async () => {
@@ -55,28 +63,70 @@ export const EditProductPage = () => {
     }
     
     const handleDelete = async () => {
+        if(!product)
+            return;
+
+        if(!window.confirm(`Delete "${product.artist} - ${product.name}"? This also clears its stock in every store and cannot be undone.`))
+            return;
+
+        setStatus(null);
+        setSaving(true);
         try {
-            const res = await authClient.delete(`/Product/DeleteById/${params.id}`);
-            console.log(res.data.data);
+            await authClient.delete(`/Product/DeleteById/${params.id}`);
+            notify(`Deleted "${product.name}"`, "info");
             window.history.back();
         }
         catch(e){
-            console.error(e);
+            const message = apiError(e, "Could not delete the product");
+            setStatus({kind: "error", message});
+            notify(message, "error");
+        }
+        finally{
+            setSaving(false);
         }
     }
-    
+
     const handleUpdate = async () => {
-       try{
-           const res = await authClient.put(`/Product/UpdateProduct`, {
-               product,
-               storeQuantities: availability
-           });
-           console.log(res.data.data);
-           window.history.back();
-       }
-       catch(e){
-           console.error(e);
-       }
+        if(!product)
+            return;
+
+        setStatus(null);
+
+        if(!availability || availability.length === 0){
+            setStatus({kind: "error", message: "A product needs at least one store — create a store first"});
+            return;
+        }
+
+        const invalid = validatePrice(product.price);
+        if(invalid){
+            setPriceHint(invalid);
+            priceRef.current?.focus();
+            return;
+        }
+
+        if(!window.confirm(`Save your changes to "${product.artist} - ${product.name}"?`))
+            return;
+
+        setSaving(true);
+        try{
+            await authClient.put(`/Product/UpdateProduct`, {
+                product: {...product, price: normalizePrice(product.price)},
+                storeQuantities: availability
+            });
+            notify(`Updated "${product.name}"`);
+            window.history.back();
+        }
+        catch(e){
+            const message = apiError(e, "Could not update the product");
+            if(message.toLowerCase().includes("price"))
+                setPriceHint(message);
+            else
+                setStatus({kind: "error", message});
+            notify(message, "error");
+        }
+        finally{
+            setSaving(false);
+        }
     }
     
     const calculateRuntime = (list:Array<Track>): string => {
@@ -148,11 +198,23 @@ export const EditProductPage = () => {
                                 setProduct({...product, artist: e.target.value});
                             }}/>
                         </div>
-                        <div className="infoField">
+                        <div className="infoField priceRow">
                             <p>Price: </p>
-                            <input type="text" value={product.price ?? ""} onChange={(e) => {
-                                setProduct({...product, price: e.target.value});
-                            }}/>
+                            <input type="text" inputMode="decimal" placeholder="0.00"
+                                   ref={priceRef}
+                                   aria-invalid={priceHint !== null}
+                                   value={product.price ?? ""}
+                                   onChange={(e) => {
+                                       setProduct({...product, price: e.target.value});
+                                       setPriceHint(null);
+                                   }}/>
+                            {priceHint && (
+                                <div className="priceHint"
+                                     role="tooltip"
+                                     onClick={() => setPriceHint(null)}>
+                                    {priceHint}
+                                </div>
+                            )}
                         </div>
                         <div className="infoField">
                             <p>Type:</p>
@@ -213,7 +275,7 @@ export const EditProductPage = () => {
                                                value={a.quantity} 
                                                onChange={(e) => {
                                                    const t = [...availability];
-                                                   t[i].quantity = Number.parseInt(e.target.value, 10);
+                                                   t[i].quantity = Math.max(0, Number.parseInt(e.target.value, 10) || 0);
                                                    setAvailability(t);
                                                }}/>
                                     </p>
@@ -224,9 +286,22 @@ export const EditProductPage = () => {
                 </div>
                 <div className="buttonsEdit">
                     <button className="buttonEdit cancelEdit" onClick={handleCancel}>Cancel Update</button>
-                    <button className="buttonEdit updateEdit" onClick={handleUpdate}>Update Product</button>
-                    <button className="buttonEdit deleteEdit" onClick={handleDelete}>Delete Product</button>
+                    <button className="buttonEdit updateEdit"
+                            disabled={saving || !availability || availability.length === 0}
+                            onClick={handleUpdate}>
+                        {saving ? "Updating…" : "Update Product"}
+                    </button>
+                    <button className="buttonEdit deleteEdit" disabled={saving} onClick={handleDelete}>
+                        Delete Product
+                    </button>
                 </div>
+
+                {status && (
+                    <p className={"formStatus " + (status.kind === "ok" ? "formStatusOk" : "formStatusError")}
+                       role="alert">
+                        {status.message}
+                    </p>
+                )}
             </div>
         )
     }

@@ -2,6 +2,8 @@ import "../styles/AddStoreForm.css"
 import {useEffect, useState} from "react";
 import authClient from "../api/AuthClient.ts";
 import * as React from "react";
+import {useToast} from "./ToastContext.tsx";
+import {apiError} from "../helpers/apiError.ts";
 
 export const AddStoreForm = () => {
 
@@ -15,6 +17,7 @@ export const AddStoreForm = () => {
     const [warehouseVisible, setWarehouseVisible] = useState(true);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const {notify} = useToast();
     
     useEffect(() => {
         const hasWarehouse = async () => {
@@ -57,18 +60,24 @@ export const AddStoreForm = () => {
             })
         }
         catch(e: any) {
-            setError(e.response?.data ?? e.message ?? "Undefined error");
+            const failure = apiError(e, "Undefined error");
+            setError(failure);
+            notify(failure, "error");
             return;
         }
-        setMessage("Added store \"" + result?.data.data.name + "\"");
-        
+
+        const added = result?.data.data.name;
+
+        setError("");
+        setMessage("Added store \"" + added + "\"");
+        notify(`Added store "${added}"`);
+
         setTimeout(()=>{
             setMessage("");
         }, 2000);
-        
+
         e.target.reset();
         setWarehouseVisible(warehouse ?  false : warehouseVisible);
-        console.log("Added store \"" + result?.data.data.name + "\"");
     }
     
     return (

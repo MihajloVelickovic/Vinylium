@@ -4,6 +4,8 @@ import Store from "../models/Store.ts";
 import {Field} from "./Field.tsx";
 import {useStoreDraft} from "../hooks/useStoreDraft.ts";
 import authClient from "../api/AuthClient.ts";
+import {useToast} from "./ToastContext.tsx";
+import {apiError} from "../helpers/apiError.ts";
 import "../styles/AlbumCard.css"
 import "../styles/EditProductPage.css"
 import "../styles/EditStorePage.css"
@@ -15,23 +17,30 @@ const EditStoreForm = ({store}: { store: Store }) => {
     const {draft, setField, toPayload} = useStoreDraft(store);
     const [error, setError] = useState("");
     const [busy, setBusy] = useState(false);
+    const {notify} = useToast();
 
     const handleCancel = () => {
         navigate("/admin/manage-stores");
     }
 
     const handleUpdate = async () => {
+        if (!window.confirm(`Save your changes to "${store.name}"?`))
+            return;
+
         setError("");
         setBusy(true);
         try {
             await authClient.put("/Store/UpdateStore", toPayload());
+            notify(`Updated "${draft.name}"`);
             /* navigate rather than history.back() so the list remounts and
              * refetches instead of replaying the previous history entry
              */
             navigate("/admin/manage-stores");
         }
         catch (e: any) {
-            setError(e.response?.data?.message ??  "Failed to update store");
+            const message = apiError(e, "Failed to update store");
+            setError(message);
+            notify(message, "error");
         }
         finally {
             setBusy(false);
@@ -46,10 +55,13 @@ const EditStoreForm = ({store}: { store: Store }) => {
         setBusy(true);
         try {
             await authClient.delete(`/Store/DeleteStore/${store.id}`);
+            notify(`Deleted "${store.name}"`, "info");
             navigate("/admin/manage-stores");
         }
         catch (e: any) {
-            setError(e.response?.data ?? e.message ?? "Failed to delete store");
+            const message = apiError(e, "Failed to delete store");
+            setError(message);
+            notify(message, "error");
         }
         finally {
             setBusy(false);

@@ -10,16 +10,22 @@ import Store from "../models/Store.ts";
 import StoreQuantityPair from "../models/StoreQuantityPair.ts";
 import {useProductDraft} from "../hooks/useProductDraft.ts";
 import Track from "../models/Track.ts";
+import {apiError} from "../helpers/apiError.ts";
+import {useToast} from "./ToastContext.tsx";
 
 export const AlbumCard = ({product, best}: { product: Product, best: boolean }) => {
     const [isOpen, setIsOpen] = useState(false);
     const priceRef = useRef<HTMLInputElement>(null);
 
-    const [showPriceHint, setShowPriceHint] = useState(true);
+    const [priceHint, setPriceHint] = useState<string | null>("Set a price before adding");
+    const [status, setStatus] = useState<{ kind: "ok" | "error", message: string } | null>(null);
+    const [saving, setSaving] = useState(false);
     const [storeQuantities, setStoreQuantities] = useState<Array<StoreQuantityPair>>([]);
+    const [storesFailed, setStoresFailed] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const {draft, setField, toPayload} = useProductDraft(product);
+    const {draft, setField, toPayload, priceError} = useProductDraft(product);
+    const {notify} = useToast();
 
     useEffect(() => {
         const getStores = async () => {
@@ -34,6 +40,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                 });
             } catch (e) {
                 console.error(e);
+                setStoresFailed(true);
             }
 
             return pairs;
@@ -53,7 +60,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
         setStoreQuantities(prev =>
             prev.map(p => {
                 return p.store.id === storeId ?
-                       new StoreQuantityPair(p.store, parseInt(quantity)) :
+                       new StoreQuantityPair(p.store, Math.max(0, parseInt(quantity) || 0)) :
                        p;
                 }
             )
@@ -103,13 +110,42 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
     };
 
     const acceptProduct = async () => {
+        setStatus(null);
+
+        if (storeQuantities.length === 0) {
+            setStatus({
+                kind: "error",
+                message: storesFailed ?
+                         "Could not load stores — refresh and try again" :
+                         "Add a store before adding products to the catalogue"
+            });
+            return;
+        }
+
+        const invalid = priceError();
+        if (invalid) {
+            setPriceHint(invalid);
+            priceRef.current?.focus();
+            return;
+        }
+
+        setSaving(true);
         try {
             await authClient.post("/Product/AddProduct", {
                 product: toPayload(),
                 storeQuantities
             });
-        } catch (e) {
-            return;
+            setStatus({kind: "ok", message: `Added ${draft.name} to the catalogue`});
+            notify(`Added "${draft.name}" to the catalogue`);
+        } catch (e: any) {
+            const message = apiError(e, "Could not add the product");
+            if (message.toLowerCase().includes("price"))
+                setPriceHint(message);
+            else
+                setStatus({kind: "error", message});
+            notify(message, "error");
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -180,17 +216,18 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                                 uncontrolled and drops the first character */}
                             <input type="text" inputMode="decimal" placeholder="0.00"
                                    ref={priceRef}
+                                   aria-invalid={priceHint !== null}
                                    value={draft.price ?? ""}
                                    onChange={e => {
                                        setField("price", e.target.value);
-                                       setShowPriceHint(false);
+                                       setPriceHint(null);
                                    }}/>
-                            {showPriceHint && (
+                            {priceHint && (
                                 <div
                                     className="priceHint"
                                     role="tooltip"
-                                    onClick={() => setShowPriceHint(false)}>
-                                    Set a price before adding
+                                    onClick={() => setPriceHint(null)}>
+                                    {priceHint}
                                 </div>
                             )}
                         </div>
@@ -237,6 +274,13 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                     <div>
                         <p>Availability:</p>
                         <div className="tracks">
+                            {!loading && storeQuantities.length === 0 &&
+                                <p className="noStores">
+                                    {storesFailed ?
+                                     "Could not load stores — refresh and try again" :
+                                     "No stores yet — create one first"}
+                                </p>}
+
                             {!loading &&
                                 storeQuantities.map((s: StoreQuantityPair) => (
                                     <p key={s.store.id}>
@@ -253,8 +297,14 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                 <div className="buttonsEdit">
                     <button className="buttonEdit updateEdit"
                             type="button"
+                            disabled={saving || loading || storeQuantities.length === 0}
+                            title={storeQuantities.length === 0 && !loading ?
+                                   (storesFailed ?
+                                    "Could not load stores" :
+                                    "There are no stores to stock this product in") :
+                                   undefined}
                             onClick={acceptProduct}>
-                        Add Product
+                        {saving ? "Adding…" : "Add Product"}
                     </button>
 
                     <button className="buttonEdit cancelEdit"
@@ -263,6 +313,13 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                         Details
                     </button>
                 </div>
+
+                {status && (
+                    <p className={"formStatus " + (status.kind === "ok" ? "formStatusOk" : "formStatusError")}
+                       role={status.kind === "ok" ? "status" : "alert"}>
+                        {status.message}
+                    </p>
+                )}
             </div>
 
             {/* the tracklist moved inline above, so the pop-out is now just the
