@@ -8,12 +8,13 @@ using app.Repositories;
 namespace app.Services;
 
 public interface IJwtService{
-	string GenerateAccessToken(Guid id, string username, string email, bool admin);
+	string GenerateAccessToken(Guid id, string username, string email, bool admin, int tokenVersion);
 	Task<string> GenerateRefreshToken(string username, Guid userId, string id);
 	Task<ClaimsPrincipal?> ValidateToken(string token, bool refresh = false);
 	Task<string?> GetUsernameFromToken(string token, bool refresh = false);
 	Task<bool> GetAdminStatus(string token);
 	public Task DeleteRefreshToken(string token);
+	public Task DeleteAllRefreshTokens(Guid userId);
 }
 
 public class JwtService: IJwtService{
@@ -34,7 +35,7 @@ public class JwtService: IJwtService{
 		_jwtRepository = jwtRepo;
 	}
 
-	public string GenerateAccessToken(Guid id, string username, string email, bool admin){
+	public string GenerateAccessToken(Guid id, string username, string email, bool admin, int tokenVersion){
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var key = Encoding.ASCII.GetBytes(_jwtSecret);
 
@@ -43,6 +44,7 @@ public class JwtService: IJwtService{
 			new("username", username),
 			new("email", email),
 			new("id", id.ToString()),
+			new("ver", tokenVersion.ToString()),
 		};
 
 		if(admin)
@@ -124,5 +126,9 @@ public class JwtService: IJwtService{
 			return;
 
 		await _jwtRepository.FindJtiAndDeleteAsync(jti.Value);
+	}
+
+	public async Task DeleteAllRefreshTokens(Guid userId){
+		await _jwtRepository.DeleteAllForUserAsync(userId);
 	}
 }

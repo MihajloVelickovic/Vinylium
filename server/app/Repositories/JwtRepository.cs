@@ -8,6 +8,7 @@ public interface IJwtRepository{
 	public Task DeleteJtiAsync(string jti);
 	public Task FindJtiAndDeleteAsync(string jti);
 	public Task<Token> FindJtiAsync(string jti);
+	public Task DeleteAllForUserAsync(Guid userId);
 }
 
 public class JwtRepository: IJwtRepository{
@@ -37,6 +38,10 @@ public class JwtRepository: IJwtRepository{
 		             throw new Exception("Temp exception");
 
 		return exists;
+	}
+
+	public async Task DeleteAllForUserAsync(Guid userId){
+		await _dbContext.Tokens.Where(tok => tok.UserId == userId).ExecuteDeleteAsync();
 	}
 
 	public async Task FindJtiAndDeleteAsync(string jti){

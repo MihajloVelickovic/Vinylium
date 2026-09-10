@@ -81,6 +81,22 @@ public class Program{
 					ValidateAudience = false,
 					ClockSkew = TimeSpan.Zero
 				};
+				options.Events = new JwtBearerEvents{
+					OnTokenValidated = async ctx => {
+						var idClaim = ctx.Principal?.FindFirst("id")?.Value;
+						var verClaim = ctx.Principal?.FindFirst("ver")?.Value;
+
+						if(!Guid.TryParse(idClaim, out var userId) || !int.TryParse(verClaim, out var version)){
+							ctx.Fail("Token missing id or version");
+							return;
+						}
+
+						var users = ctx.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+
+						if(!await users.IsTokenVersionCurrentAsync(userId, version))
+							ctx.Fail("Token no longer valid");
+					}
+				};
 			});
 
 		var app = builder.Build();
