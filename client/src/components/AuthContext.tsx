@@ -2,7 +2,6 @@ import {createContext, type Dispatch, type SetStateAction, useContext, useEffect
 import {useNavigate} from "react-router-dom";
 import authClient from "../api/AuthClient";
 import client from "../api/Client.ts";
-import User from "../models/User.ts";
 
 type AuthContextData = {
     username: string | null;
@@ -110,18 +109,18 @@ export const AuthProvider = ({children}) => {
     }
     
     const logout = async () => {
-        await authClient.post("/User/Logout", {
-            refreshToken
-        }).then(_ => {
+        await authClient.post("/User/Logout", {refreshToken})
+        .catch(e => console.error(e))
+        .finally(() => {
             setToken(null);
             setRefreshToken(null);
+            setUsername(null);
             setAdmin(false);
             localStorage.removeItem("token");
             localStorage.removeItem("refreshToken");
             setMessage("Logged Out");
             navigate("/")
-        })
-          .catch(e => setError(e.response?.data ?? e.message));
+        });
     }
     
     const isLoggedIn = () => {
@@ -137,5 +136,4 @@ export const AuthProvider = ({children}) => {
     )
 }
 
-/* hook */
 export const useAuth = () => useContext(AuthContext);

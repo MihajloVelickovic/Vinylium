@@ -34,24 +34,76 @@
     padding: 0.5em;
 }
 
-.buttons{
+/* scoped to the card: .button, .buttons and .delete are generic enough that
+ * leaving them global would style any later component that reuses the names
+ */
+.userCard .buttons{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75em;
+    padding: 1em;
 }
 
-.button{
-    margin: 1em;
+.userCard .button{
     font-family: var(--heading), sans-serif;
-    border: none;
-    background-color: var(--vinylium-accent);
-    height: 2em;
-    
+    /* the card body runs at 18px, so the browser default of ~13px left these
+     * noticeably smaller than everything around them
+     */
+    font-size: 1rem;
+    /* padding rather than a fixed height, so a wrapped label is never clipped
+     * and both buttons still match height through the grid
+     */
+    padding: 0.7em 0.6em;
+    color: var(--text-h);
+    background-color: var(--bg);
+    /* the border is what keeps each button legible as a distinct block once
+     * .userCard:hover repaints the card itself in --vinylium-accent
+     */
+    border: 2px solid var(--vinylium-accent);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.userCard .button:hover:not(:disabled){
+    cursor: pointer;
+    /* --accent-bg is translucent, so it goes on as a layer over the opaque
+     * --bg underneath rather than as the background-color itself. Set directly
+     * it would let the hovered card's purple through and take the label's
+     * contrast with it. As a wash it also stays legible in both palettes,
+     * which a solid accent fill would not
+     */
+    background-image: linear-gradient(var(--accent-bg), var(--accent-bg));
+    border-color: var(--accent);
+}
+
+.userCard .button:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* matches .buttonEdit:disabled on the product and store edit pages */
+.userCard .button:disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .userInfo{
     border-bottom: 2px solid var(--vinylium-accent);
 }
 
-.delete{
-    background-color: red;
+/* white on a deeper red instead of dark-on-pure-red, which was the least
+ * readable pairing on the card
+ */
+.userCard .delete{
+    color: #fff;
+    background-color: #b3261e;
+    border-color: #7f1d17;
+}
+
+.userCard .delete:hover:not(:disabled){
+    /* clears the accent wash inherited from .button:hover, which would
+     * otherwise tint the red
+     */
+    background-image: none;
+    background-color: #d0342c;
+    border-color: #b3261e;
 }

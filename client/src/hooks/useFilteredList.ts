@@ -75,6 +75,6 @@ export const useFilteredList = <TItem, TFilters extends IBaseFilters>(
         setFilters({...filters, pages: result.data.pages, currentPage: 1});
         setItems(result.data.data.map((raw: any) => deserialize(raw)));
     }
-
-    return {items, filters, setFilters, change, setChange, searchRef, loading, error};
+    
+    return {items, setItems, filters, setFilters, change, setChange, searchRef, loading, error};
 }

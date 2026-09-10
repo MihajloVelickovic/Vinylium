@@ -20,7 +20,7 @@ const initialFilters: IUserFilters = {
 
 export const useUserFilters = (client: AxiosInstance) => {
 
-    const {items: users, filters, setFilters, change, setChange, searchRef, loading, error} =
+    const {items: users, setItems: setUsers, filters, setFilters, change, setChange, searchRef, loading, error} =
         useFilteredList<User, IUserFilters>(
             client,
             "/User/GetUsersFiltered",
@@ -29,5 +29,5 @@ export const useUserFilters = (client: AxiosInstance) => {
             (raw) => new User(raw)
         );
 
-    return {users, filters, setFilters, change, setChange, searchRef, loading, error};
+    return {users, setUsers, filters, setFilters, change, setChange, searchRef, loading, error};
 }

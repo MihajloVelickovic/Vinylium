@@ -11,3 +11,12 @@
     from { filter: blur(10px); }
     to { filter: blur(0); }
 }
+
+.manage-users-message{
+    text-align: center;
+    font-family: var(--heading), sans-serif;
+}
+
+.manage-users-error{
+    color: red;
+}
