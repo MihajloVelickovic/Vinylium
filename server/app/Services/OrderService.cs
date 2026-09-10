@@ -78,8 +78,8 @@ public class OrderService: IOrderService{
 	public async Task CancelOrderAsync(Guid orderId, Guid userId, string email){
 		var order = await _orderRepository.GetByIdAsync(orderId) ??
 		            throw new Exception("Order not found");
-
-		if(!(order.UserId == userId || order.Email == email))
+		
+		if(!(order.UserId == userId || (order.UserId == null && order.Email == email)))
 			throw new Exception("Order not found");
 
 		if(DateTime.UtcNow - order.CreatedAt > CancellationWindow)

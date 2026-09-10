@@ -20,8 +20,7 @@ public class StoreController: ControllerBase{
 		_storeService = storeService;
 		_productService = productService;
 	}
-
-    //both creating and editing endpoints are doing the same validation so we now just have a function that they call instead
+	
 	private static void ValidateStoreInput(string openingHours, string closingHours, string contactNumber){
 		var parsedOt = DateTime.TryParseExact(openingHours, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
 
@@ -37,7 +36,7 @@ public class StoreController: ControllerBase{
 			throw new Exception("Contact number not valid Serbian phone number");
 	}
 
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpPost("CreateStore")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -53,6 +52,7 @@ public class StoreController: ControllerBase{
 		}	
 	}
 
+	[Authorize(Roles = "Admin")]
 	[HttpGet("HasWarehouse")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -67,7 +67,7 @@ public class StoreController: ControllerBase{
 		}
 	}
 	
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpDelete("DeleteStore/{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -85,7 +85,7 @@ public class StoreController: ControllerBase{
 		}
 	}
 	
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpGet("GetAllStores")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -99,7 +99,7 @@ public class StoreController: ControllerBase{
 		}
 	}
 	
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpGet("GetStoresFiltered")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -130,7 +130,7 @@ public class StoreController: ControllerBase{
 		}
 	}
 
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpGet("GetStoreById/{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -145,7 +145,7 @@ public class StoreController: ControllerBase{
 		}
 	}
 
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpPut("UpdateStore")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]

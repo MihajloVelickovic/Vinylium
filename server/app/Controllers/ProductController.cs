@@ -19,7 +19,7 @@ public class ProductController: ControllerBase{
 		_productService = productService;
 	}
 
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpPost("FetchProducts")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -103,7 +103,7 @@ public class ProductController: ControllerBase{
 		}
 	}
 	
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpPost("AddProduct")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -143,7 +143,7 @@ public class ProductController: ControllerBase{
 		}
 	}
 	
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpPut("UpdateProduct")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -157,6 +157,7 @@ public class ProductController: ControllerBase{
 		}
 	}
 	
+	[Authorize(Roles = "Admin")]
 	[HttpDelete("DeleteById/{barcode}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<ActionResult> DeleteById(string barcode){

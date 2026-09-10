@@ -26,7 +26,7 @@ public class OrderRepository: IOrderRepository{
 	public async Task<List<Order>> GetOrdersForUserAsync(Guid userId, string email){
 		return await _dbContext.Orders
 							   .Include(o => o.Items)
-							   .Where(o => o.UserId == userId || o.Email == email)
+							   .Where(o => o.UserId == userId || (o.UserId == null && o.Email == email))
 							   .OrderByDescending(o => o.CreatedAt)
 							   .ToListAsync();
 	}
