@@ -49,7 +49,7 @@ public class UserController: ControllerBase{
 			
 			var guid = Guid.NewGuid().ToString();
 
-			var token = _jwtService.GenerateAccessToken(user.Id, user.Username, user.Email, user.Admin);
+			var token = _jwtService.GenerateAccessToken(user.Id, user.Username, user.Email, user.Admin, user.TokenVersion);
 			var refreshToken = await _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
 			
 			return Ok(new{ message = "Successfully Registered", user, token, refreshToken});
@@ -82,7 +82,7 @@ public class UserController: ControllerBase{
 
 			var guid = Guid.NewGuid().ToString();
 
-			var token = _jwtService.GenerateAccessToken(user.Id, user.Username, user.Email, user.Admin);
+			var token = _jwtService.GenerateAccessToken(user.Id, user.Username, user.Email, user.Admin, user.TokenVersion);
 			var refreshToken = await _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
 			
 			return Ok(new{
@@ -97,7 +97,6 @@ public class UserController: ControllerBase{
 		}
 	}
 	
-	//TODO encapsulate stuff to user service
 	[HttpPost("RefreshAccess")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,7 +115,7 @@ public class UserController: ControllerBase{
 			
 			var guid = Guid.NewGuid().ToString();
 
-			var newToken = _jwtService.GenerateAccessToken(user.Id, user.Username, user.Email, user.Admin);
+			var newToken = _jwtService.GenerateAccessToken(user.Id, user.Username, user.Email, user.Admin, user.TokenVersion);
 			var newRefreshToken = await _jwtService.GenerateRefreshToken(user.Username, user.Id, guid);
 
 			return Ok(new{
@@ -190,6 +189,105 @@ public class UserController: ControllerBase{
 		}
 	}
 
+	[Authorize(Roles = "Admin")]
+	[HttpPut("SetAdmin")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> SetAdmin([FromBody] SetAdminReq req){
+		try{
+			var claim = HttpContext.User.FindFirst("id");
+			if(claim == null)
+				throw new Exception("Access token not found in request");
+			
+			if(string.CompareOrdinal(claim.Value, req.Id.ToString()) == 0 && !req.Admin)
+				throw new Exception("You cannot revoke your own admin status");
+
+			var user = await _userService.SetAdminAsync(req.Id, req.Admin);
+			return Ok(new{ data = new{ user.Id, user.Email, user.Username, user.Admin } });
+		}
+		catch(Exception e){
+			return BadRequest(new{ message = e.Message });
+		}
+	}
+
+	[Authorize(Roles = "Admin")]
+	[HttpDelete("DeleteById/{id}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> DeleteById(string id){
+		try{
+			if(!Guid.TryParse(id, out var idGuid))
+				throw new Exception($"Couldnt parse user id: {id}");
+
+			var user = await _userService.FindUserByIdAsync(idGuid) ??
+			           throw new Exception($"User with id {id} not found");
+			
+			await _userService.DeleteUserByIdAsync(idGuid);
+			return Ok(new{ message = $"Deleted User {user.Username}" });
+		}
+		catch(Exception e){
+			return BadRequest(new{ message = e.Message });
+		}
+	}
+
+	[Authorize]
+	[HttpPut("UpdateEmail")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> UpdateEmail([FromBody] UpdateEmailReq req){
+		try{
+			if(!RegExp.Check(@"^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$", req.Email))
+				throw new Exception("Email address format not valid");
+
+			var claim = HttpContext.User.FindFirst("id");
+			if(claim == null)
+				throw new Exception("Access token not found in request");
+
+			if(!Guid.TryParse(claim.Value, out var idGuid))
+				throw new Exception("Couldnt parse user id from access token");
+
+			await _userService.UpdateEmailAsync(idGuid, req.Email, req.Password);
+
+			await _jwtService.DeleteAllRefreshTokens(idGuid);
+
+			return Ok(new{ message = "Email updated, please log in again" });
+		}
+		catch(Exception e){
+			return BadRequest(new{ message = e.Message });
+		}
+	}
+
+	[Authorize]
+	[HttpPut("UpdatePassword")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[ProducesResponseType(StatusCodes.Status400BadRequest)]
+	public async Task<ActionResult> UpdatePassword([FromBody] UpdatePasswordReq req){
+		try{
+			if(!RegExp.Check(@"^[ -~]{8,}$", req.NewPassword))
+				throw new Exception("Password format not valid");
+
+			var claim = HttpContext.User.FindFirst("id");
+			if(claim == null)
+				throw new Exception("Access token not found in request");
+
+			if(!Guid.TryParse(claim.Value, out var idGuid))
+				throw new Exception("Couldnt parse user id from access token");
+
+			await _userService.UpdatePasswordAsync(idGuid, req.OldPassword, req.NewPassword);
+			
+			await _jwtService.DeleteAllRefreshTokens(idGuid);
+
+			return Ok(new{ message = "Password updated, please log in again" });
+		}
+		catch(Exception e){
+			return BadRequest(new{ message = e.Message });
+		}
+	}
+
 	[Authorize]
 	[HttpGet("GetUsername")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
@@ -207,7 +305,7 @@ public class UserController: ControllerBase{
 		}
 	}
 
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpGet("GetAllUsers")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -222,7 +320,7 @@ public class UserController: ControllerBase{
 		}
 	}
 
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpGet("GetUsersFiltered")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]

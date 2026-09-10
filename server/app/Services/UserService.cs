@@ -9,7 +9,12 @@ public interface IUserService{
 	Task<User> RegisterUserAsync(RegisterReq req);
 	Task<User> LoginUserAsync(LoginReq request);
 	Task DeleteUserAsync(string username);
+	Task DeleteUserByIdAsync(Guid id);
+	Task<User> SetAdminAsync(Guid id, bool admin);
+	Task<User> UpdateEmailAsync(Guid id, string email, string password);
+	Task<User> UpdatePasswordAsync(Guid id, string oldPassword, string newPassword);
 	Task<User?> FindUserByEmailOrUsernameAsync(string username);
+	Task<User?> FindUserByIdAsync(Guid id);
 	Task<List<User>> GetAllUsersAsync();
 	Task<(List<User> result, int pages)> GetFilteredAsync(int? page, int? items, string? search, bool? admin);
 }
@@ -49,6 +54,10 @@ public class UserService: IUserService{
 		return await _userRepository.FindUserByEmailOrUsernameAsync(username);
 	}
 
+	public async Task<User?> FindUserByIdAsync(Guid id){
+		return await _userRepository.FindUserByIdAsync(id);
+	}
+
 	public async Task<List<User>> GetAllUsersAsync(){
 		return await _userRepository.GetAllUsersAsync();
 	}
@@ -73,5 +82,45 @@ public class UserService: IUserService{
 
 	public async Task DeleteUserAsync(string username){
 		await _userRepository.DeleteUserAsync(username);
+	}
+
+	public async Task DeleteUserByIdAsync(Guid id){
+		await _userRepository.DeleteUserByIdAsync(id);
+	}
+
+	public async Task<User> SetAdminAsync(Guid id, bool admin){
+		return await _userRepository.SetAdminAsync(id, admin);
+	}
+
+	public async Task<User> UpdateEmailAsync(Guid id, string email, string password){
+		var user = await _userRepository.FindUserByIdAsync(id) ??
+		           throw new Exception($"User with id {id} not found");
+
+		var correctPassword = BC.Verify(password, user.Password);
+		if(!correctPassword)
+			throw new Exception("Incorrect password");
+
+		var updated = await _userRepository.UpdateEmailAsync(id, email);
+		
+		try{
+			await _orderService.BackfillGuestOrdersAsync(updated.Id, updated.Email);
+		}
+		catch{
+			// ignored
+		}
+
+		return updated;
+	}
+
+	public async Task<User> UpdatePasswordAsync(Guid id, string oldPassword, string newPassword){
+		var user = await _userRepository.FindUserByIdAsync(id) ??
+		           throw new Exception($"User with id {id} not found");
+
+		var correctPassword = BC.Verify(oldPassword, user.Password);
+		if(!correctPassword)
+			throw new Exception("Incorrect password");
+
+		var hashedPassword = BC.HashPassword(newPassword, salt: BC.GenerateSalt());
+		return await _userRepository.UpdatePasswordAsync(id, hashedPassword);
 	}
 }
