@@ -7,7 +7,11 @@ public interface ICartService{
 	Task<CartView> AddItemAsync(Guid? cartId, string barcode, Guid storeId, int quantity);
 	Task<CartView?> UpdateItemAsync(Guid cartId, string barcode, Guid storeId, int quantity);
 	Task<CartView?> RemoveItemAsync(Guid cartId, string barcode, Guid storeId);
-	Task<CartView?> GetCartAsync(Guid cartId);
+	Task<CartView?> GetCartAsync(Guid cartId, Guid? requesterId = null);
+	Task<CartView?> GetCartForUserAsync(Guid userId);
+	Task<Guid?> GetCartIdForUserAsync(Guid userId);
+	Task<Guid> GetOrCreateCartIdForUserAsync(Guid userId);
+	Task<CartMergeResult> MergeGuestCartAsync(Guid guestCartId, Guid userId);
 	Task DeleteCartAsync(Guid cartId);
 }
 
@@ -62,13 +66,112 @@ public class CartService: ICartService{
 		return await BuildCartViewOrDeleteIfEmpty(cartId);
 	}
 
-	public async Task<CartView?> GetCartAsync(Guid cartId){
+	public async Task<CartView?> GetCartAsync(Guid cartId, Guid? requesterId = null){
 		var cart = await _cartRepository.GetCartAsync(cartId);
-		return cart == null ? null : await BuildCartView(cartId);
+
+		if(cart == null)
+			return null;
+
+		if(cart.UserId != null && cart.UserId != requesterId)
+			return null;
+
+		return await BuildCartView(cartId);
+	}
+
+	public async Task<CartView?> GetCartForUserAsync(Guid userId){
+		var cart = await _cartRepository.GetCartByUserAsync(userId);
+		return cart == null ? null : await BuildCartView(cart.Id);
+	}
+
+	public async Task<Guid?> GetCartIdForUserAsync(Guid userId){
+		var cart = await _cartRepository.GetCartByUserAsync(userId);
+		return cart?.Id;
+	}
+
+	public async Task<Guid> GetOrCreateCartIdForUserAsync(Guid userId){
+		var cart = await _cartRepository.GetCartByUserAsync(userId) ??
+		           await _cartRepository.CreateCartAsync(userId);
+		return cart.Id;
+	}
+
+	public async Task<CartMergeResult> MergeGuestCartAsync(Guid guestCartId, Guid userId){
+		var guestCart = await _cartRepository.GetCartAsync(guestCartId);
+
+		if(guestCart == null || guestCart.UserId != null || guestCart.Items.Count == 0)
+			return new CartMergeResult{
+				Cart = await GetCartForUserAsync(userId),
+				MergedItems = 0,
+				Capped = [],
+				Dropped = []
+			};
+
+		var userCart = await _cartRepository.GetCartByUserAsync(userId);
+
+		if(userCart == null){
+			await _cartRepository.AttachCartToUserAsync(guestCart.Id, userId);
+			return new CartMergeResult{
+				Cart = await BuildCartView(guestCart.Id),
+				MergedItems = guestCart.Items.Count,
+				Capped = [],
+				Dropped = []
+			};
+		}
+
+		var merged = 0;
+		var capped = new List<string>();
+		var dropped = new List<string>();
+
+		foreach(var item in guestCart.Items){
+			var available = await AvailableAtStoreAsync(item.ProductBarcode, item.StoreId);
+
+			if(available == 0){
+				dropped.Add(await ProductNameAsync(item.ProductBarcode));
+				continue;
+			}
+
+			var existing = userCart.Items
+				.FirstOrDefault(i => i.ProductBarcode == item.ProductBarcode && i.StoreId == item.StoreId);
+
+			var current = existing?.Quantity ?? 0;
+			var wanted = current + item.Quantity;
+			var total = Math.Min(wanted, available);
+
+			if(total < wanted)
+				capped.Add(await ProductNameAsync(item.ProductBarcode));
+
+			if(total == current)
+				continue;
+
+			if(existing != null)
+				await _cartRepository.SetItemQuantityAsync(userCart.Id, item.ProductBarcode, item.StoreId, total);
+			else
+				await _cartRepository.AddOrUpdateItemAsync(userCart.Id, item.ProductBarcode, item.StoreId, total);
+
+			merged++;
+		}
+
+		await _cartRepository.DeleteCartAsync(guestCart.Id);
+
+		return new CartMergeResult{
+			Cart = await BuildCartView(userCart.Id),
+			MergedItems = merged,
+			Capped = capped,
+			Dropped = dropped
+		};
 	}
 
 	public async Task DeleteCartAsync(Guid cartId){
 		await _cartRepository.DeleteCartAsync(cartId);
+	}
+
+	private async Task<int> AvailableAtStoreAsync(string barcode, Guid storeId){
+		var stores = await _productService.GetAvailableStoresByIdAsync(barcode);
+		return stores.FirstOrDefault(s => s.StoreId == storeId)?.Quantity ?? 0;
+	}
+
+	private async Task<string> ProductNameAsync(string barcode){
+		var product = await _productService.GetByIdAsync(barcode);
+		return product.Name;
 	}
 	
 	private async Task<CartView?> BuildCartViewOrDeleteIfEmpty(Guid cartId){

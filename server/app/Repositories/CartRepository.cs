@@ -4,8 +4,10 @@ using Microsoft.EntityFrameworkCore;
 namespace app.Repositories;
 
 public interface ICartRepository{
-	Task<Cart> CreateCartAsync();
+	Task<Cart> CreateCartAsync(Guid? userId = null);
 	Task<Cart?> GetCartAsync(Guid id);
+	Task<Cart?> GetCartByUserAsync(Guid userId);
+	Task AttachCartToUserAsync(Guid cartId, Guid userId);
 	Task AddOrUpdateItemAsync(Guid cartId, string barcode, Guid storeId, int quantity);
 	Task SetItemQuantityAsync(Guid cartId, string barcode, Guid storeId, int quantity);
 	Task RemoveItemAsync(Guid cartId, string barcode, Guid storeId);
@@ -19,8 +21,8 @@ public class CartRepository: ICartRepository{
 		_dbContext = dbContext;
 	}
 
-	public async Task<Cart> CreateCartAsync(){
-		var cart = new Cart();
+	public async Task<Cart> CreateCartAsync(Guid? userId = null){
+		var cart = new Cart{ UserId = userId };
 		await _dbContext.Carts.AddAsync(cart);
 		await _dbContext.SaveChangesAsync();
 		return cart;
@@ -28,6 +30,18 @@ public class CartRepository: ICartRepository{
 
 	public async Task<Cart?> GetCartAsync(Guid id){
 		return await _dbContext.Carts.Include(c => c.Items).FirstOrDefaultAsync(c => c.Id == id);
+	}
+
+	public async Task<Cart?> GetCartByUserAsync(Guid userId){
+		return await _dbContext.Carts.Include(c => c.Items).FirstOrDefaultAsync(c => c.UserId == userId);
+	}
+
+	public async Task AttachCartToUserAsync(Guid cartId, Guid userId){
+		var cart = await _dbContext.Carts.FirstOrDefaultAsync(c => c.Id == cartId) ??
+		           throw new Exception("Cart not found");
+
+		cart.UserId = userId;
+		await _dbContext.SaveChangesAsync();
 	}
 
 	public async Task AddOrUpdateItemAsync(Guid cartId, string barcode, Guid storeId, int quantity){

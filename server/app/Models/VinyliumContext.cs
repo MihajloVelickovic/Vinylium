@@ -15,10 +15,6 @@ public class VinyliumContext: DbContext{
 	public VinyliumContext(DbContextOptions options): base(options){}
 
 	protected override void OnModelCreating(ModelBuilder builder){
-		builder.Entity<User>()
-			.HasMany(p => p.Cart)
-			.WithMany();
-		
 		builder.Entity<Token>()
 			.HasOne(u => u.User)
 			.WithMany();
@@ -56,6 +52,17 @@ public class VinyliumContext: DbContext{
 			.HasMany(c => c.Items)
 			.WithOne()
 			.HasForeignKey(i => i.CartId);
+
+		builder.Entity<Cart>()
+			.HasOne<User>()
+			.WithMany()
+			.HasForeignKey(c => c.UserId)
+			.IsRequired(false)
+			.OnDelete(DeleteBehavior.Cascade);
+
+		builder.Entity<Cart>()
+			.HasIndex(c => c.UserId)
+			.IsUnique();
 
 		builder.Entity<CartItem>()
 			.HasOne<Product>()

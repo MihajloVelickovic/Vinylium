@@ -14,6 +14,4 @@ public class User{
 	public required bool Admin{ get; set; }
 
 	public int TokenVersion{ get; set; }
-
-	public ICollection<Product> Cart{ get; } = [];
 }

@@ -1,7 +1,8 @@
 import {createContext, useContext, useEffect, useState} from "react";
-import client from "../api/Client.ts";
+import authClient from "../api/AuthClient.ts";
 import Cart from "../models/Cart.ts";
 import {useToast} from "./ToastContext.tsx";
+import {useAuth} from "./AuthContext.tsx";
 import {apiError} from "../helpers/apiError.ts";
 
 type CartContextData = {
@@ -13,15 +14,46 @@ type CartContextData = {
     refreshCart: () => Promise<void>;
 }
 
+type MergeToast = {
+    text: string;
+    kind: "success" | "info";
+}
+
 const CartContext = createContext<CartContextData>({} as CartContextData);
+
+const mergeToast = (result: any): MergeToast | null => {
+    const merged: number = result?.mergedItems ?? 0;
+    const capped: string[] = result?.capped ?? [];
+    const dropped: string[] = result?.dropped ?? [];
+
+    if (merged === 0 && capped.length === 0 && dropped.length === 0)
+        return null;
+
+    const parts: string[] = [];
+
+    if (merged > 0)
+        parts.push(`Merged ${merged} ${merged === 1 ? "item" : "items"} from your guest cart`);
+
+    if (capped.length > 0)
+        parts.push(`limited to available stock: ${capped.join(", ")}`);
+
+    if (dropped.length > 0)
+        parts.push(`out of stock and removed: ${dropped.join(", ")}`);
+
+    return {
+        text: parts.join(" — "),
+        kind: capped.length > 0 || dropped.length > 0 ? "info" : "success"
+    };
+};
 
 export const CartProvider = ({children}) => {
     const [cart, setCart] = useState<Cart | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const {notify} = useToast();
+    const {token} = useAuth();
 
-    const fetchCart = async (cartId: string) => {
-        await client.get(`/Cart/${cartId}`)
+    const fetchGuestCart = async (cartId: string) => {
+        await authClient.get(`/Cart/${cartId}`)
             .then(res => setCart(new Cart(res.data.data)))
             .catch(() => {
                 localStorage.removeItem("cartId");
@@ -29,25 +61,66 @@ export const CartProvider = ({children}) => {
             });
     }
 
+    const fetchMyCart = async () => {
+        await authClient.get("/Cart/Mine")
+            .then(res => setCart(res.data.data ? new Cart(res.data.data) : null))
+            .catch(() => setCart(null));
+    }
+
+    const mergeGuestCart = async (guestCartId: string) => {
+        await authClient.post("/Cart/Merge", {guestCartId})
+            .then(res => {
+                const result = res.data.data;
+                localStorage.removeItem("cartId");
+                setCart(result?.cart ? new Cart(result.cart) : null);
+
+                const toast = mergeToast(result);
+                if (toast)
+                    notify(toast.text, toast.kind);
+            })
+            .catch(async e => {
+                notify(apiError(e, "Could not merge your guest cart"), "error");
+                await fetchMyCart();
+            });
+    }
+
     useEffect(() => {
-        const cartId = localStorage.getItem("cartId");
-        if (!cartId) {
-            setLoading(false);
+        const sync = async () => {
+            const guestCartId = localStorage.getItem("cartId");
+
+            if (!token) {
+                if (guestCartId)
+                    await fetchGuestCart(guestCartId);
+                else
+                    setCart(null);
+                return;
+            }
+
+            if (guestCartId)
+                await mergeGuestCart(guestCartId);
+            else
+                await fetchMyCart();
+        }
+
+        sync().finally(() => setLoading(false));
+    }, [token]);
+
+    const refreshCart = async () => {
+        if (token) {
+            await fetchMyCart();
             return;
         }
 
-        fetchCart(cartId).finally(() => setLoading(false));
-    }, []);
-
-    const refreshCart = async () => {
         if (!cart)
             return;
-        await fetchCart(cart.id);
+
+        await fetchGuestCart(cart.id);
     }
 
     const persist = (updated: Cart) => {
         setCart(updated);
-        localStorage.setItem("cartId", updated.id);
+        if (!token)
+            localStorage.setItem("cartId", updated.id);
     }
 
     const applyCartResponse = (data: any) => {
@@ -58,7 +131,7 @@ export const CartProvider = ({children}) => {
     }
 
     const addItem = async (barcode: string, storeId: string, quantity: number = 1) => {
-        await client.post("/Cart/AddItem", {
+        await authClient.post("/Cart/AddItem", {
             cartId: cart?.id ?? null,
             storeId,
             barcode,
@@ -75,7 +148,7 @@ export const CartProvider = ({children}) => {
 
     const updateQuantity = async (barcode: string, storeId: string, quantity: number) => {
         if (!cart) return;
-        await client.put("/Cart/UpdateItem", {
+        await authClient.put("/Cart/UpdateItem", {
             cartId: cart.id,
             storeId,
             barcode,
@@ -89,7 +162,7 @@ export const CartProvider = ({children}) => {
 
         const removed = cart.items.find(i => i.barcode === barcode && i.storeId === storeId);
 
-        await client.delete(`/Cart/RemoveItem/${cart.id}/${storeId}/${barcode}`)
+        await authClient.delete(`/Cart/RemoveItem/${cart.id}/${storeId}/${barcode}`)
             .then(res => {
                 applyCartResponse(res.data.data);
                 notify(removed ? `Removed ${removed.name} from cart` : "Removed from cart", "info");

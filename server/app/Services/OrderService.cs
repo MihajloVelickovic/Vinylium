@@ -31,7 +31,7 @@ public class OrderService: IOrderService{
 	}
 
 	public async Task<Order> CheckoutAsync(CheckoutReq req, Guid? userId){
-		var cart = await _cartService.GetCartAsync(req.CartId) ??
+		var cart = await _cartService.GetCartAsync(req.CartId, userId) ??
 		           throw new Exception("Cart not found");
 
 		if(cart.Items.Count == 0)
