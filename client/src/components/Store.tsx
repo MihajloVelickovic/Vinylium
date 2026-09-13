@@ -14,7 +14,7 @@ const Store = () => {
             <Filters searchRef={searchRef} params={{filters, setFilters, change, setChange}}>
                 <ProductFilterFields params={{filters, setFilters, change, setChange}}/>
             </Filters>
-            <div className="products">
+            <div className="products" data-testid="product-grid">
                 {
                     products.map((product) => {
                         return <ProductCard product={product}/>

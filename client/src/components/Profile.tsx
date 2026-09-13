@@ -127,18 +127,18 @@ export const Profile = () => {
     }
 
     return (
-        <div className="profile">
-            <button className="button-main" onClick={logout}>Logout</button>
-            <button className="button-main"
+        <div className="profile" data-testid="profile-page">
+            <button className="button-main" data-testid="profile-logout" onClick={logout}>Logout</button>
+            <button className="button-main" data-testid="profile-edit-toggle"
                     onClick={() => openMode(mode === "none" ? "menu" : "none")}>
                 {mode === "none" ? "Edit" : "Cancel"}
             </button>
 
             {mode === "menu" &&
                 <div className="edit-menu">
-                    <button className="button-main" type="button"
+                    <button className="button-main" data-testid="profile-change-email" type="button"
                             onClick={() => openMode("email")}>Change Email</button>
-                    <button className="button-main" type="button"
+                    <button className="button-main" data-testid="profile-change-password" type="button"
                             onClick={() => openMode("password")}>Change Password</button>
                 </div>
             }
@@ -147,13 +147,13 @@ export const Profile = () => {
                 <div className="edit-form">
                     <h2>Change Email</h2>
                     <Field label="New Email:" value={email} onChange={setEmail}
-                           placeholder="you@example.com"/>
+                           testId="profile-new-email" placeholder="you@example.com"/>
                     <Field label="Password:" value={password} onChange={setPassword}
-                           type="password" placeholder="Current password"/>
+                           testId="profile-current-password" type="password" placeholder="Current password"/>
                     <div className="edit-form-buttons">
                         <button className="button-main" type="button"
                                 onClick={() => openMode("menu")}>Back</button>
-                        <button className="button-main" type="button"
+                        <button className="button-main" data-testid="profile-save" type="button"
                                 disabled={busy} onClick={changeEmail}>
                             {busy ? "Saving…" : "Save Email"}
                         </button>
@@ -165,13 +165,13 @@ export const Profile = () => {
                 <div className="edit-form">
                     <h2>Change Password</h2>
                     <Field label="Current Password:" value={password} onChange={setPassword}
-                           type="password" placeholder="Current password"/>
+                           testId="profile-current-password" type="password" placeholder="Current password"/>
                     <Field label="New Password:" value={newPassword} onChange={setNewPassword}
-                           type="password" placeholder="At least 8 characters"/>
+                           testId="profile-new-password" type="password" placeholder="At least 8 characters"/>
                     <div className="edit-form-buttons">
                         <button className="button-main" type="button"
                                 onClick={() => openMode("menu")}>Back</button>
-                        <button className="button-main" type="button"
+                        <button className="button-main" data-testid="profile-save" type="button"
                                 disabled={busy} onClick={changePassword}>
                             {busy ? "Saving…" : "Save Password"}
                         </button>
@@ -179,20 +179,20 @@ export const Profile = () => {
                 </div>
             }
 
-            {error && <p className="error">{error}</p>}
+            {error && <p className="error" data-testid="profile-error">{error}</p>}
 
-            <div className="my-orders">
+            <div className="my-orders" data-testid="profile-orders">
                 <h2>My Orders</h2>
                 {
                     orders.length === 0 ?
-                        <p>No orders yet.</p> :
+                        <p data-testid="profile-no-orders">No orders yet.</p> :
                         orders.map(order => (
-                            <div className="order-summary" key={order.id}>
+                            <div className="order-summary" data-testid="order-summary" key={order.id}>
                                 <p>{new Date(order.createdAt).toLocaleDateString()}</p>
                                 <p>{order.items.length} item(s)</p>
                                 <p>{order.total()} RSD</p>
                                 {order.canCancel() &&
-                                    <button className="button-main" type="button"
+                                    <button className="button-main" data-testid="order-cancel" type="button"
                                             onClick={() => cancelOrder(order.id)}>Cancel</button>
                                 }
                             </div>

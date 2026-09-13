@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 export const ManageProductCard = ({product}:{product: Product}) => {
     return (
         <Link to={`/admin/manage-products/${product.barcode}`} style={{textDecoration: "none", color: "var(--text)"}}>
-            <div className="manage-product-card">
+            <div className="manage-product-card" data-testid="manage-product-card">
                 <div>
                     <img src={product.imageUrl}
                          width={200}

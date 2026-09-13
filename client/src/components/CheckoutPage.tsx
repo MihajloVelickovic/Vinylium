@@ -52,10 +52,10 @@ export const CheckoutPage = () => {
 
     if (confirmedOrder) {
         return (
-            <div className="checkout-page">
+            <div className="checkout-page" data-testid="checkout-confirmation">
                 <h1>Order Placed</h1>
                 <p>Thank you! A confirmation has been recorded for {confirmedOrder.email}.</p>
-                <p>Order #{confirmedOrder.id}</p>
+                <p data-testid="checkout-order-id">Order #{confirmedOrder.id}</p>
                 <div className="checkout-items">
                     {confirmedOrder.items.map(item => (
                         <div className="checkout-item" key={item.productBarcode + item.storeId}>
@@ -65,17 +65,17 @@ export const CheckoutPage = () => {
                         </div>
                     ))}
                 </div>
-                <p className="checkout-total">Total: {confirmedOrder.total()} RSD</p>
+                <p className="checkout-total" data-testid="checkout-total">Total: {confirmedOrder.total()} RSD</p>
             </div>
         )
     }
 
     return (
-        <div className="checkout-page">
+        <div className="checkout-page" data-testid="checkout-page">
             <h1>Checkout</h1>
             {
                 items.length === 0 ?
-                    <p>Your cart is empty.</p> :
+                    <p data-testid="checkout-empty">Your cart is empty.</p> :
                     <>
                         <div className="checkout-items">
                             {items.map(item => (
@@ -90,14 +90,14 @@ export const CheckoutPage = () => {
                                 </div>
                             ))}
                         </div>
-                        <p className="checkout-total">Total: {cart?.total() ?? 0} RSD</p>
+                        <p className="checkout-total" data-testid="checkout-total">Total: {cart?.total() ?? 0} RSD</p>
 
-                        <input type="email" placeholder="Email" required value={email}
+                        <input type="email" data-testid="checkout-email" placeholder="Email" required value={email}
                                onChange={e => setEmail(e.target.value)}/>
 
-                        {error && <p className="error">{error}</p>}
+                        {error && <p className="error" data-testid="checkout-error">{error}</p>}
 
-                        <button className="button-main" type="button" disabled={submitting || !email}
+                        <button className="button-main" data-testid="checkout-finish" type="button" disabled={submitting || !email}
                                 onClick={finish}>Finish</button>
                     </>
             }

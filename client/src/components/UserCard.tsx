@@ -64,11 +64,11 @@ export const UserCard = ({user, onUpdated, onDeleted}: UserCardProps) => {
     }
 
     return (
-        <div className="userCard">
+        <div className="userCard" data-testid="user-card">
             <div className="userInfo">
                 <div className="info">
                     <p>Username: </p>
-                    <p>{user.username}</p>
+                    <p data-testid="user-username">{user.username}</p>
                 </div>
                 <div className="info">
                     <p>Email: </p>
@@ -76,17 +76,17 @@ export const UserCard = ({user, onUpdated, onDeleted}: UserCardProps) => {
                 </div>
                 <div className="info">
                     <p>Admin Status: </p>
-                    <p>{user.admin ? "True" : "False"}</p>
+                    <p data-testid="user-admin-status">{user.admin ? "True" : "False"}</p>
                 </div>
             </div>
             <div className="buttons">
-                <button className="button" type="button"
+                <button className="button" data-testid="user-toggle-admin" type="button"
                         disabled={busy || blockedDemote}
                         title={blockedDemote ? "You cannot revoke your own admin status" : undefined}
                         onClick={handleToggleAdmin}>
                     {user.admin ? "Revoke Admin" : "Make Admin"}
                 </button>
-                <button className="button delete" type="button"
+                <button className="button delete" data-testid="user-delete" type="button"
                         disabled={busy}
                         onClick={handleDelete}>
                     Delete

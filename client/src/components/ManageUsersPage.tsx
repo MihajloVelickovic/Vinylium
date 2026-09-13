@@ -29,7 +29,7 @@ export const ManageUsersPage = () => {
                     <h2 className="manage-users-message manage-users-error">{error}</h2> :
                 users.length === 0 ?
                     <h2 className="manage-users-message">No users found.</h2> :
-                    <div className="users">
+                    <div className="users" data-testid="manage-user-grid">
                         {
                             users.map(user => {
                                 return <UserCard key={user.id} user={user}
