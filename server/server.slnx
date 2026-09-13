@@ -3,4 +3,5 @@
     <Project Path="tests/Vinylium.UnitTests/Vinylium.UnitTests.csproj" />
   </Folder>
   <Project Path="app/app.csproj" />
+  <Project Path="app.E2ETest/app.E2ETest.csproj" />
 </Solution>

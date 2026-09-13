@@ -1,6 +1,5 @@
 import "../styles/AlbumCard.css";
-/* the card deliberately borrows EditProductPage's layout so the add and edit
- * screens read as the same thing at different stages */
+
 import "../styles/EditProductPage.css";
 import PopOutCard from "./PopOutCard.tsx";
 import {useEffect, useRef, useState} from "react";
@@ -116,7 +115,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
             setStatus({
                 kind: "error",
                 message: storesFailed ?
-                         "Could not load stores — refresh and try again" :
+                         "Could not load stores - refresh and try again" :
                          "Add a store before adding products to the catalogue"
             });
             return;
@@ -175,6 +174,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                         <div className="infoField">
                             <p>Barcode: </p>
                             <input type="text" spellCheck={false}
+                                   data-testid="album-barcode"
                                    value={draft.barcode}
                                    onChange={e => setField("barcode", e.target.value)}/>
                         </div>
@@ -182,6 +182,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                         <div className="infoField">
                             <p>Catalog Number: </p>
                             <input type="text" spellCheck={false}
+                                   data-testid="album-catalog-number"
                                    value={draft.catalogNumber}
                                    onChange={e => setField("catalogNumber", e.target.value)}/>
                         </div>
@@ -189,6 +190,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                         <div className="infoField">
                             <p>Name: </p>
                             <input type="text" spellCheck={false}
+                                   data-testid="album-name"
                                    value={draft.name}
                                    onChange={e => setField("name", e.target.value)}/>
                         </div>
@@ -196,6 +198,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                         <div className="infoField">
                             <p>Artist: </p>
                             <input type="text" spellCheck={false}
+                                   data-testid="album-artist"
                                    value={draft.artist}
                                    onChange={e => setField("artist", e.target.value)}/>
                         </div>
@@ -203,6 +206,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                         <div className="infoField">
                             <p>Release Date: </p>
                             <input type="text" spellCheck={false}
+                                   data-testid="album-release-date"
                                    value={draft.releaseDate}
                                    onChange={e => setField("releaseDate", e.target.value)}/>
                         </div>
@@ -214,7 +218,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                             {/* ?? "" keeps the input controlled from the first
                                 render, otherwise React swaps it from
                                 uncontrolled and drops the first character */}
-                            <input type="text" inputMode="decimal" placeholder="0.00"
+                            <input type="text" data-testid="album-price" inputMode="decimal" placeholder="0.00"
                                    ref={priceRef}
                                    aria-invalid={priceHint !== null}
                                    value={draft.price ?? ""}
@@ -225,6 +229,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                             {priceHint && (
                                 <div
                                     className="priceHint"
+                                    data-testid="album-price-hint"
                                     role="tooltip"
                                     onClick={() => setPriceHint(null)}>
                                     {priceHint}
@@ -285,7 +290,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                                 storeQuantities.map((s: StoreQuantityPair) => (
                                     <p key={s.store.id}>
                                         {s.store.name}
-                                        <input className="track" type="text" inputMode="numeric"
+                                        <input className="track" data-testid="album-store-quantity" type="text" inputMode="numeric"
                                                value={s.quantity.toString()}
                                                onChange={e => setQuantity(s.store.id, e.target.value)}/>
                                     </p>
@@ -296,6 +301,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
 
                 <div className="buttonsEdit">
                     <button className="buttonEdit updateEdit"
+                            data-testid="album-add"
                             type="button"
                             disabled={saving || loading || storeQuantities.length === 0}
                             title={storeQuantities.length === 0 && !loading ?
@@ -308,6 +314,7 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                     </button>
 
                     <button className="buttonEdit cancelEdit"
+                            data-testid="album-details"
                             type="button"
                             onClick={() => setIsOpen(true)}>
                         Details
@@ -315,7 +322,8 @@ export const AlbumCard = ({product, best}: { product: Product, best: boolean }) 
                 </div>
 
                 {status && (
-                    <p className={"formStatus " + (status.kind === "ok" ? "formStatusOk" : "formStatusError")}
+                    <p data-testid="album-status"
+                       className={"formStatus " + (status.kind === "ok" ? "formStatusOk" : "formStatusError")}
                        role={status.kind === "ok" ? "status" : "alert"}>
                         {status.message}
                     </p>

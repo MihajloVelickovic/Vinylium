@@ -83,32 +83,38 @@ export const AddStoreForm = () => {
     return (
         <form onSubmit={addStore} className="addStoreForm">
             <input type="text" 
+                   data-testid="store-name"
                    placeholder="Store Name" 
                    onChange={(e) => {
                        setStoreName(e.target.value);
                    }}></input>
             <input type="text" 
+                   data-testid="store-address"
                    placeholder="Address"
                    onChange={(e) => {
                        setStoreAddress(e.target.value);
                    }}></input>
             <input type="text"
+                   data-testid="store-city"
                    placeholder="City"
                    onChange={(e) => {
                        setStoreCity(e.target.value);
                    }}></input>
             <input type="text" 
+                   data-testid="store-contact"
                    placeholder="Contact Number"
                    onChange={(e)=>{
                        setStoreContact(e.target.value);
                    }}></input>
             <input type="text" 
+                   data-testid="store-opening"
                    placeholder="Opening Hours HH:MM"
                    onBlur={(e) => {
                        e.target.value = validateTime(e.target.value);
                        setStoreOpening(e.target.value);
                    }}></input>
             <input type="text" 
+                   data-testid="store-closing"
                    placeholder="Closing Hours HH:MM"
                    onBlur={(e) => {
                        e.target.value = validateTime(e.target.value);
@@ -118,15 +124,16 @@ export const AddStoreForm = () => {
                 <div className="item">
                     <p>Warehouse</p>
                     <input type="checkbox"
+                           data-testid="store-warehouse"
                            checked={warehouse}
                            onChange={(e) => {
                                setWarehouse(e.target.checked);
                            }}/>
                 </div>
             }
-            <button type="submit">Add Store</button>
-            <h1 style={{color: "indianred"}}>{error}</h1>
-            <h1 style={{color: "lightgreen"}}>{message}</h1>
+            <button type="submit" data-testid="store-submit">Add Store</button>
+            <h1 data-testid="store-error" style={{color: "indianred"}}>{error}</h1>
+            <h1 data-testid="store-message" style={{color: "lightgreen"}}>{message}</h1>
 
         </form>
     )

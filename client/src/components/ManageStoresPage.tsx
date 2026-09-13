@@ -22,7 +22,7 @@ export const ManageStoresPage = () => {
                     <h2 className="manage-stores-message manage-stores-error">{error}</h2> :
                 stores.length === 0 ?
                     <h2 className="manage-stores-message">No stores yet.</h2> :
-                    <div className="manage-stores">
+                    <div className="manage-stores" data-testid="manage-store-grid">
                         {
                             stores.map(s => {
                                 return <ManageStoreCard key={s.id} store={s}/>

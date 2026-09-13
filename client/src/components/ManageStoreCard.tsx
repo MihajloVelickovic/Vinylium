@@ -17,9 +17,9 @@ export const ManageStoreCard = ({store}: { store: Store }) => {
     return (
         <Link to={`/admin/manage-stores/${store.id}`}
               style={{textDecoration:'none', color: "var(--text)"}}>
-                <div className="manage-store-card">
+                <div className="manage-store-card" data-testid="manage-store-card">
                     <div className="storeIdentity">
-                        <h2>{store.name}</h2>
+                        <h2 data-testid="manage-store-name">{store.name}</h2>
                         <p className="storeCity">{store.city}</p>
                         <p className="storeHours">
                             {trimSeconds(store.openingHours)} - {trimSeconds(store.closingHours)}

@@ -44,7 +44,7 @@ export const ProductPage = () => {
 
     const renderProduct = (product: Product) => {
         return (
-            <div className="productPage">
+            <div className="productPage" data-testid="product-page">
                 <div className="productCombined">
 
                     <div className="background-style-prod-page" style={{
@@ -84,7 +84,7 @@ export const ProductPage = () => {
                             </div>
                             <div className="mainRightSide">
                                 <div>
-                                    <div className="title">
+                                    <div className="title" data-testid="product-title">
                                         <div>
                                             <h1>{product.artist}</h1>
                                         </div>
@@ -98,10 +98,11 @@ export const ProductPage = () => {
                                 </div>
 
                                 <div className="priceQuantityInfo">
-                                    <p className="price">{product.price} RSD</p>
+                                    <p className="price" data-testid="product-price">{product.price} RSD</p>
                                 </div>
                                 <div className="storeSelect">
-                                    <select value={selectedStoreId}
+                                    <select data-testid="product-store-select"
+                                            value={selectedStoreId}
                                             onChange={e => setSelectedStoreId(e.target.value)}>
                                         <option value="" disabled>Select a store</option>
                                         {storeQuantities.map(p => (
@@ -112,7 +113,7 @@ export const ProductPage = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <button className="add-to-cart" type="button"
+                                    <button className="add-to-cart" data-testid="product-add-to-cart" type="button"
                                             disabled={!product.inStock || !selectedStoreId || selectedQuantity === 0}
                                             onClick={() => addItem(product.barcode, selectedStoreId, 1)}>{
                                         product.inStock ?

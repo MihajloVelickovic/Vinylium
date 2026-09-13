@@ -14,7 +14,7 @@ export const ManageProductsPage = () => {
             <Filters searchRef={searchRef} params={{filters, setFilters, change, setChange}}>
                 <ProductFilterFields params={{filters, setFilters, change, setChange}}/>
             </Filters>
-            <div className="products">
+            <div className="products" data-testid="manage-product-grid">
                 {
                     products.map((product) => {
                         return <ManageProductCard product={product}/>

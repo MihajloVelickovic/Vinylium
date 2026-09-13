@@ -69,43 +69,43 @@ const EditStoreForm = ({store}: { store: Store }) => {
     }
 
     return (
-        <div className="editStoreCard">
+        <div className="editStoreCard" data-testid="edit-store-card">
             <h1 className="editStoreTitle">{store.name}</h1>
 
             <div className="editStoreFields">
-                <Field label="Name:" value={draft.name}
+                <Field label="Name:" value={draft.name} testId="edit-store-name"
                        onChange={v => setField("name", v)}/>
 
-                <Field label="Address:" value={draft.address}
+                <Field label="Address:" value={draft.address} testId="edit-store-address"
                        onChange={v => setField("address", v)}/>
 
-                <Field label="City:" value={draft.city}
+                <Field label="City:" value={draft.city} testId="edit-store-city"
                        onChange={v => setField("city", v)}/>
 
-                <Field label="Contact No.:" value={draft.contactNumber}
+                <Field label="Contact No.:" value={draft.contactNumber} testId="edit-store-contact"
                        onChange={v => setField("contactNumber", v)}
                        placeholder="+381601234567"/>
 
-                <Field label="Opens:" value={draft.openingHours}
+                <Field label="Opens:" value={draft.openingHours} testId="edit-store-opens"
                        onChange={v => setField("openingHours", v)}
                        placeholder="HH:MM"/>
 
-                <Field label="Closes:" value={draft.closingHours}
+                <Field label="Closes:" value={draft.closingHours} testId="edit-store-closes"
                        onChange={v => setField("closingHours", v)}
                        placeholder="HH:MM"/>
-                <Field label="Warehouse?:"
+                <Field label="Warehouse?:" testId="edit-store-warehouse"
                        contentEditable={false}
                        onClick={v => setField("isWarehouse", !draft.isWarehouse)}
                        onChange={()=>{}}
                        value={draft.isWarehouse ? "Yes" : "No"}/>
             </div>
 
-            {error && <p className="editStoreError">{error}</p>}
+            {error && <p className="editStoreError" data-testid="edit-store-error">{error}</p>}
 
             <div className="buttonsEdit">
-                <button className="buttonEdit cancelEdit" onClick={handleCancel}>Cancel Update</button>
-                <button className="buttonEdit updateEdit" onClick={handleUpdate} disabled={busy}>Update Store</button>
-                <button className="buttonEdit deleteEdit" onClick={handleDelete} disabled={busy}>Delete Store</button>
+                <button className="buttonEdit cancelEdit" data-testid="edit-store-cancel" onClick={handleCancel}>Cancel Update</button>
+                <button className="buttonEdit updateEdit" data-testid="edit-store-update" onClick={handleUpdate} disabled={busy}>Update Store</button>
+                <button className="buttonEdit deleteEdit" data-testid="edit-store-delete" onClick={handleDelete} disabled={busy}>Delete Store</button>
             </div>
         </div>
     )

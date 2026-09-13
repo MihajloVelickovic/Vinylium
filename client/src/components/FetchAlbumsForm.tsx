@@ -55,30 +55,31 @@ export const FetchAlbumsForm = () => {
                 <div className={"formAndBest" + (browsing ? " browsing" : "")}>
                     <form onSubmit={handleSubmit} className="form">
                             <input type="text"
+                                   data-testid="fetch-code"
                                    value={code}
                                    placeholder="Code"
                                    onChange={(f) => setCode(f.target.value)}/>
-                            <button className="fetchButton" type="submit">Fetch</button>
+                            <button className="fetchButton" data-testid="fetch-submit" type="submit">Fetch</button>
                         
                     </form>
                     {results.length > 0 ?
                         <div className={"mainMatch" + (browsing ? " hidden" : "")}>
-                            <h2>{selected === 0 ? "Top match" : `Match ${selected + 1} of ${results.length}`}</h2>
+                            <h2 data-testid="fetch-match-heading">{selected === 0 ? "Top match" : `Match ${selected + 1} of ${results.length}`}</h2>
                             <AlbumCard key={`${fetchId}-${selected}`} product={results[selected]} best={selected === 0}/>
-                            {results.length > 1 && <button className="altButton" onClick={()=>setBrowsing(true)}>
+                            {results.length > 1 && <button className="altButton" data-testid="fetch-see-others" onClick={()=>setBrowsing(true)}>
                                 Not this one? See {results.length - 1} other matches
                             </button>
                             }
                         </div>
                         :
-                        <h2 className="fetchError">{error}</h2>
+                        <h2 className="fetchError" data-testid="fetch-error">{error}</h2>
                     }
                 </div>
                 {browsing &&
                     <div className="crate">
-                        <button className="backButton" onClick={()=> setBrowsing(false)}>←Back</button>
+                        <button className="backButton" data-testid="fetch-back" onClick={()=> setBrowsing(false)}>←Back</button>
                         <h2>Other matches</h2>
-                        <div className="crateGrid">
+                        <div className="crateGrid" data-testid="fetch-crate">
                             {results
                                 .map((p: Product, i: number) => ({p, i}))
                                 .filter(({i}) => i !== selected)
