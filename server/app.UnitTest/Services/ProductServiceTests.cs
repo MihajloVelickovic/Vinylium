@@ -6,7 +6,7 @@ using app.Services;
 using Moq;
 using Newtonsoft.Json.Linq;
 
-namespace Vinylium.UnitTests.Services;
+namespace app.UnitTest.Services;
 
 [TestFixture]
 public class ProductServiceTests{

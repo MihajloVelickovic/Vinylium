@@ -1,7 +1,7 @@
 using app.Enums;
 using app.Models;
 
-namespace Vinylium.UnitTests;
+namespace app.UnitTest;
 
 public static class TestData{
 	public static Product NewProduct(string barcode = "5099969944123", decimal? price = 19.99m, bool inStock = true){

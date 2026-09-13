@@ -4,7 +4,7 @@ using app.Requests;
 using app.Services;
 using Moq;
 
-namespace Vinylium.UnitTests.Services;
+namespace app.UnitTest.Services;
 
 [TestFixture]
 public class StoreServiceTests{

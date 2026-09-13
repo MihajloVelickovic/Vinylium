@@ -3,7 +3,7 @@ using app.Repositories;
 using app.Services;
 using Moq;
 
-namespace Vinylium.UnitTests.Services;
+namespace app.UnitTest.Services;
 
 [TestFixture]
 public class CartServiceTests{

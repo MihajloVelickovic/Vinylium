@@ -5,7 +5,7 @@ using app.Services;
 using Moq;
 using BC = BCrypt.Net.BCrypt;
 
-namespace Vinylium.UnitTests.Services;
+namespace app.UnitTest.Services;
 
 [TestFixture]
 public class UserServiceTests{
