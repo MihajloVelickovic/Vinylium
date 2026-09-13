@@ -43,9 +43,10 @@ export const ToastProvider = ({children}: { children: ReactNode }) => {
     return (
         <ToastContext value={{notify, dismiss}}>
             {children}
-            <div className="toast-stack" role="status" aria-live="polite">
+            <div className="toast-stack" data-testid="toast-stack" role="status" aria-live="polite">
                 {toasts.map(t => (
                     <button className={`toast toast-${t.kind}`}
+                            data-testid="toast"
                             key={t.id}
                             type="button"
                             title="Dismiss"

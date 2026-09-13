@@ -3,7 +3,7 @@ import Product from "../models/Product";
 export const ProductFilterFields = ({params}) => {
     return (
         <>
-            <select onChange={(t) => {
+            <select data-testid="filter-type" onChange={(t) => {
                 console.log(t.target.selectedIndex)
                 params.setFilters({...params.filters, type: t.target.selectedIndex <= 0 ? null : t.target.selectedIndex-1})
                 params.setChange(!params.change)
@@ -16,12 +16,12 @@ export const ProductFilterFields = ({params}) => {
                     })
                 }
             </select>
-            <input placeholder="Price from" type="number"
+            <input data-testid="filter-price-low" placeholder="Price from" type="number"
             onInput={(e) => {
                 params.setFilters({...params.filters, priceLow: e.currentTarget.value})
                 params.setChange(!params.change)
             }}></input>
-            <input placeholder="Price to" type="number"
+            <input data-testid="filter-price-high" placeholder="Price to" type="number"
             onInput={(e) => {
                 params.setFilters({...params.filters, priceHigh: e.currentTarget.value})
                 params.setChange(!params.change)

@@ -12,7 +12,7 @@ export const Filters = ({searchRef, params, children}) => {
                 }}
                     >
                     <label>Per Page</label>
-                    <select onChange={(t) => {
+                    <select data-testid="filters-perpage" onChange={(t) => {
                         // 0 because selectedOptions only has one item (no 'multiple' tag)
                         params.setFilters({...params.filters, items:parseInt(t.target.selectedOptions[0].innerText)})
                         params.setChange(!params.change)
@@ -24,7 +24,7 @@ export const Filters = ({searchRef, params, children}) => {
                             })
                         }
                     </select>
-                    <input ref={searchRef} type="text" placeholder="Search"
+                    <input ref={searchRef} data-testid="filters-search" type="text" placeholder="Search"
                     onInput={(e) => {
                         params.setFilters({...params.filters, search: e.currentTarget.value})
                         params.setChange(!params.change)
@@ -38,7 +38,7 @@ export const Filters = ({searchRef, params, children}) => {
             <div className="pages">
                 {
                     Array.from(Array(params.filters.pages).keys()).map((_, i) => (i+1)).map((n => {
-                    return <button onClick={() => {
+                    return <button data-testid="filters-page" onClick={() => {
                         params.setFilters({...params.filters, currentPage: n})
                         params.setChange(!params.change)
                     }} className={(params.filters.currentPage == n ? "clicked" : "")+" button-main"}>{n}</button>

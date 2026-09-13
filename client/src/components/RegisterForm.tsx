@@ -31,7 +31,8 @@ export default function RegisterForm() {
     return (
         <div className="registrationForm">
             <div>
-                <button onClick={() => {
+                <button data-testid="auth-mode-login"
+                        onClick={() => {
                     setIsRegister(false);
                     setEmail("");
                     setUsername("");
@@ -40,7 +41,8 @@ export default function RegisterForm() {
                         className="button-main loginRegButton"
                         style={{backgroundColor: isRegister ? "" : "var(--vinylium-accent)"}}>Login
                 </button>
-                <button onClick={() => {
+                <button data-testid="auth-mode-register"
+                        onClick={() => {
                     {
                         setIsRegister(true);
                         setEmail("");
@@ -55,6 +57,7 @@ export default function RegisterForm() {
             <form onSubmit={isRegister ? handleRegister : handleLogin}>
                 <div>
                     <input
+                        data-testid="auth-identifier"
                         type={isRegister ? "email" : "text"}
                         placeholder={isRegister ? "Email" : "Email or Username"}
                         value={email}
@@ -63,6 +66,7 @@ export default function RegisterForm() {
                 </div>
                 {isRegister ? <div>
                     <input
+                        data-testid="auth-username"
                         type="text"
                         placeholder="Username"
                         value={username}
@@ -71,15 +75,16 @@ export default function RegisterForm() {
                 </div> : null}
                 <div>
                     <input
+                        data-testid="auth-password"
                         type="password"
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-                <button type="submit" className="button-main submitButton">{isRegister ? "Register" : "Login"}</button>
-                <h1 style={{color: "indianred"}}>{error}</h1>          
-                <h1 style={{color: "lightgreen"}}>{message}</h1>
+                <button type="submit" data-testid="auth-submit" className="button-main submitButton">{isRegister ? "Register" : "Login"}</button>
+                <h1 data-testid="auth-error" style={{color: "indianred"}}>{error}</h1>          
+                <h1 data-testid="auth-message" style={{color: "lightgreen"}}>{message}</h1>
 
             </form>
         </div>

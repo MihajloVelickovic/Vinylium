@@ -200,7 +200,7 @@ export const EditProductPage = () => {
                         </div>
                         <div className="infoField priceRow">
                             <p>Price: </p>
-                            <input type="text" inputMode="decimal" placeholder="0.00"
+                            <input type="text" data-testid="edit-product-price" inputMode="decimal" placeholder="0.00"
                                    ref={priceRef}
                                    aria-invalid={priceHint !== null}
                                    value={product.price ?? ""}
@@ -285,19 +285,21 @@ export const EditProductPage = () => {
                     </div>
                 </div>
                 <div className="buttonsEdit">
-                    <button className="buttonEdit cancelEdit" onClick={handleCancel}>Cancel Update</button>
+                    <button className="buttonEdit cancelEdit" data-testid="edit-product-cancel" onClick={handleCancel}>Cancel Update</button>
                     <button className="buttonEdit updateEdit"
+                            data-testid="edit-product-update"
                             disabled={saving || !availability || availability.length === 0}
                             onClick={handleUpdate}>
                         {saving ? "Updating…" : "Update Product"}
                     </button>
-                    <button className="buttonEdit deleteEdit" disabled={saving} onClick={handleDelete}>
+                    <button className="buttonEdit deleteEdit" data-testid="edit-product-delete" disabled={saving} onClick={handleDelete}>
                         Delete Product
                     </button>
                 </div>
 
                 {status && (
-                    <p className={"formStatus " + (status.kind === "ok" ? "formStatusOk" : "formStatusError")}
+                    <p data-testid="edit-product-status"
+                       className={"formStatus " + (status.kind === "ok" ? "formStatusOk" : "formStatusError")}
                        role="alert">
                         {status.message}
                     </p>

@@ -489,3 +489,7 @@ $RECYCLE.BIN/
 
 # Frontend build output
 dist/
+
+# Playwright E2E artifacts
+server/app.E2ETest/Videos/
+server/app.E2ETest/Screenshots/

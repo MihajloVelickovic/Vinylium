@@ -1,6 +1,6 @@
 export const UserFilterFields = ({params}) => {
     return (
-        <select onChange={(t) => {
+        <select data-testid="filter-role" onChange={(t) => {
             const idx = t.target.selectedIndex;
             params.setFilters({...params.filters, admin: idx <= 0 ? null : idx === 1})
             params.setChange(!params.change)

@@ -2,6 +2,7 @@ import {createContext, type Dispatch, type SetStateAction, useContext, useEffect
 import {useNavigate} from "react-router-dom";
 import authClient from "../api/AuthClient";
 import client from "../api/Client.ts";
+import {apiError} from "../helpers/apiError.ts";
 
 type AuthContextData = {
     username: string | null;
@@ -87,7 +88,7 @@ export const AuthProvider = ({children}) => {
                 navigate("/")
             }, 1000);
         })
-        .catch(e => setError(e.response?.data ?? e.message));
+        .catch(e => setError(apiError(e, "Registration failed")));
     }
     
     const login = async (emailOrUsername: string, password: string) => {
@@ -103,7 +104,7 @@ export const AuthProvider = ({children}) => {
             setMessage("Successful login");
             setTimeout(() => navigate("/"), 1000);
         }).catch(e => {
-            setError(e.response?.data ?? e.message)
+            setError(apiError(e, "Login failed"))
         });
 
     }
