@@ -22,7 +22,9 @@ services:
       - ASPNETCORE_HTTP_PORTS=1738
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       - DOTNET_CLI_TELEMETRY_OPTOUT=1
-    env_file: ./server/.env
+    env_file:
+      - ./server/.env
+      - ./server/db.env
     image: vinylium-server
     build:
       context: ./server
