@@ -6,7 +6,7 @@ services:
       - "5432:5432"
     restart: always
     shm_size: 128mb
-    env_file: ./server/db.env
+    env_file: ./server/.env
     volumes:
       - pgdata:/var/lib/postgresql/
     
@@ -22,9 +22,10 @@ services:
       - ASPNETCORE_HTTP_PORTS=1738
       - DOTNET_USE_POLLING_FILE_WATCHER=1
       - DOTNET_CLI_TELEMETRY_OPTOUT=1
+      - POSTGRES_HOST=vinylium.database
+      - REDIS_HOST=vinylium.cache
     env_file:
       - ./server/.env
-      - ./server/db.env
     image: vinylium-server
     build:
       context: ./server

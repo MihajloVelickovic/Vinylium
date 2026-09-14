@@ -14,7 +14,6 @@ public class Program{
 	public static void Main(string[] args){
 		var builder = WebApplication.CreateBuilder(args);
 		DotEnv.LoadFromFile("../.env");
-		DotEnv.LoadFromFile("../db.env");
 		/* checks for discogs api key and secret
 		 * still works if they're not set, just with a
 		 * smaller rate limit
@@ -25,7 +24,7 @@ public class Program{
 
 		builder.Services.AddControllers();
 
-		var connectionString = $"Host={DotEnv.Get("POSTGRES_HOST")};Database={DotEnv.Get("POSTGRES_DB")};" +
+		var connectionString = $"Host={DotEnv.Get("POSTGRES_HOST")};Port={DotEnv.Get("POSTGRES_PORT")};Database={DotEnv.Get("POSTGRES_DB")};" +
 		                       $"User Id={DotEnv.Get("POSTGRES_USER")};Password={DotEnv.Get("POSTGRES_PASSWORD")};";
 
 		builder.Services.AddDbContext<VinyliumContext>(options =>
@@ -33,7 +32,7 @@ public class Program{
 		);
 
 		builder.Services.AddStackExchangeRedisCache(options => {
-			options.Configuration = DotEnv.Get("REDIS_CS");
+			options.Configuration = $"{DotEnv.Get("REDIS_HOST")}:{DotEnv.Get("REDIS_PORT")}";
 		});
 		
 		builder.Services.AddScoped<IUserService, UserService>();

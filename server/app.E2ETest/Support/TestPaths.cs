@@ -26,19 +26,18 @@ public static class TestPaths{
 
 	public static void LoadEnvironment(){
 		DotEnv.LoadFromFile(Path.Combine(RepositoryRoot, "server", ".env"));
-		DotEnv.LoadFromFile(Path.Combine(RepositoryRoot, "server", "db.env"));
 	}
 
 	public static string PostgresConnectionString(){
 		LoadEnvironment();
 
-		return $"Host={DotEnv.Get("POSTGRES_HOST")};Database={DotEnv.Get("POSTGRES_DB")};" +
+		return $"Host={DotEnv.Get("POSTGRES_HOST")};Port={DotEnv.Get("POSTGRES_PORT")};Database={DotEnv.Get("POSTGRES_DB")};" +
 		       $"Username={DotEnv.Get("POSTGRES_USER")};Password={DotEnv.Get("POSTGRES_PASSWORD")};";
 	}
 
 	public static string RedisConnectionString(){
 		LoadEnvironment();
 
-		return $"{DotEnv.Get("REDIS_CS") ?? "localhost:6379"},allowAdmin=true";
+		return $"{DotEnv.Get("REDIS_HOST")}:{DotEnv.Get("REDIS_PORT")},allowAdmin=true";
 	}
 }
